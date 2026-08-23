@@ -1,0 +1,24 @@
+{
+  "_default": {
+    "title": "SIZE & SPECS",
+    "height": "≈ — cm",
+    "length": "≈ — cm",
+    "badges": ["AGE 3+", "DURABLE", "GIFT READY", "FUN"],
+    "detail_crop": [0.30, 0.55, 0.90, 1.0],
+    "detail_label": "CLOSER LOOK"
+  },
+  "SCOOTER-LED-PINK": {
+    "height": "≈ 66 cm",
+    "length": "≈ 56 cm",
+    "badges": ["AGE 3+", "MAX 50 KG", "FOLDABLE", "LED WHEELS"],
+    "detail_crop": [0.30, 0.62, 0.85, 1.0],
+    "detail_label": "LIGHT-UP WHEELS"
+  },
+  "SCOOTER-LED-BEIGE": {
+    "height": "≈ 66 cm",
+    "length": "≈ 56 cm",
+    "badges": ["AGE 3+", "MAX 50 KG", "FOLDABLE", "LED WHEELS"],
+    "detail_crop": [0.30, 0.60, 0.90, 1.0],
+    "detail_label": "LIGHT-UP DECK & WHEELS"
+  }
+}

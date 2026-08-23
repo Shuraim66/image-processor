@@ -1,0 +1,16 @@
+.venv/
+__pycache__/
+*.pyc
+# generated outputs (regenerate anytime)
+output/
+gallery_out/
+hero/
+gallery_out/**
+# large / machine-specific model files
+*.onnx
+# Draw Things: fetched by setup_drawthings.sh (third-party, not vendored)
+generated/
+dt_certs/
+# scenes you export from Draw Things (per machine)
+backgrounds/
+woocommerce_import.csv
