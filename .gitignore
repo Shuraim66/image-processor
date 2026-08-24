@@ -14,3 +14,4 @@ dt_certs/
 # scenes you export from Draw Things (per machine)
 backgrounds/
 woocommerce_import.csv
+input/**/product.json
