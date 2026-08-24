@@ -75,11 +75,15 @@ _rembg_session = None
 # Image processing
 # --------------------------------------------------------------------------- #
 def _get_rembg_session():
-    """Create the rembg session once and reuse it (model load is expensive)."""
+    """Create the rembg session once and reuse it (model load is expensive).
+
+    Honors REMBG_MODEL env (e.g. 'u2netp' for a tiny, low-memory model on small
+    RAM machines; default is rembg's built-in model, higher quality/heavier)."""
     global _rembg_session
     if _rembg_session is None:
         from rembg import new_session
-        _rembg_session = new_session()
+        model = os.environ.get("REMBG_MODEL")
+        _rembg_session = new_session(model) if model else new_session()
     return _rembg_session
 
 

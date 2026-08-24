@@ -153,10 +153,20 @@ class DrawThingsProvider(BackgroundProvider):
         img = None
         for resp in self._stub.GenerateImage(request):   # server streams results
             for gi in getattr(resp, "generatedImages", []) or []:
-                if getattr(gi, "data", None):
-                    img = Image.open(io.BytesIO(gi.data)).convert("RGBA")
+                data = getattr(gi, "data", None)
+                if not data:
+                    continue
+                w = getattr(gi, "width", 0) or 0
+                h = getattr(gi, "height", 0) or 0
+                ch = getattr(gi, "channels", 0) or 0
+                if w and h and ch:                 # raw pixel buffer (DT's format)
+                    mode = "RGBA" if ch == 4 else "RGB"
+                    img = Image.frombytes(mode, (w, h), bytes(data)).convert("RGBA")
+                else:                              # fallback: encoded PNG/JPEG bytes
+                    img = Image.open(io.BytesIO(bytes(data))).convert("RGBA")
         if img is None:
-            raise RuntimeError("no image in Draw Things response")
+            raise RuntimeError("no image in Draw Things response "
+                               "(often an out-of-memory failure on the server)")
         return img.resize((W, W), Image.LANCZOS)
 
 
