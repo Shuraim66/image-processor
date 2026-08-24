@@ -243,25 +243,44 @@ def draw_feature_icon(base, cx, cy, r, kind, circle_color):
 # --------------------------------------------------------------------------- #
 # Compose
 # --------------------------------------------------------------------------- #
+def _fit_font(fontname, lines, max_w, start_px, min_px=16):
+    """Largest font (<= start_px) whose widest line fits within max_w px."""
+    if isinstance(lines, str):
+        lines = [lines]
+    px = start_px
+    while px > min_px:
+        f = _font(fontname, px)
+        if max(f.getbbox(ln)[2] for ln in lines) <= max_w:
+            return f
+        px -= 2
+    return _font(fontname, min_px)
+
+
 def overlay_hero_text(bg, content, theme):
     """Draw the headline banners, sticker wordmark, feature bullets, corner
-    ribbon, side callout and brand logo onto an existing composed image."""
-    # --- headline banners (top-left) ---
-    f_ban = _font("Montserrat-ExtraBold.otf", 46)
+    ribbon, side callout and brand logo. All text auto-shrinks to its zone so it
+    never overlaps the product (centred right) or runs off-canvas."""
     x0, y0 = int(W * 0.05), int(W * 0.06)
-    w1, h1 = banner(bg, (x0, y0), content["tagline_top"], f_ban, theme["primary"], angle=0)
-    banner(bg, (x0 + 12 * SS, y0 + h1 + 8 * SS), content["tagline_sub"], f_ban,
-           theme["accent"], angle=0)
+    LEFT_W = int(W * 0.42)          # text column keeps clear of the product
 
-    # --- sticker wordmark ---
-    f_word = _font("Montserrat-Black.otf", 150)
-    sticker_text(bg, (x0, int(W * 0.22)), content["name"], f_word,
+    # --- headline banners (top-left) ---
+    f_ban = _fit_font("Montserrat-ExtraBold.otf",
+                      [content["tagline_top"], content["tagline_sub"]],
+                      LEFT_W - 60 * SS, 46, 24)
+    w1, h1 = banner(bg, (x0, y0), content["tagline_top"], f_ban, theme["primary"])
+    banner(bg, (x0 + 12 * SS, y0 + h1 + 8 * SS), content["tagline_sub"], f_ban,
+           theme["accent"])
+
+    # --- sticker wordmark (fit to the left column) ---
+    f_word = _fit_font("Montserrat-Black.otf", content["name"], LEFT_W, 150, 54)
+    sticker_text(bg, (x0, int(W * 0.24)), content["name"], f_word,
                  fill=theme["primary"], outline=(255, 255, 255), outline_w=12)
 
     # --- feature bullets (left column) ---
-    f_feat = _font("Montserrat-Bold.otf", 34)
-    fy = int(W * 0.46)
     r = int(W * 0.032)
+    label_x = x0 + 2 * r + 22 * SS
+    label_max = LEFT_W - (label_x - x0)         # width left for the label text
+    fy = int(W * 0.46)
     gap = int(W * 0.105)
     for i, feat in enumerate(content["features"][:4]):
         cyc = fy + i * gap
@@ -269,21 +288,24 @@ def overlay_hero_text(bg, content, theme):
         draw_feature_icon(bg, x0 + r, cyc, r, feat["icon"], col)
         d = ImageDraw.Draw(bg)
         lines = feat["label"].split("\n")
-        ty = cyc - (len(lines) * 40 * SS) // 2
+        ff = _fit_font("Montserrat-Bold.otf", lines, label_max, 34, 18)
+        lh = ff.getmetrics(); lh = lh[0] + lh[1]
+        ty = cyc - (len(lines) * lh) // 2
         for ln in lines:
-            d.text((x0 + 2 * r + 22 * SS, ty), ln, font=f_feat, fill=theme["ink"])
-            ty += 42 * SS
+            d.text((label_x, ty), ln, font=ff, fill=theme["ink"])
+            ty += lh
 
     # --- corner ribbon (bottom-left) ---
-    f_rib = _font("Montserrat-ExtraBold.otf", 36)
-    banner(bg, (int(W * 0.03), int(W * 0.87)), content["ribbon"], f_rib,
+    f_rib = _fit_font("Montserrat-ExtraBold.otf", content["ribbon"], int(W * 0.5), 36, 20)
+    banner(bg, (int(W * 0.03), int(W * 0.88)), content["ribbon"], f_rib,
            theme["accent"], radius=22, angle=6)
 
-    # --- side callout burst (right, anchored so it never clips) ---
+    # --- side callout burst (right, anchored + fitted so it never clips) ---
     if content.get("callout"):
-        f_call = _font("Montserrat-ExtraBold.otf", 34)
-        banner(bg, (int(W * 0.965), int(W * 0.30)),
-               content["callout"].replace(" & ", "\n& "), f_call,
+        call = content["callout"].replace(" & ", "\n& ")
+        f_call = _fit_font("Montserrat-ExtraBold.otf", call.split("\n"),
+                           int(W * 0.30), 34, 20)
+        banner(bg, (int(W * 0.965), int(W * 0.30)), call, f_call,
                theme["primary"], radius=22, angle=-8, anchor="right")
 
     # --- brand logo (top-right) ---
