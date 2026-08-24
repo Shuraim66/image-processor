@@ -74,13 +74,15 @@ def make_cutout(raw_path, sku):
     return out
 
 
-def build_for_sku(sku, specs, provider, use_ollama, reanalyze, ext="webp"):
+def build_for_sku(sku, specs, provider, use_ollama, reanalyze, ext="webp",
+                  per_product=False, cache_bg=False, vlm=False):
     folder = os.path.join(pp.INPUT_DIR, sku)
     raws = pp.raw_images_in(folder)
     if not raws:
         print(f"  ! no images for {sku}", file=sys.stderr)
         return []
-    out_dir = os.path.join(OUTPUT_ROOT, sku)
+    # step 5: per-product folder becomes the record (products/<SKU>/output style)
+    out_dir = os.path.join(folder, "output") if per_product else os.path.join(OUTPUT_ROOT, sku)
     os.makedirs(out_dir, exist_ok=True)
 
     primary_raw = raws[0]
@@ -106,6 +108,9 @@ def build_for_sku(sku, specs, provider, use_ollama, reanalyze, ext="webp"):
     for slot, variant, prompt in [("03_lifestyle_a", "A", prompts[0]),
                                   ("04_lifestyle_b", "B", prompts[1])]:
         scene = provider.scene(sku, cutout, primary_raw, variant, prompt)
+        if cache_bg:   # step 7: save the scene so a later --bg-provider folder run reuses it
+            os.makedirs("backgrounds", exist_ok=True)
+            scene.convert("RGB").save(os.path.join("backgrounds", f"{sku}_{variant.lower()}.{ext}"))
         made.append(mh.render_hero(cutout, cont, op(slot), background=scene))
 
     # 05 — feature infographic
@@ -122,8 +127,13 @@ def build_for_sku(sku, specs, provider, use_ollama, reanalyze, ext="webp"):
     made.append(gallery.render_detail(primary_raw, tuple(sp["detail_crop"]),
                 sp.get("detail_label", "CLOSER LOOK"), cont, op("07_detail")))
 
-    # quality report (deterministic checks)
+    # quality report (deterministic checks + optional VLM semantic check)
     report = quality.check_gallery(sku, out_dir, mh.SIZE, cutout_path=cutout)
+    if vlm:   # step 6: does the lifestyle image faithfully show the real product?
+        v = quality.vlm_check(primary_raw, op("03_lifestyle_a"))
+        report["vlm_check"] = v
+        if v["status"] == "review":
+            report["status"] = "review"
     with open(os.path.join(out_dir, "quality-report.json"), "w", encoding="utf-8") as f:
         json.dump(report, f, indent=2)
     print(f"  -> quality: {report['status']}")
@@ -141,6 +151,12 @@ def main():
                     help="re-run the analyzer even if product.json already exists")
     ap.add_argument("--format", choices=["webp", "jpg"], default="webp",
                     help="output image format (default webp)")
+    ap.add_argument("--per-product", action="store_true",
+                    help="write images + report into input/<SKU>/output/ (folder = record)")
+    ap.add_argument("--cache-backgrounds", action="store_true",
+                    help="save generated scenes to backgrounds/ for reuse (memory sequencing)")
+    ap.add_argument("--vlm-check", action="store_true",
+                    help="VLM check that the lifestyle image matches the real product")
     args = ap.parse_args()
 
     specs = load_specs()
@@ -153,7 +169,10 @@ def main():
         try:
             for p in build_for_sku(sku, specs, provider,
                                    use_ollama=not args.no_ollama,
-                                   reanalyze=args.reanalyze, ext=args.format):
+                                   reanalyze=args.reanalyze, ext=args.format,
+                                   per_product=args.per_product,
+                                   cache_bg=args.cache_backgrounds,
+                                   vlm=args.vlm_check):
                 print(f"  -> {p}")
         except Exception as exc:  # keep the batch alive
             print(f"  ! {sku} failed: {exc}", file=sys.stderr)

@@ -55,8 +55,8 @@ def body_html(p: "analyzer.ProductProfile"):
     return "".join(parts)
 
 
-def images_for(sku, base_url):
-    d = os.path.join(GALLERY_DIR, sku)
+def images_for(sku, base_url, per_product=False):
+    d = os.path.join(PRODUCTS_DIR, sku, "output") if per_product else os.path.join(GALLERY_DIR, sku)
     if not os.path.isdir(d):
         return []
     files = sorted(f for f in os.listdir(d) if f.lower().endswith(IMG_EXTS))
@@ -69,7 +69,7 @@ def rows_for(sku, folder, args):
         print(f"  ! {sku}: no product.json (run analyzer.py first)", file=sys.stderr)
         return []
     p = analyzer.ProductProfile.model_validate_json(open(prof_path, encoding="utf-8").read())
-    imgs = images_for(sku, args.image_base_url)
+    imgs = images_for(sku, args.image_base_url, per_product=args.per_product)
     if not imgs:
         print(f"  ! {sku}: no gallery images in {GALLERY_DIR}/{sku}", file=sys.stderr)
 
@@ -118,6 +118,8 @@ def main():
     ap.add_argument("--status", choices=["draft", "active"], default="draft")
     ap.add_argument("--price", default="", help="variant price (blank = set later in Shopify)")
     ap.add_argument("--qty", type=int, default=0, help="inventory quantity")
+    ap.add_argument("--per-product", action="store_true",
+                    help="read images from input/<SKU>/output/ (matches --per-product build)")
     ap.add_argument("--image-base-url", default="",
                     help="public URL prefix for images (Shopify fetches Image Src over HTTP)")
     args = ap.parse_args()

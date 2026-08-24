@@ -77,3 +77,29 @@ def check_gallery(sku, out_dir, expect_size, cutout_path=None):
                 report["status"] = "review"
                 report["note"] = "cutout very small — background removal may have failed"
     return report
+
+
+def vlm_check(original_path, generated_path, model=None):
+    """Step 6: ask a local VLM whether the generated image faithfully shows the
+    same product as the original. Returns {status, reason}; 'skipped' if no VLM."""
+    import os
+    model = model or os.environ.get("OLLAMA_VLM", "qwen3-vl:8b")
+    try:
+        import json
+        import ollama
+        r = ollama.chat(model=model, messages=[{
+            "role": "user",
+            "content": ("Image 1 is the REAL product photo. Image 2 is a generated "
+                        "marketing image. Does image 2 show the SAME product "
+                        "accurately (same item, same colors, no distortion or "
+                        "fabricated parts)? Reply JSON {\"pass\":bool,\"reason\":str}."),
+            "images": [original_path, generated_path]}],
+            format={"type": "object",
+                    "properties": {"pass": {"type": "boolean"},
+                                   "reason": {"type": "string"}},
+                    "required": ["pass", "reason"]})
+        d = json.loads(r["message"]["content"])
+        return {"status": "pass" if d.get("pass") else "review",
+                "reason": d.get("reason", "")}
+    except Exception as exc:  # noqa: BLE001 — no ollama / model / error
+        return {"status": "skipped", "reason": str(exc)}
