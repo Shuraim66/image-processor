@@ -69,13 +69,16 @@ def check_gallery(sku, out_dir, expect_size, cutout_path=None):
     if cutout_path and os.path.exists(cutout_path):
         cut = Image.open(cutout_path)
         if cut.mode == "RGBA":
-            bbox = cut.getchannel("A").getbbox()
-            frac = (((bbox[2] - bbox[0]) * (bbox[3] - bbox[1])) /
-                    (cut.width * cut.height)) if bbox else 0.0
+            h = cut.getchannel("A").histogram()          # opaque-pixel fraction
+            opaque = sum(h[11:])
+            frac = opaque / float(sum(h)) if sum(h) else 0.0
             report["cutout_coverage"] = round(frac, 3)
-            if frac < 0.05:
+            if frac < 0.05:                              # product almost entirely removed
                 report["status"] = "review"
-                report["note"] = "cutout very small — background removal may have failed"
+                report["note"] = "cutout nearly empty — background removal may have failed"
+            elif frac > 0.97:                            # nothing removed — likely kept the bg
+                report["status"] = "review"
+                report["note"] = "cutout almost fully opaque — background may not have been removed"
     return report
 
 
