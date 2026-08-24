@@ -31,7 +31,7 @@ from PIL import Image
 import process_products as pp
 import make_hero as mh
 import gallery
-import content as content_mod
+import analyzer
 import providers
 
 OUTPUT_ROOT = "gallery_out"
@@ -48,6 +48,21 @@ def specs_for(specs, sku):
     return {**specs.get("_default", {}), **specs.get(sku, {})}
 
 
+def get_profile(sku, folder, use_ollama, reanalyze):
+    """Load input/<SKU>/product.json, or generate it via the analyzer.
+
+    Returns the content dict the templates consume (a superset of the fields
+    they read). product.json is the single source of truth for copy.
+    """
+    path = os.path.join(folder, "product.json")
+    if os.path.exists(path) and not reanalyze:
+        profile = analyzer.ProductProfile.model_validate_json(
+            open(path, encoding="utf-8").read())
+    else:
+        profile = analyzer.analyze_folder(folder, use_ollama=use_ollama)
+    return profile.model_dump()
+
+
 def make_cutout(raw_path, sku):
     """Transparent, trimmed cutout via the full rembg model (cached across SKUs)."""
     os.makedirs(CUTOUT_DIR, exist_ok=True)
@@ -58,7 +73,7 @@ def make_cutout(raw_path, sku):
     return out
 
 
-def build_for_sku(sku, specs, provider, use_gemini):
+def build_for_sku(sku, specs, provider, use_ollama, reanalyze):
     folder = os.path.join(pp.INPUT_DIR, sku)
     raws = pp.raw_images_in(folder)
     if not raws:
@@ -69,7 +84,7 @@ def build_for_sku(sku, specs, provider, use_gemini):
 
     primary_raw = raws[0]
     cutout = make_cutout(primary_raw, sku)
-    cont = content_mod.build_content(sku, primary_raw, use_gemini=use_gemini)
+    cont = get_profile(sku, folder, use_ollama, reanalyze)
     sp = specs_for(specs, sku)
     made = []
 
@@ -112,8 +127,10 @@ def main():
     ap.add_argument("--sku", help="only this SKU (default: all under input/)")
     ap.add_argument("--bg-provider", choices=["procedural", "folder", "drawthings"],
                     default="procedural", help="background engine for slots 3-4")
-    ap.add_argument("--no-gemini", action="store_true",
-                    help="skip the free Gemini copy step; use deterministic fallback")
+    ap.add_argument("--no-ollama", action="store_true",
+                    help="skip the Qwen3-VL analyzer; use deterministic fallback copy")
+    ap.add_argument("--reanalyze", action="store_true",
+                    help="re-run the analyzer even if product.json already exists")
     args = ap.parse_args()
 
     specs = load_specs()
@@ -124,7 +141,9 @@ def main():
     for i, sku in enumerate(skus, 1):
         print(f"[{i}/{len(skus)}] {sku}")
         try:
-            for p in build_for_sku(sku, specs, provider, use_gemini=not args.no_gemini):
+            for p in build_for_sku(sku, specs, provider,
+                                   use_ollama=not args.no_ollama,
+                                   reanalyze=args.reanalyze):
                 print(f"  -> {p}")
         except Exception as exc:  # keep the batch alive
             print(f"  ! {sku} failed: {exc}", file=sys.stderr)

@@ -25,10 +25,24 @@ Reads `input/<SKU>/*.jpg`, writes white-background images to `output/` and
 `woocommerce_import.csv` (SEO title + description via Gemini).
 `--dry-run` skips the API (images only, no cost).
 
-### 2. Full 7-image listing gallery
+### 2. Analyze photos → product.json (local, no API)
+```bash
+ollama pull qwen3-vl:8b          # once
+python analyzer.py --all         # multi-photo → input/<SKU>/product.json
+# no model handy? add --no-ollama for deterministic fallback copy
+```
+
+### 3. Full 7-image listing gallery (reads product.json)
 ```bash
 python gallery_pipeline.py --sku SCOOTER-LED-PINK --bg-provider procedural
-# all SKUs: drop --sku ;  no API: add --no-gemini
+# all SKUs: drop --sku ;  regenerate copy: --reanalyze ;  no model: --no-ollama
+```
+
+### 4. Shopify CSV
+```bash
+python shopify_export.py --price 29.99 --status draft \
+    --image-base-url https://your-cdn.example.com/toys/
+# writes shopify_import.csv (product row + one row per gallery image)
 ```
 Writes `gallery_out/<SKU>/01_main … 07_detail`:
 
