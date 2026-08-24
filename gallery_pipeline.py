@@ -33,6 +33,7 @@ import make_hero as mh
 import gallery
 import analyzer
 import providers
+import quality
 
 OUTPUT_ROOT = "gallery_out"
 CUTOUT_DIR = "gallery_out/_cutouts"
@@ -73,7 +74,7 @@ def make_cutout(raw_path, sku):
     return out
 
 
-def build_for_sku(sku, specs, provider, use_ollama, reanalyze):
+def build_for_sku(sku, specs, provider, use_ollama, reanalyze, ext="webp"):
     folder = os.path.join(pp.INPUT_DIR, sku)
     raws = pp.raw_images_in(folder)
     if not raws:
@@ -88,37 +89,44 @@ def build_for_sku(sku, specs, provider, use_ollama, reanalyze):
     sp = specs_for(specs, sku)
     made = []
 
-    # 01 — pure white main (no watermark; marketplace-safe)
-    p = os.path.join(out_dir, "01_main.jpg")
-    pp.process_image(primary_raw, None).save(p, quality=94); made.append(p)
+    def op(name):
+        return os.path.join(out_dir, f"{name}.{ext}")
+
+    # 01 — pure white main (no watermark; marketplace-safe), matched to gallery size
+    p = op("01_main")
+    (pp.process_image(primary_raw, None)
+       .resize((mh.SIZE, mh.SIZE), Image.LANCZOS)
+       .save(p, quality=92)); made.append(p)
 
     # 02 — branded hero (procedural bg)
-    made.append(mh.render_hero(cutout, cont, os.path.join(out_dir, "02_hero.jpg")))
+    made.append(mh.render_hero(cutout, cont, op("02_hero")))
 
     # 03/04 — lifestyle scenes (pluggable provider), real product composited on top
     prompts = cont.get("scene_prompts", []) + ["bright playroom", "sunny living room"]
     for slot, variant, prompt in [("03_lifestyle_a", "A", prompts[0]),
                                   ("04_lifestyle_b", "B", prompts[1])]:
         scene = provider.scene(sku, cutout, primary_raw, variant, prompt)
-        made.append(mh.render_hero(cutout, cont,
-                                   os.path.join(out_dir, f"{slot}.jpg"),
-                                   background=scene))
+        made.append(mh.render_hero(cutout, cont, op(slot), background=scene))
 
     # 05 — feature infographic
-    made.append(gallery.render_infographic(cutout, cont,
-                os.path.join(out_dir, "05_infographic.jpg")))
+    made.append(gallery.render_infographic(cutout, cont, op("05_infographic")))
 
     # 06 — size & age card
     made.append(gallery.render_size_card(cutout, {
         "title": sp.get("title", "SIZE & SPECS"),
         "height": sp["height"], "length": sp["length"], "badges": sp["badges"],
         "theme": cont.get("theme", {}),
-    }, os.path.join(out_dir, "06_size.jpg")))
+    }, op("06_size")))
 
     # 07 — detail close-up
     made.append(gallery.render_detail(primary_raw, tuple(sp["detail_crop"]),
-                sp.get("detail_label", "CLOSER LOOK"), cont,
-                os.path.join(out_dir, "07_detail.jpg")))
+                sp.get("detail_label", "CLOSER LOOK"), cont, op("07_detail")))
+
+    # quality report (deterministic checks)
+    report = quality.check_gallery(sku, out_dir, mh.SIZE, cutout_path=cutout)
+    with open(os.path.join(out_dir, "quality-report.json"), "w", encoding="utf-8") as f:
+        json.dump(report, f, indent=2)
+    print(f"  -> quality: {report['status']}")
     return made
 
 
@@ -131,6 +139,8 @@ def main():
                     help="skip the Qwen3-VL analyzer; use deterministic fallback copy")
     ap.add_argument("--reanalyze", action="store_true",
                     help="re-run the analyzer even if product.json already exists")
+    ap.add_argument("--format", choices=["webp", "jpg"], default="webp",
+                    help="output image format (default webp)")
     args = ap.parse_args()
 
     specs = load_specs()
@@ -143,7 +153,7 @@ def main():
         try:
             for p in build_for_sku(sku, specs, provider,
                                    use_ollama=not args.no_ollama,
-                                   reanalyze=args.reanalyze):
+                                   reanalyze=args.reanalyze, ext=args.format):
                 print(f"  -> {p}")
         except Exception as exc:  # keep the batch alive
             print(f"  ! {sku} failed: {exc}", file=sys.stderr)
