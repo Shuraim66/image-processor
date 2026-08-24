@@ -139,7 +139,8 @@ def analyze(sku: str, image_paths: List[str], use_ollama: bool = True) -> Produc
             model=OLLAMA_MODEL,
             messages=[{"role": "user", "content": PROMPT, "images": image_paths}],
             format=ProductProfile.model_json_schema(),   # structured output
-            options={"temperature": 0.4},
+            options={"temperature": 0.4,
+                     "num_ctx": int(os.environ.get("OLLAMA_NUM_CTX", "8192"))},
         )
         data = _normalize(json.loads(resp["message"]["content"]), sku)
         return ProductProfile(**data)

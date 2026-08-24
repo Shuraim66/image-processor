@@ -97,7 +97,8 @@ def vlm_check(original_path, generated_path, model=None):
             format={"type": "object",
                     "properties": {"pass": {"type": "boolean"},
                                    "reason": {"type": "string"}},
-                    "required": ["pass", "reason"]})
+                    "required": ["pass", "reason"]},
+            options={"num_ctx": int(os.environ.get("OLLAMA_NUM_CTX", "8192"))})
         d = json.loads(r["message"]["content"])
         return {"status": "pass" if d.get("pass") else "review",
                 "reason": d.get("reason", "")}
