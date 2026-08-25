@@ -22,13 +22,26 @@ and only you know what is actually in the box.
 import re
 
 # Words that turn a selling point into a warning. Deliberately narrow — a list
-# that flags "small" would reject "SMALL ENOUGH TO CARRY".
+# that flags "small" would reject "SMALL ENOUGH TO CARRY", and one that flags a
+# bare "rough" rejects "withstands rough play", which is a durability claim.
 NEGATIVE_TERMS = (
-    "noisy", "loud", "cheap", "flimsy", "fragile", "breakable", "weak",
-    "wobbly", "unstable", "poor", "low quality", "low-quality", "boring",
-    "difficult", "hard to", "slow", "uncomfortable", "rough", "sharp edges",
+    "noisy", "cheap", "flimsy", "fragile", "breakable", "weak",
+    "wobbly", "unstable", "poor quality", "low quality", "low-quality",
+    "boring", "uncomfortable", "rough edges", "sharp edges", "rough finish",
     "not durable", "thin plastic", "easily broken", "may break",
+    "hard to use", "difficult to use", "falls apart",
 )
+
+# A negative word after one of these is a promise, not a warning: "no sharp
+# edges", "withstands rough play", "hard to break". Checked in the run-up to the
+# match, which is where English puts its negation.
+NEGATION_CUES = (
+    "no", "not", "never", "without", "free from", "avoids", "avoid",
+    "resists", "resist", "withstands", "withstand", "handles", "handle",
+    "prevents", "prevent", "anti", "won't", "wont", "doesn't", "isn't",
+    "hard to", "difficult to", "protects", "protect", "against",
+)
+NEGATION_WINDOW = 34        # characters of run-up to inspect
 
 # Character, brand and personality names common in toy catalogs. Not
 # exhaustive — no list is — but it covers what actually turns up.
@@ -64,10 +77,28 @@ def _text_of(value):
     return ""
 
 
-def _hits(text, terms):
+def _negated(text, start):
+    """True when the run-up to `start` flips the term's meaning."""
+    window = text[max(0, start - NEGATION_WINDOW):start]
+    return any(re.search(rf"(?<!\w){re.escape(cue)}(?!\w)", window)
+               for cue in NEGATION_CUES)
+
+
+def _hits(text, terms, allow_negation=True):
+    """Terms present in `text`, skipping ones a negation cue turns positive.
+
+    `allow_negation=False` for trademarks: "not a Disney product" still puts the
+    mark in the listing, so the cue is irrelevant there.
+    """
     low = text.lower()
-    return sorted({t for t in terms
-                   if re.search(rf"(?<!\w){re.escape(t)}(?!\w)", low)})
+    found = set()
+    for term in terms:
+        for match in re.finditer(rf"(?<!\w){re.escape(term)}(?!\w)", low):
+            if allow_negation and _negated(low, match.start()):
+                continue
+            found.add(term)
+            break
+    return sorted(found)
 
 
 def negative_features(data):
@@ -100,7 +131,8 @@ def find_issues(data, photo_count=1):
             f"whats_included lists {len(included)} items from {photo_count} photo(s) — "
             "unverifiable without a packaging shot")
 
-    tm = _hits(" ".join(_text_of(data.get(f)) for f in _TM_FIELDS), TRADEMARK_TERMS)
+    tm = _hits(" ".join(_text_of(data.get(f)) for f in _TM_FIELDS),
+               TRADEMARK_TERMS, allow_negation=False)
     if tm:
         issues.append(f"possible trademarked names in listing copy: {', '.join(tm)}")
 

@@ -249,13 +249,19 @@ def analyze(sku: str, image_paths: List[str], use_ollama: bool = True,
         return _fallback(sku, "error")
 
 
-def analyze_folder(sku_folder: str, use_ollama: bool = True,
+def profile_path(sku_folder: str, out_dir: str = None) -> str:
+    """Where product.json lives. Generated data belongs with the output."""
+    return os.path.join(out_dir or sku_folder, "product.json")
+
+
+def analyze_folder(sku_folder: str, out_dir: str = None, use_ollama: bool = True,
                    allow_fallback: bool = False) -> ProductProfile:
     sku = os.path.basename(os.path.normpath(sku_folder))
     imgs = images_in(sku_folder)
     print(f"[{sku}] {len(imgs)} photo(s) -> {OLLAMA_MODEL if use_ollama else 'fallback'}")
     profile = analyze(sku, imgs, use_ollama=use_ollama, allow_fallback=allow_fallback)
-    out = os.path.join(sku_folder, "product.json")
+    out = profile_path(sku_folder, out_dir)
+    os.makedirs(os.path.dirname(out) or ".", exist_ok=True)
     with open(out, "w", encoding="utf-8") as f:
         f.write(profile.model_dump_json(indent=2))
     flags = f"  {len(profile.review_flags)} flag(s)" if profile.review_flags else ""
@@ -267,6 +273,8 @@ def main():
     ap = argparse.ArgumentParser(description="Analyze product photos -> product.json (local Qwen3-VL).")
     ap.add_argument("folder", nargs="?", help="a single SKU folder (e.g. input/SCOOTER-LED-PINK)")
     ap.add_argument("--all", action="store_true", help="every SKU folder under input/")
+    ap.add_argument("--out-dir", default="output", metavar="DIR",
+                    help="root for generated product.json (default output/)")
     ap.add_argument("--no-ollama", action="store_true", help="skip the model; deterministic fallback")
     ap.add_argument("--allow-fallback", action="store_true",
                     help="write placeholder copy instead of failing when analysis breaks "
@@ -284,7 +292,9 @@ def main():
     failed, fell_back = [], []
     for f in folders:
         try:
-            profile = analyze_folder(f, use_ollama=not args.no_ollama,
+            sku = os.path.basename(os.path.normpath(f))
+            profile = analyze_folder(f, out_dir=os.path.join(args.out_dir, sku),
+                                     use_ollama=not args.no_ollama,
                                      allow_fallback=args.allow_fallback)
         except AnalyzerError as exc:
             print(f"  ! {exc}", file=sys.stderr)

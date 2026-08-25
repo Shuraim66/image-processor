@@ -40,10 +40,27 @@ import scenes
 import specs as specs_mod
 import quality
 
-OUTPUT_ROOT = "gallery_out"
-CUTOUT_DIR = "gallery_out/_cutouts"
+# input/ holds only the raw photos you supply. Everything generated — images,
+# product.json, cutout cache, manifest — lives under OUTPUT_ROOT, so the input
+# tree stays exactly as you left it and the output tree is safe to delete.
+OUTPUT_ROOT = "output"
 SPECS_PATH = "specs.json"
-MANIFEST_PATH = "gallery_out/_manifest.json"
+
+
+def out_root(root=None):
+    return root or OUTPUT_ROOT
+
+
+def sku_dir(sku, root=None):
+    return os.path.join(out_root(root), sku)
+
+
+def cutout_dir(root=None):
+    return os.path.join(out_root(root), "_cutouts")
+
+
+def manifest_path(root=None):
+    return os.path.join(out_root(root), "_manifest.json")
 
 # A worker holding a rembg session peaks around this much. Measured with
 # bria-rmbg; a lighter REMBG_MODEL needs far less. It is the binding constraint
@@ -60,26 +77,28 @@ def specs_for(specs, sku):
     return specs_mod.for_sku(specs, sku)
 
 
-def get_profile(sku, folder, use_ollama, reanalyze, allow_fallback=False):
-    """Load input/<SKU>/product.json, or generate it via the analyzer.
+def get_profile(sku, folder, out_dir, use_ollama, reanalyze, allow_fallback=False):
+    """Load <out_dir>/product.json, or generate it via the analyzer.
 
-    Returns the content dict the templates consume (a superset of the fields
-    they read). product.json is the single source of truth for copy.
+    product.json is generated, so it belongs with the other output. Older runs
+    wrote it next to the photos; that location is still read as a fallback so an
+    existing catalog does not have to be re-analyzed.
     """
-    path = os.path.join(folder, "product.json")
-    if os.path.exists(path) and not reanalyze:
-        profile = analyzer.ProductProfile.model_validate_json(
-            open(path, encoding="utf-8").read())
-    else:
-        profile = analyzer.analyze_folder(folder, use_ollama=use_ollama,
-                                          allow_fallback=allow_fallback)
-    return profile.model_dump()
+    path = analyzer.profile_path(folder, out_dir)
+    legacy = os.path.join(folder, "product.json")
+    if not reanalyze:
+        for candidate in (path, legacy):
+            if os.path.exists(candidate):
+                return analyzer.ProductProfile.model_validate_json(
+                    open(candidate, encoding="utf-8").read()).model_dump()
+    return analyzer.analyze_folder(folder, out_dir=out_dir, use_ollama=use_ollama,
+                                   allow_fallback=allow_fallback).model_dump()
 
 
-def make_cutout(raw_path, sku):
+def make_cutout(raw_path, sku, root=None):
     """Transparent, trimmed cutout via the full rembg model (cached across SKUs)."""
-    os.makedirs(CUTOUT_DIR, exist_ok=True)
-    out = os.path.join(CUTOUT_DIR, f"{sku}.png")
+    os.makedirs(cutout_dir(root), exist_ok=True)
+    out = os.path.join(cutout_dir(root), f"{sku}.png")
     src = Image.open(raw_path).convert("RGBA")
     cut = pp.trim_to_content(pp.remove_background(src))
     cut.save(out)
@@ -87,20 +106,18 @@ def make_cutout(raw_path, sku):
 
 
 def build_for_sku(sku, specs, provider, use_ollama, reanalyze, ext="webp",
-                  per_product=False, cache_bg=False, vlm=False,
-                  allow_fallback=False):
+                  root=None, cache_bg=False, vlm=False, allow_fallback=False):
     folder = os.path.join(pp.INPUT_DIR, sku)
     raws = pp.raw_images_in(folder)
     if not raws:
         print(f"  ! no images for {sku}", file=sys.stderr)
         return []
-    # step 5: per-product folder becomes the record (products/<SKU>/output style)
-    out_dir = os.path.join(folder, "output") if per_product else os.path.join(OUTPUT_ROOT, sku)
+    out_dir = sku_dir(sku, root)
     os.makedirs(out_dir, exist_ok=True)
 
     primary_raw = raws[0]
-    cutout = make_cutout(primary_raw, sku)
-    cont = get_profile(sku, folder, use_ollama, reanalyze, allow_fallback)
+    cutout = make_cutout(primary_raw, sku, root)
+    cont = get_profile(sku, folder, out_dir, use_ollama, reanalyze, allow_fallback)
     # Colour the whole set from the product itself, so a pink scooter and a
     # green plant dome stop shipping in the same corporate blue and red. A theme
     # pinned in product.json wins.
@@ -176,27 +193,28 @@ def build_for_sku(sku, specs, provider, use_ollama, reanalyze, ext="webp",
     return made, report
 
 
-def load_manifest():
+def load_manifest(root=None):
     """Per-SKU record of what has been built, for --resume."""
-    if not os.path.exists(MANIFEST_PATH):
+    path = manifest_path(root)
+    if not os.path.exists(path):
         return {}
     try:
-        with open(MANIFEST_PATH, encoding="utf-8") as fh:
+        with open(path, encoding="utf-8") as fh:
             return json.load(fh).get("skus", {})
     except (json.JSONDecodeError, OSError):
-        print(f"  ! {MANIFEST_PATH} unreadable — starting a fresh manifest",
-              file=sys.stderr)
+        print(f"  ! {path} unreadable — starting a fresh manifest", file=sys.stderr)
         return {}
 
 
-def save_manifest(skus):
+def save_manifest(skus, root=None):
     """Write via a temp file so an interrupt cannot leave a truncated manifest."""
-    os.makedirs(os.path.dirname(MANIFEST_PATH), exist_ok=True)
-    tmp = MANIFEST_PATH + ".tmp"
+    path = manifest_path(root)
+    os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
+    tmp = path + ".tmp"
     with open(tmp, "w", encoding="utf-8") as fh:
         json.dump({"updated": time.strftime("%Y-%m-%dT%H:%M:%S"), "skus": skus},
                   fh, indent=2)
-    os.replace(tmp, MANIFEST_PATH)
+    os.replace(tmp, path)
 
 
 _WORKER = {}
@@ -266,8 +284,10 @@ def main():
                     help="re-run the analyzer even if product.json already exists")
     ap.add_argument("--format", choices=["webp", "jpg"], default="webp",
                     help="output image format (default webp)")
-    ap.add_argument("--per-product", action="store_true",
-                    help="write images + report into input/<SKU>/output/ (folder = record)")
+    ap.add_argument("--out-dir", default=OUTPUT_ROOT, metavar="DIR",
+                    help=f"where generated images, product.json, cutouts and the "
+                         f"manifest are written (default {OUTPUT_ROOT}/). "
+                         f"input/ is never written to")
     ap.add_argument("--cache-backgrounds", action="store_true",
                     help="save generated scenes to backgrounds/ for reuse (memory sequencing)")
     ap.add_argument("--vlm-check", action="store_true",
@@ -285,7 +305,7 @@ def main():
     specs = load_specs()
     skus = [args.sku] if args.sku else pp.find_sku_folders(pp.INPUT_DIR)
 
-    manifest = load_manifest()
+    manifest = load_manifest(args.out_dir)
     if args.resume:
         before = len(skus)
         skus = [s for s in skus if manifest.get(s, {}).get("status") != "ok"]
@@ -295,7 +315,7 @@ def main():
         return 0
 
     opts = dict(use_ollama=not args.no_ollama, reanalyze=args.reanalyze,
-                ext=args.format, per_product=args.per_product,
+                ext=args.format, root=args.out_dir,
                 cache_bg=args.cache_backgrounds, vlm=args.vlm_check,
                 allow_fallback=args.allow_fallback)
 
@@ -305,7 +325,8 @@ def main():
         # Workers must not queue up on one Ollama instance, so analysis has to
         # be done already. Say which SKUs are missing rather than failing later.
         missing = [s for s in skus
-                   if not os.path.exists(os.path.join(pp.INPUT_DIR, s, "product.json"))]
+                   if not os.path.exists(analyzer.profile_path(
+                       os.path.join(pp.INPUT_DIR, s), sku_dir(s, args.out_dir)))]
         if missing or args.reanalyze:
             print(f"--jobs {jobs} needs every SKU analyzed first "
                   f"({len(missing)} missing). Run:\n"
@@ -314,7 +335,7 @@ def main():
             return 1
 
     print(f"Background provider: {args.bg_provider} | {len(skus)} SKU(s) | "
-          f"jobs={jobs} ({threads} thread(s) each)")
+          f"jobs={jobs} ({threads} thread(s) each) | out: {args.out_dir}/")
     started = time.time()
     done = 0
 
@@ -331,7 +352,7 @@ def main():
         for result in results:
             done += 1
             manifest[result["sku"]] = result
-            save_manifest(manifest)          # after every SKU, so a kill is cheap
+            save_manifest(manifest, args.out_dir)   # after every SKU: a kill is cheap
             if result["status"] == "ok":
                 ok += 1
                 note = f" ({result['quality']})" if result["quality"] != "pass" else ""
@@ -351,7 +372,7 @@ def main():
     elapsed = time.time() - started
     per = elapsed / max(1, done)
     print(f"\n{ok} built, {failed} failed in {elapsed / 60:.1f} min "
-          f"({per:.0f}s/SKU). Manifest: {MANIFEST_PATH}")
+          f"({per:.0f}s/SKU). Output: {args.out_dir}/")
     review = [s for s, r in manifest.items() if r.get("quality") == "review"]
     if review:
         print(f"Needs review: {', '.join(sorted(review))}", file=sys.stderr)

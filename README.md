@@ -28,7 +28,7 @@ Reads `input/<SKU>/*.jpg`, writes white-background images to `output/` and
 ### 2. Analyze photos → product.json (local, no API)
 ```bash
 ollama pull qwen3-vl:8b          # once
-python analyzer.py --all         # multi-photo → input/<SKU>/product.json
+python analyzer.py --all         # multi-photo → output/<SKU>/product.json
 # no model handy? add --no-ollama for deterministic fallback copy
 ```
 
@@ -55,8 +55,12 @@ python gallery_pipeline.py --sku SCOOTER-LED-PINK
 # all SKUs: drop --sku ;  regenerate copy: --reanalyze ;  no model: --no-ollama
 # analysis failures skip the SKU; pass --allow-fallback for placeholder copy
 python gallery_pipeline.py --resume        # skip what the manifest says is built
+python gallery_pipeline.py --out-dir /Volumes/Drive/toys   # anywhere you like
 ```
-Progress is recorded in `gallery_out/_manifest.json` after every product, so an
+**`input/` is only ever read.** Every generated file — images, `product.json`,
+cutout cache, manifest — goes under `output/`, so the folder you drop photos
+into stays exactly as you left it and the output tree is safe to delete.
+Progress is recorded in `output/_manifest.json` after every product, so an
 interrupted batch resumes instead of restarting. Anything the copy checks or the
 image checks flag is listed at the end under "Needs review".
 Colours come from the product's own pixels and the hero picks its composition
@@ -65,10 +69,13 @@ side-by-side. Pin `theme` in `product.json` to override the palette.
 
 ### 6. Shopify CSV
 ```bash
-python shopify_export.py --price 29.99 --status draft \
-    --image-base-url https://your-cdn.example.com/toys/
+python shopify_export.py --price 29.99 --status draft
 # writes shopify_import.csv (product row + one row per gallery image)
+# products the copy checks flagged are held back; --include-flagged overrides
 ```
+Image Src holds local `output/` paths, which is fine for reviewing the CSV.
+Shopify's own importer fetches images over HTTP, so add
+`--image-base-url https://your-cdn.example.com/toys/` once they are hosted.
 Writes `gallery_out/<SKU>/01_main … 07_detail`:
 
 | # | slot | source |
@@ -93,7 +100,9 @@ Writes `gallery_out/<SKU>/01_main … 07_detail`:
 
 ## Layout
 ```
-input/<SKU>/*.jpg     raw product photos (one folder per SKU)
+input/<SKU>/*.jpg     raw product photos you supply — never written to
+output/<SKU>/         generated: 01_main … 07_detail, product.json, quality-report.json
+output/_cutouts/      cutout cache      output/_manifest.json   build record
 logo.png              brand watermark / badge (transparent)
 specs.json            per-SKU size-card data (dimensions, badges)
 assets/fonts/         bundled faces + licences (OS-portable rendering)

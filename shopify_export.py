@@ -28,7 +28,7 @@ import analyzer
 import copyguard
 
 PRODUCTS_DIR = "input"
-GALLERY_DIR = "gallery_out"
+GALLERY_DIR = "output"
 IMG_EXTS = (".jpg", ".jpeg", ".png", ".webp")
 
 COLUMNS = [
@@ -80,8 +80,8 @@ def body_html(p: "analyzer.ProductProfile"):
     return "".join(parts)
 
 
-def images_for(sku, base_url, per_product=False):
-    d = os.path.join(PRODUCTS_DIR, sku, "output") if per_product else os.path.join(GALLERY_DIR, sku)
+def images_for(sku, base_url, out_dir=GALLERY_DIR):
+    d = os.path.join(out_dir, sku)
     if not os.path.isdir(d):
         return []
     files = sorted(f for f in os.listdir(d) if f.lower().endswith(IMG_EXTS))
@@ -89,10 +89,13 @@ def images_for(sku, base_url, per_product=False):
 
 
 def rows_for(sku, folder, args, seen_handles):
-    prof_path = os.path.join(folder, "product.json")
+    prof_path = analyzer.profile_path(folder, os.path.join(args.out_dir, sku))
     if not os.path.exists(prof_path):
-        print(f"  ! {sku}: no product.json (run analyzer.py first)", file=sys.stderr)
-        return []
+        legacy = os.path.join(folder, "product.json")      # pre-output-root runs
+        if not os.path.exists(legacy):
+            print(f"  ! {sku}: no product.json (run analyzer.py first)", file=sys.stderr)
+            return []
+        prof_path = legacy
     p = analyzer.ProductProfile.model_validate_json(open(prof_path, encoding="utf-8").read())
 
     # The CSV is the last gate before a listing is live, so a product the copy
@@ -101,9 +104,9 @@ def rows_for(sku, folder, args, seen_handles):
         print(f"  ! {sku}: held back — {'; '.join(p.review_flags)}", file=sys.stderr)
         return []
 
-    imgs = images_for(sku, args.image_base_url, per_product=args.per_product)
+    imgs = images_for(sku, args.image_base_url, args.out_dir)
     if not imgs:
-        print(f"  ! {sku}: no gallery images in {GALLERY_DIR}/{sku}", file=sys.stderr)
+        print(f"  ! {sku}: no images in {args.out_dir}/{sku}", file=sys.stderr)
 
     handle = handle_for(p, sku, args.handle_from, seen_handles)
     base = {c: "" for c in COLUMNS}
@@ -150,8 +153,8 @@ def main():
     ap.add_argument("--status", choices=["draft", "active"], default="draft")
     ap.add_argument("--price", default="", help="variant price (blank = set later in Shopify)")
     ap.add_argument("--qty", type=int, default=0, help="inventory quantity")
-    ap.add_argument("--per-product", action="store_true",
-                    help="read images from input/<SKU>/output/ (matches --per-product build)")
+    ap.add_argument("--out-dir", default=GALLERY_DIR, metavar="DIR",
+                    help=f"where the pipeline wrote its output (default {GALLERY_DIR}/)")
     ap.add_argument("--handle-from", choices=["title", "sku"], default="title",
                     help="source for the product URL (default title: SEO-friendly "
                          "and free of SKU codes)")
@@ -187,8 +190,9 @@ def main():
         print(f"{held} product(s) held back. Fix the flags in product.json, or pass "
               f"--include-flagged to export anyway.", file=sys.stderr)
     if not args.image_base_url:
-        print("Note: Image Src is relative — set --image-base-url to public URLs "
-              "before importing to Shopify.", file=sys.stderr)
+        print("Note: Image Src holds local paths. Fine for review; Shopify's "
+              "importer needs public URLs, so set --image-base-url when you get "
+              "to that.", file=sys.stderr)
     return 0
 
 
