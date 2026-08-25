@@ -52,8 +52,11 @@ def check_image(path, is_main):
     return checks
 
 
-def check_gallery(sku, out_dir, cutout_path=None, copy_source=""):
-    report = {"sku": sku, "status": "pass", "copy_source": copy_source, "images": []}
+def check_gallery(sku, out_dir, cutout_path=None, copy_source="", copy_flags=()):
+    report = {"sku": sku, "status": "pass", "copy_source": copy_source,
+              "copy_flags": list(copy_flags), "images": []}
+    if copy_flags:
+        report["status"] = "review"
     if copy_source.startswith("fallback"):
         report["status"] = "review"
         report["note"] = f"copy is placeholder text ({copy_source}) — not written by the model"

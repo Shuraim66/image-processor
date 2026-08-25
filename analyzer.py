@@ -17,9 +17,12 @@ import argparse
 import json
 import os
 import sys
+from functools import lru_cache
 from typing import Any, Dict, List
 
 from pydantic import BaseModel, Field, ValidationError
+
+import copyguard
 
 OLLAMA_MODEL = os.environ.get("OLLAMA_VLM", "qwen3-vl:8b")
 INPUT_DIR = "input"
@@ -57,6 +60,7 @@ class ProductProfile(BaseModel):
     scene_prompts: List[str]        # 2 lifestyle background prompts
     theme: Dict[str, Any] = Field(default_factory=dict)   # pin colours here to
     # override the palette derived from the product's own pixels (see palette.py)
+    review_flags: List[str] = Field(default_factory=list)  # copyguard findings
 
 
 PROMPT = (
@@ -76,7 +80,9 @@ PROMPT = (
     "'icon' chosen ONLY from: shield (safety/sturdy), arrows (adjustable/size), "
     "wheel (movement/smooth), smiley (fun/age). Every label must be a POSITIVE "
     "selling point, never a drawback.\n"
-    "- whats_included: what's in the box (from the packaging if visible).\n"
+    "- whats_included: ONLY what you can actually see or read on visible "
+    "packaging. If no packaging or box contents are visible, return exactly one "
+    "item naming the product itself. Never guess at accessories.\n"
     "- seo_title (<=60 chars), meta_description (<=155 chars), tags (8-13 RELEVANT keywords only, no unrelated terms), "
     "alt_text (one descriptive sentence).\n"
     "- info_title: heading for a features graphic (e.g. 'WHY KIDS LOVE IT').\n"
@@ -85,7 +91,10 @@ PROMPT = (
     "- scene_prompts: 2 lifestyle BACKGROUND descriptions (a bright, relevant "
     "room/place for THIS product, NO people, NO text), each ending with "
     "'product photography, soft daylight, square, empty foreground surface'.\n"
-    "Base everything only on what is visible. Do not invent a brand name."
+    "Base everything only on what is visible. Do not invent a brand name, and "
+    "do NOT reproduce a character, franchise, club or celebrity name even if you "
+    "can see one — describe the product generically (a 'superhero plush', a "
+    "'footballer figure') so the listing does not trade on someone else's mark."
 )
 
 
@@ -93,6 +102,7 @@ class AnalyzerError(RuntimeError):
     """Analysis could not be completed and fallback copy was not permitted."""
 
 
+@lru_cache(maxsize=8)
 def resolve_model(name: str = OLLAMA_MODEL) -> str:
     """Return an Ollama tag that is actually installed, or raise.
 
@@ -169,7 +179,7 @@ def _request_schema() -> dict:
     """The schema the model is asked to fill — bookkeeping fields removed so it
     does not waste tokens inventing an sku or a source it cannot know."""
     schema = ProductProfile.model_json_schema()
-    for field in ("sku", "source", "theme"):
+    for field in ("sku", "source", "theme", "review_flags"):
         schema.get("properties", {}).pop(field, None)
         if field in schema.get("required", []):
             schema["required"].remove(field)
@@ -204,7 +214,28 @@ def analyze(sku: str, image_paths: List[str], use_ollama: bool = True,
                      "num_ctx": int(os.environ.get("OLLAMA_NUM_CTX", "8192"))},
         )
         data = _normalize(json.loads(resp["message"]["content"]), sku)
+
+        # A drawback described as a feature gets printed onto two images, so it
+        # is worth one corrective round-trip before falling back to repair.
+        if copyguard.negative_features(data):
+            retry = ollama.chat(
+                model=model,
+                messages=[{"role": "user",
+                           "content": PROMPT + "\n\n" + copyguard.RETRY_NOTE,
+                           "images": image_paths}],
+                format=_request_schema(),
+                options={"temperature": 0.2,
+                         "num_ctx": int(os.environ.get("OLLAMA_NUM_CTX", "8192"))},
+            )
+            data = _normalize(json.loads(retry["message"]["content"]), sku)
+
+        for note in copyguard.repair_features(data):
+            print(f"  [analyzer] {sku}: {note}", file=sys.stderr)
+
         data["source"] = model
+        data["review_flags"] = copyguard.find_issues(data, len(image_paths))
+        for flag in data["review_flags"]:
+            print(f"  [analyzer] {sku}: {flag}", file=sys.stderr)
         return ProductProfile(**data)
     except AnalyzerError:
         if not allow_fallback:
@@ -227,7 +258,8 @@ def analyze_folder(sku_folder: str, use_ollama: bool = True,
     out = os.path.join(sku_folder, "product.json")
     with open(out, "w", encoding="utf-8") as f:
         f.write(profile.model_dump_json(indent=2))
-    print(f"  -> {out}  [{profile.source}]")
+    flags = f"  {len(profile.review_flags)} flag(s)" if profile.review_flags else ""
+    print(f"  -> {out}  [{profile.source}]{flags}")
     return profile
 
 

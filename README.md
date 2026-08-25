@@ -45,7 +45,11 @@ have them — see `DRAWTHINGS_SETUP.md`.
 python gallery_pipeline.py --sku SCOOTER-LED-PINK
 # all SKUs: drop --sku ;  regenerate copy: --reanalyze ;  no model: --no-ollama
 # analysis failures skip the SKU; pass --allow-fallback for placeholder copy
+python gallery_pipeline.py --resume        # skip what the manifest says is built
 ```
+Progress is recorded in `gallery_out/_manifest.json` after every product, so an
+interrupted batch resumes instead of restarting. Anything the copy checks or the
+image checks flag is listed at the end under "Needs review".
 Colours come from the product's own pixels and the hero picks its composition
 from the product's shape — wide products get the poster layout, tall ones the
 side-by-side. Pin `theme` in `product.json` to override the palette.
@@ -93,8 +97,23 @@ analyzer.py           local VLM -> product.json
 palette.py            per-product colours from the cutout
 scenes.py             scene categories + placeholder plates
 typeset.py            per-category display typography
+copyguard.py          drawback / invention / trademark checks on copy
 providers.py          background providers
 ```
+
+## Running a large batch
+
+At roughly 55 s of analysis plus 30 s of rendering per product, a thousand
+products is a ~24 h job. Two things matter more than parallelism:
+
+- **Analyze first, render second.** `python analyzer.py --all`, then
+  `gallery_pipeline.py`. Ollama and rembg both want the whole machine; running
+  them at once just makes both slower.
+- **Watch memory, not cores.** A rembg worker peaks around 3.5 GB, so `--jobs`
+  is capped by RAM, not by core count — on 18 GB, more than two or three workers
+  swaps and the batch gets *slower* than serial. `--jobs` clamps itself and says
+  so. `REMBG_MODEL=birefnet-general-lite` (or `u2netp`) cuts the per-worker
+  footprint and is the real lever on a small machine.
 
 ## Notes
 - Fonts are bundled, so rendering works on macOS/Linux without system fonts.

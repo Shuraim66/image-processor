@@ -22,8 +22,10 @@ Background provider for slots 3-4 is pluggable:
 
 import argparse
 import json
+import multiprocessing
 import os
 import sys
+import time
 import traceback
 
 from PIL import Image
@@ -40,6 +42,13 @@ import quality
 OUTPUT_ROOT = "gallery_out"
 CUTOUT_DIR = "gallery_out/_cutouts"
 SPECS_PATH = "specs.json"
+MANIFEST_PATH = "gallery_out/_manifest.json"
+
+# A worker holding a rembg session peaks around this much. Measured with
+# bria-rmbg; a lighter REMBG_MODEL needs far less. It is the binding constraint
+# on --jobs: four workers want ~13 GB, which is why parallel rendering runs
+# SLOWER than serial on an 18 GB machine once it starts swapping.
+WORKER_PEAK_GB = 3.5
 
 
 def load_specs():
@@ -143,7 +152,8 @@ def build_for_sku(sku, specs, provider, use_ollama, reanalyze, ext="webp",
 
     # quality report (deterministic checks + optional VLM semantic check)
     report = quality.check_gallery(sku, out_dir, cutout_path=cutout,
-                                   copy_source=cont.get("source", ""))
+                                   copy_source=cont.get("source", ""),
+                                   copy_flags=cont.get("review_flags", []))
     if vlm:   # step 6: does the lifestyle image faithfully show the real product?
         v = quality.vlm_check(primary_raw, op("03_lifestyle_a"))
         report["vlm_check"] = v
@@ -152,7 +162,84 @@ def build_for_sku(sku, specs, provider, use_ollama, reanalyze, ext="webp",
     with open(os.path.join(out_dir, "quality-report.json"), "w", encoding="utf-8") as f:
         json.dump(report, f, indent=2)
     print(f"  -> quality: {report['status']}")
-    return made
+    return made, report
+
+
+def load_manifest():
+    """Per-SKU record of what has been built, for --resume."""
+    if not os.path.exists(MANIFEST_PATH):
+        return {}
+    try:
+        with open(MANIFEST_PATH, encoding="utf-8") as fh:
+            return json.load(fh).get("skus", {})
+    except (json.JSONDecodeError, OSError):
+        print(f"  ! {MANIFEST_PATH} unreadable — starting a fresh manifest",
+              file=sys.stderr)
+        return {}
+
+
+def save_manifest(skus):
+    """Write via a temp file so an interrupt cannot leave a truncated manifest."""
+    os.makedirs(os.path.dirname(MANIFEST_PATH), exist_ok=True)
+    tmp = MANIFEST_PATH + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as fh:
+        json.dump({"updated": time.strftime("%Y-%m-%dT%H:%M:%S"), "skus": skus},
+                  fh, indent=2)
+    os.replace(tmp, MANIFEST_PATH)
+
+
+_WORKER = {}
+
+
+def total_ram_gb():
+    try:
+        return os.sysconf("SC_PAGE_SIZE") * os.sysconf("SC_PHYS_PAGES") / 1024 ** 3
+    except (ValueError, OSError, AttributeError):
+        return 0.0
+
+
+def safe_jobs(requested):
+    """Clamp --jobs to what memory allows, and say so.
+
+    onnxruntime already saturates every core inside one process, so extra
+    workers buy throughput only while they all fit in RAM. Past that the machine
+    swaps and the whole batch gets slower, not faster.
+    """
+    ram = total_ram_gb()
+    if not ram:
+        return requested
+    budget = max(1, int((ram * 0.6) // WORKER_PEAK_GB))
+    if requested > budget:
+        print(f"  ! --jobs {requested} needs ~{requested * WORKER_PEAK_GB:.0f} GB; "
+              f"this machine has {ram:.0f} GB. Using {budget} to stay out of swap "
+              f"(a lighter REMBG_MODEL raises this).", file=sys.stderr)
+        return budget
+    return requested
+
+
+def _init_worker(provider_name, specs, opts, threads):
+    """Each process builds its own provider and rembg session once."""
+    # Pin thread counts before the ONNX session is created, or N workers each
+    # spawn one thread per core and fight each other for the same cores.
+    for var in ("OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS"):
+        os.environ[var] = str(threads)
+    _WORKER["provider"] = providers.get_provider(provider_name)
+    _WORKER["specs"] = specs
+    _WORKER["opts"] = opts
+
+
+def _build_one(sku):
+    try:
+        made, report = build_for_sku(sku, _WORKER["specs"], _WORKER["provider"],
+                                     **_WORKER["opts"])
+        return {"sku": sku, "status": "ok", "images": len(made),
+                "quality": report["status"], "flags": report.get("copy_flags", []),
+                "finished": time.strftime("%Y-%m-%dT%H:%M:%S")}
+    except Exception as exc:  # keep the batch alive; the manifest records why
+        traceback.print_exc()
+        return {"sku": sku, "status": "failed",
+                "error": f"{type(exc).__name__}: {exc}",
+                "finished": time.strftime("%Y-%m-%dT%H:%M:%S")}
 
 
 def main():
@@ -176,29 +263,88 @@ def main():
                     help="VLM check that the lifestyle image matches the real product")
     ap.add_argument("--allow-fallback", action="store_true",
                     help="use placeholder copy when analysis fails instead of skipping the SKU")
+    ap.add_argument("--jobs", type=int, default=1, metavar="N",
+                    help="render N products in parallel. Rendering is CPU-bound and "
+                         "scales well; analysis is not, so every SKU must already "
+                         "have a product.json when N > 1")
+    ap.add_argument("--resume", action="store_true",
+                    help="skip SKUs the manifest already records as built")
     args = ap.parse_args()
 
     specs = load_specs()
-    provider = providers.get_provider(args.bg_provider)
-    print(f"Background provider: {provider.name}")
-
     skus = [args.sku] if args.sku else pp.find_sku_folders(pp.INPUT_DIR)
-    for i, sku in enumerate(skus, 1):
-        print(f"[{i}/{len(skus)}] {sku}")
-        try:
-            for p in build_for_sku(sku, specs, provider,
-                                   use_ollama=not args.no_ollama,
-                                   reanalyze=args.reanalyze, ext=args.format,
-                                   per_product=args.per_product,
-                                   cache_bg=args.cache_backgrounds,
-                                   vlm=args.vlm_check,
-                                   allow_fallback=args.allow_fallback):
-                print(f"  -> {p}")
-        except Exception as exc:  # keep the batch alive
-            print(f"  ! {sku} failed: {exc}", file=sys.stderr)
-            traceback.print_exc()
-    print(f"\nDone. Galleries in '{OUTPUT_ROOT}/<SKU>/'.")
-    return 0
+
+    manifest = load_manifest()
+    if args.resume:
+        before = len(skus)
+        skus = [s for s in skus if manifest.get(s, {}).get("status") != "ok"]
+        print(f"Resuming: {before - len(skus)} already built, {len(skus)} to go")
+    if not skus:
+        print("Nothing to do.")
+        return 0
+
+    opts = dict(use_ollama=not args.no_ollama, reanalyze=args.reanalyze,
+                ext=args.format, per_product=args.per_product,
+                cache_bg=args.cache_backgrounds, vlm=args.vlm_check,
+                allow_fallback=args.allow_fallback)
+
+    jobs = safe_jobs(max(1, args.jobs))
+    threads = max(1, (os.cpu_count() or 4) // jobs)
+    if jobs > 1:
+        # Workers must not queue up on one Ollama instance, so analysis has to
+        # be done already. Say which SKUs are missing rather than failing later.
+        missing = [s for s in skus
+                   if not os.path.exists(os.path.join(pp.INPUT_DIR, s, "product.json"))]
+        if missing or args.reanalyze:
+            print(f"--jobs {jobs} needs every SKU analyzed first "
+                  f"({len(missing)} missing). Run:\n"
+                  f"    python analyzer.py --all\n"
+                  f"then re-run with --jobs.", file=sys.stderr)
+            return 1
+
+    print(f"Background provider: {args.bg_provider} | {len(skus)} SKU(s) | "
+          f"jobs={jobs} ({threads} thread(s) each)")
+    started = time.time()
+    done = 0
+
+    if jobs == 1:
+        _init_worker(args.bg_provider, specs, opts, os.cpu_count() or 4)
+        results = (_build_one(s) for s in skus)
+    else:
+        pool = multiprocessing.Pool(jobs, initializer=_init_worker,
+                                    initargs=(args.bg_provider, specs, opts, threads))
+        results = pool.imap_unordered(_build_one, skus)
+
+    ok = failed = 0
+    try:
+        for result in results:
+            done += 1
+            manifest[result["sku"]] = result
+            save_manifest(manifest)          # after every SKU, so a kill is cheap
+            if result["status"] == "ok":
+                ok += 1
+                note = f" ({result['quality']})" if result["quality"] != "pass" else ""
+                print(f"[{done}/{len(skus)}] {result['sku']}: {result['images']} images{note}")
+            else:
+                failed += 1
+                print(f"[{done}/{len(skus)}] {result['sku']}: FAILED — {result['error']}",
+                      file=sys.stderr)
+    except KeyboardInterrupt:
+        print("\nInterrupted — manifest saved; re-run with --resume.", file=sys.stderr)
+        return 130
+    finally:
+        if jobs > 1:
+            pool.terminate()
+            pool.join()
+
+    elapsed = time.time() - started
+    per = elapsed / max(1, done)
+    print(f"\n{ok} built, {failed} failed in {elapsed / 60:.1f} min "
+          f"({per:.0f}s/SKU). Manifest: {MANIFEST_PATH}")
+    review = [s for s, r in manifest.items() if r.get("quality") == "review"]
+    if review:
+        print(f"Needs review: {', '.join(sorted(review))}", file=sys.stderr)
+    return 1 if failed else 0
 
 
 if __name__ == "__main__":
