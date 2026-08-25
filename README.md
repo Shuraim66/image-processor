@@ -32,13 +32,25 @@ python analyzer.py --all         # multi-photo → input/<SKU>/product.json
 # no model handy? add --no-ollama for deterministic fallback copy
 ```
 
-### 3. Full 7-image listing gallery (reads product.json)
+### 3. Background plates (once)
 ```bash
-python gallery_pipeline.py --sku SCOOTER-LED-PINK --bg-provider procedural
-# all SKUs: drop --sku ;  regenerate copy: --reanalyze ;  no model: --no-ollama
+python scenes.py            # placeholder plates -> backgrounds/<category>_a|b.jpg
+python scenes.py --list     # which category each SKU resolves to
 ```
+Replace these with real Draw Things scenes under the same filenames when you
+have them — see `DRAWTHINGS_SETUP.md`.
 
-### 4. Shopify CSV
+### 4. Full 7-image listing gallery (reads product.json)
+```bash
+python gallery_pipeline.py --sku SCOOTER-LED-PINK
+# all SKUs: drop --sku ;  regenerate copy: --reanalyze ;  no model: --no-ollama
+# analysis failures skip the SKU; pass --allow-fallback for placeholder copy
+```
+Colours come from the product's own pixels and the hero picks its composition
+from the product's shape — wide products get the poster layout, tall ones the
+side-by-side. Pin `theme` in `product.json` to override the palette.
+
+### 5. Shopify CSV
 ```bash
 python shopify_export.py --price 29.99 --status draft \
     --image-base-url https://your-cdn.example.com/toys/
@@ -58,9 +70,9 @@ Writes `gallery_out/<SKU>/01_main … 07_detail`:
 ## Background providers (slots 3 & 4)
 
 `--bg-provider`:
-- **procedural** (default) — soft studio background, free, offline.
-- **folder** — reads scenes you exported from Draw Things into
-  `backgrounds/<SKU>_a.*` / `_b.*` (missing → procedural).
+- **folder** (default) — reads plates from `backgrounds/`, most specific first:
+  `<SKU>_a.*`, then `<category>_a.*`, then `_a.*` (missing → procedural).
+- **procedural** — soft studio gradient, free, offline.
 - **drawthings** — generates scenes automatically via a local Draw Things gRPC
   server. See `DRAWTHINGS_SETUP.md`; run `bash setup_drawthings.sh` first
   (fetches the official gRPC stubs — no protoc). Falls back to procedural if the
@@ -72,10 +84,15 @@ input/<SKU>/*.jpg     raw product photos (one folder per SKU)
 logo.png              brand watermark / badge (transparent)
 specs.json            per-SKU size-card data (dimensions, badges)
 assets/fonts/         bundled Montserrat (OS-portable rendering)
-process_products.py   catalog + CSV
+backgrounds/          scene plates, one pair per category (see scenes.py)
+process_products.py   catalog + CSV, cutout trimming
 gallery_pipeline.py   7-slot gallery orchestrator
-make_hero.py          hero template   gallery.py  infographic/size/detail
-providers.py          background providers   content.py  Gemini copy
+make_hero.py          hero templates (side + poster)
+gallery.py            infographic / size / detail slots
+analyzer.py           local VLM -> product.json
+palette.py            per-product colours from the cutout
+scenes.py             scene categories + placeholder plates
+providers.py          background providers
 ```
 
 ## Notes
@@ -83,3 +100,4 @@ providers.py          background providers   content.py  Gemini copy
 - `specs.json` numbers are placeholders — fill in real supplier dimensions.
 - Never commit API keys; pass `GEMINI_API_KEY` via the environment.
 - The `main` catalog image is kept pure white (no watermark) for marketplace rules.
+- `OLLAMA_VLM` must name a tag you actually pulled; the analyzer reports which it used.

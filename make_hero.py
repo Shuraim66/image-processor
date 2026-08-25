@@ -279,6 +279,95 @@ def _fit_font(fontname, lines, max_w, start_px, min_px=16):
     return _font(fontname, min_px)
 
 
+def _centred(base, layer, y):
+    """Composite a rendered layer horizontally centred at height y."""
+    base.alpha_composite(layer, ((W - layer.size[0]) // 2, y))
+
+
+def _logo_at(bg, x_frac, y_frac, w_frac=0.13):
+    if not os.path.exists(LOGO_PATH):
+        return 0
+    logo = Image.open(LOGO_PATH).convert("RGBA")
+    lw = int(W * w_frac)
+    logo = logo.resize((lw, int(logo.height * lw / logo.width)), Image.LANCZOS)
+    bg.alpha_composite(logo, (int(W * x_frac), int(W * y_frac)))
+    return logo.height
+
+
+def round_badge(bg, cx, cy, r, lines, theme):
+    """Circular corner badge — the '6 PIECES SET' motif from catalog posters."""
+    d = ImageDraw.Draw(bg)
+    d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=theme["accent"])
+    d.ellipse([cx - r, cy - r, cx + r, cy + r], outline=(255, 255, 255),
+              width=max(2, r // 18))
+    f = _fit_font("Montserrat-ExtraBold.otf", lines, int(r * 1.5), 34, 14)
+    asc, desc = f.getmetrics()
+    lh = asc + desc
+    ty = cy - (len(lines) * lh) // 2
+    for ln in lines:
+        w = f.getbbox(ln)[2]
+        d.text((cx - w // 2, ty), ln, font=f, fill=(255, 255, 255))
+        ty += lh
+
+
+def _badge_lines(content):
+    """Short stack for the corner badge, from whichever bit of copy is tersest.
+
+    A badge is a glance, not a sentence: 'STEM GROW GAME' reads at thumbnail
+    size, 'GROW YOUR OWN PLANTS' shrinks to nothing inside the same circle. So
+    take the shorter of callout and ribbon and cap it at three words.
+    """
+    candidates = [c.strip() for c in (content.get("callout"), content.get("ribbon"))
+                  if c and c.strip()]
+    if not candidates:
+        return None
+    words = min(candidates, key=len).replace("&", "").upper().split()[:3]
+    if not words:
+        return None
+    if len(words) == 3 and sum(len(w) for w in words[:2]) <= 9:
+        return [f"{words[0]} {words[1]}", words[2]]      # 2 lines reads bigger
+    return words
+
+
+def overlay_poster_text(bg, content, theme):
+    """Poster composition: logo and badge in the top corners, then a centred
+    eyebrow / wordmark / subtitle stack above a product that runs across the
+    bottom. Suits wide products — boxed sets, playsets, ride-ons — which look
+    cramped squeezed beside a text column.
+    """
+    _logo_at(bg, 0.04, 0.035, 0.13)
+
+    badge = _badge_lines(content)
+    if badge:
+        round_badge(bg, int(W * 0.883), int(W * 0.108), int(W * 0.082),
+                    badge, theme)
+
+    # eyebrow
+    f_eye = _fit_font("Montserrat-ExtraBold.otf", content["tagline_top"],
+                      int(W * 0.60), 44, 22)
+    lay = Image.new("RGBA", (W, int(W * 0.10)), (0, 0, 0, 0))
+    bw, _bh = banner(lay, (0, 0), content["tagline_top"], f_eye, theme["primary"])
+    _centred(bg, lay.crop((0, 0, bw, _bh)), int(W * 0.215))
+
+    # wordmark — the loudest element on the image
+    name = content["name"]
+    f_word = _fit_font("Montserrat-Black.otf", name, int(W * 0.86), 190, 60)
+    tw, th, ox, oy = _text_size(f_word, name)
+    sticker_text(bg, ((W - tw) // 2, int(W * 0.30)), name, f_word,
+                 fill=theme["primary"], outline=(255, 255, 255), outline_w=11,
+                 stroke=theme["ink"], stroke_w=5)
+
+    # subtitle
+    sub_y = int(W * 0.30) + th + int(W * 0.035)
+    f_sub = _fit_font("Montserrat-Bold.otf", content["tagline_sub"],
+                      int(W * 0.72), 46, 22)
+    d = ImageDraw.Draw(bg)
+    sw = f_sub.getbbox(content["tagline_sub"])[2]
+    d.text(((W - sw) // 2, sub_y), content["tagline_sub"], font=f_sub,
+           fill=theme["ink"])
+    return bg
+
+
 def overlay_hero_text(bg, content, theme):
     """Draw the headline banners, sticker wordmark, feature bullets, corner
     ribbon, side callout and brand logo. All text auto-shrinks to its zone so it
@@ -341,14 +430,42 @@ def overlay_hero_text(bg, content, theme):
     return bg
 
 
-def render_hero(cutout_path, content, out_path, background=None):
+# A product wider than this relative to its height gets the poster treatment;
+# anything taller reads better in the side-by-side column layout.
+POSTER_ASPECT = 1.05
+
+
+def choose_layout(cutout_path):
+    """Pick a composition from the product's own proportions.
+
+    Wide products (boxed sets, playsets, the plant dome) are squeezed to nothing
+    beside a text column, and tall ones (scooters, figures) leave a poster's
+    width empty. Deciding from the cutout means no per-SKU configuration.
+    """
+    with Image.open(cutout_path) as img:
+        w, h = img.size
+    return "poster" if h and (w / h) > POSTER_ASPECT else "side"
+
+
+LAYOUTS = {
+    #            cx     base_y  target_h  max_w   text renderer
+    "side":   (0.71,   0.86,   0.66,     0.48,   overlay_hero_text),
+    "poster": (0.50,   1.02,   0.58,     0.92,   overlay_poster_text),
+}
+
+
+def render_hero(cutout_path, content, out_path, background=None, layout=None):
     """Render a hero. If `background` (a PIL image) is given it's used as the
     scene (e.g. a Draw Things lifestyle background); otherwise a procedural
     studio background is generated. The real product cutout is always composited
-    on top — the scene is never trusted to contain the product."""
+    on top — the scene is never trusted to contain the product.
+
+    `layout` is "side", "poster", or None to choose from the product's shape.
+    """
     theme = {**THEME, **content.get("theme", {})}
-    # Product column sits to the right of the 0.40W text column, with a gutter.
-    cx, base_y = int(W * 0.71), int(W * 0.86)
+    layout = layout or choose_layout(cutout_path)
+    cx_f, base_f, targ_f, maxw_f, draw_text = LAYOUTS[layout]
+    cx, base_y = int(W * cx_f), int(W * base_f)
 
     if background is None:
         bg = make_background(theme)
@@ -358,9 +475,9 @@ def render_hero(cutout_path, content, out_path, background=None):
     bg = add_podium(bg, cx, base_y)
     cutout = Image.open(cutout_path).convert("RGBA")
     bg, _ = place_product(bg, cutout, cx, base_y,
-                          target_h=int(W * 0.66), max_w=int(W * 0.48))
+                          target_h=int(W * targ_f), max_w=int(W * maxw_f))
 
-    overlay_hero_text(bg, content, theme)
+    draw_text(bg, content, theme)
     final = bg.convert("RGB").resize((SIZE, SIZE), Image.LANCZOS)
     final.save(out_path, quality=94)
     return out_path

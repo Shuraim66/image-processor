@@ -34,6 +34,7 @@ import gallery
 import analyzer
 import palette
 import providers
+import scenes
 import quality
 
 OUTPUT_ROOT = "gallery_out"
@@ -116,7 +117,8 @@ def build_for_sku(sku, specs, provider, use_ollama, reanalyze, ext="webp",
     prompts = cont.get("scene_prompts", []) + ["bright playroom", "sunny living room"]
     for slot, variant, prompt in [("03_lifestyle_a", "A", prompts[0]),
                                   ("04_lifestyle_b", "B", prompts[1])]:
-        scene = provider.scene(sku, cutout, primary_raw, variant, prompt)
+        scene = provider.scene(sku, cutout, primary_raw, variant, prompt,
+                               scenes.category_for(cont))
         if cache_bg:   # step 7: save the scene so a later --bg-provider folder run reuses it
             os.makedirs("backgrounds", exist_ok=True)
             scene.convert("RGB").save(os.path.join("backgrounds", f"{sku}_{variant.lower()}.{ext}"))
@@ -154,7 +156,9 @@ def main():
     ap = argparse.ArgumentParser(description="Generate the 7-image listing gallery per product.")
     ap.add_argument("--sku", help="only this SKU (default: all under input/)")
     ap.add_argument("--bg-provider", choices=["procedural", "folder", "drawthings"],
-                    default="procedural", help="background engine for slots 3-4")
+                    default="folder",
+                    help="background engine for slots 3-4 (default folder: "
+                         "reads category plates from backgrounds/)")
     ap.add_argument("--no-ollama", action="store_true",
                     help="skip the Qwen3-VL analyzer; use deterministic fallback copy")
     ap.add_argument("--reanalyze", action="store_true",

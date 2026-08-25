@@ -36,7 +36,7 @@ def _tint(theme, variant):
 class BackgroundProvider:
     name = "base"
 
-    def scene(self, sku, cutout_path, original_path, variant, prompt):
+    def scene(self, sku, cutout_path, original_path, variant, prompt, category=None):
         raise NotImplementedError
 
 
@@ -44,7 +44,7 @@ class ProceduralProvider(BackgroundProvider):
     """Soft studio gradient + bokeh. Free, deterministic, always available."""
     name = "procedural"
 
-    def scene(self, sku, cutout_path, original_path, variant, prompt):
+    def scene(self, sku, cutout_path, original_path, variant, prompt, category=None):
         theme = _tint(mh.THEME, variant)
         return mh.make_background(theme)
 
@@ -101,15 +101,17 @@ class DrawThingsProvider(BackgroundProvider):
                   f"using procedural", file=sys.stderr)
             return None
 
-    def scene(self, sku, cutout_path, original_path, variant, prompt):
+    def scene(self, sku, cutout_path, original_path, variant, prompt, category=None):
         if self._stub is None:
-            return self._fallback.scene(sku, cutout_path, original_path, variant, prompt)
+            return self._fallback.scene(sku, cutout_path, original_path, variant,
+                                        prompt, category)
         try:
             return self._generate(prompt)
         except Exception as exc:
             print(f"  [drawthings] generate failed for {sku}/{variant} ({exc}); "
                   f"falling back to procedural", file=sys.stderr)
-            return self._fallback.scene(sku, cutout_path, original_path, variant, prompt)
+            return self._fallback.scene(sku, cutout_path, original_path, variant,
+                                        prompt, category)
 
     def _build_config_fbs(self):
         """Serialize the generation configuration as FlatBuffer bytes.
@@ -171,14 +173,18 @@ class DrawThingsProvider(BackgroundProvider):
 
 
 class FolderProvider(BackgroundProvider):
-    """Reads pre-made scenes you exported from the Draw Things app (or anywhere).
+    """Reads pre-made scene plates from ./backgrounds.
 
-    Looks for  backgrounds/<SKU>_a.*  and  backgrounds/<SKU>_b.*  (also accepts
-    a shared backgrounds/_a.* / _b.* used for every SKU). Falls back to
-    procedural if a file is missing, so the batch never dies.
+    Resolution order, most specific first:
+        backgrounds/<SKU>_a.*        a plate you made for this one product
+        backgrounds/<category>_a.*   the shared plate for its category
+        backgrounds/_a.*             one look for the whole catalog
+    then procedural, so a missing file never kills the batch.
 
-    Zero gRPC / protos — generate scenes manually in Draw Things, drop them in
-    ./backgrounds, run the pipeline. Great for getting galleries done now.
+    Category plates are the intended path: a thousand products do not need a
+    thousand rooms, and a storefront whose lifestyle shots share a look reads as
+    more considered, not less. `python scenes.py` writes placeholder plates;
+    replace them with Draw Things output under the same names.
     """
     name = "folder"
     BG_DIR = "backgrounds"
@@ -187,22 +193,28 @@ class FolderProvider(BackgroundProvider):
     def __init__(self):
         self._fallback = ProceduralProvider()
 
-    def _find(self, sku, variant):
+    def _find(self, sku, variant, category):
         v = variant.lower()
-        for stem in (f"{sku}_{v}", f"_{v}"):            # per-SKU, else shared
+        stems = [f"{sku}_{v}"]
+        if category:
+            stems.append(f"{category}_{v}")
+        stems.append(f"_{v}")
+        for stem in stems:
             for ext in self.EXTS:
                 p = os.path.join(self.BG_DIR, stem + ext)
                 if os.path.exists(p):
                     return p
         return None
 
-    def scene(self, sku, cutout_path, original_path, variant, prompt):
-        p = self._find(sku, variant)
+    def scene(self, sku, cutout_path, original_path, variant, prompt, category=None):
+        p = self._find(sku, variant, category)
         if p is None:
-            print(f"  [folder] no background for {sku}/{variant} in "
-                  f"{self.BG_DIR}/ (want {sku}_{variant.lower()}.*); using procedural",
+            print(f"  [folder] no plate for {sku}/{variant} in {self.BG_DIR}/ "
+                  f"(wanted {sku}_{variant.lower()}.* or "
+                  f"{category}_{variant.lower()}.*); using procedural",
                   file=sys.stderr)
-            return self._fallback.scene(sku, cutout_path, original_path, variant, prompt)
+            return self._fallback.scene(sku, cutout_path, original_path, variant,
+                                        prompt, category)
         return Image.open(p).convert("RGBA").resize((W, W), Image.LANCZOS)
 
 
