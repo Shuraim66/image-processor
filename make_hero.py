@@ -151,11 +151,18 @@ def _text_size(font, text):
 
 
 def sticker_text(base, xy, text, font, fill, outline=(255, 255, 255),
-                 outline_w=10, shadow=(0, 0, 0, 70)):
-    """Big wordmark with a thick outline halo and a soft drop shadow."""
+                 outline_w=10, shadow=(0, 0, 0, 70), stroke=None, stroke_w=4):
+    """Big wordmark with a thick outline halo and a soft drop shadow.
+
+    `stroke` adds a second, darker ring outside the halo. Without it a wordmark
+    tinted from the product can sit on a background tinted from the same product
+    and all but disappear; the dark ring keeps it readable on any ground,
+    including the photographic scenes the lifestyle slots composite onto.
+    """
     ow = outline_w * SS
+    sw = stroke_w * SS if stroke else 0
     tw, th, ox, oy = _text_size(font, text)
-    pad = ow + 20 * SS
+    pad = ow + sw + 20 * SS
     layer = Image.new("RGBA", (tw + 2 * pad, th + 2 * pad), (0, 0, 0, 0))
     d = ImageDraw.Draw(layer)
     px, py = pad - ox, pad - oy
@@ -165,12 +172,15 @@ def sticker_text(base, xy, text, font, fill, outline=(255, 255, 255),
     sh = sh.filter(ImageFilter.GaussianBlur(6 * SS))
     layer = Image.alpha_composite(layer, sh)
     d = ImageDraw.Draw(layer)
-    # outline ring
     import math
-    for ang in range(0, 360, 24):
-        dx = int(ow * math.cos(math.radians(ang)))
-        dy = int(ow * math.sin(math.radians(ang)))
-        d.text((px + dx, py + dy), text, font=font, fill=outline)
+    # rings, outermost first: dark stroke, then the light halo, then the fill
+    for radius, colour in ((ow + sw, stroke), (ow, outline)):
+        if colour is None:
+            continue
+        for ang in range(0, 360, 12):
+            dx = int(radius * math.cos(math.radians(ang)))
+            dy = int(radius * math.sin(math.radians(ang)))
+            d.text((px + dx, py + dy), text, font=font, fill=colour)
     d.text((px, py), text, font=font, fill=fill)
     base.alpha_composite(layer, (xy[0] - pad, xy[1] - pad))
     return tw, th
@@ -287,7 +297,8 @@ def overlay_hero_text(bg, content, theme):
     # --- sticker wordmark (fit to the left column) ---
     f_word = _fit_font("Montserrat-Black.otf", content["name"], LEFT_W, 150, 54)
     sticker_text(bg, (x0, int(W * 0.24)), content["name"], f_word,
-                 fill=theme["primary"], outline=(255, 255, 255), outline_w=12)
+                 fill=theme["primary"], outline=(255, 255, 255), outline_w=10,
+                 stroke=theme["ink"], stroke_w=4)
 
     # --- feature bullets (left column) ---
     r = int(W * 0.032)

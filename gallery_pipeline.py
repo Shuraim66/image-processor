@@ -32,6 +32,7 @@ import process_products as pp
 import make_hero as mh
 import gallery
 import analyzer
+import palette
 import providers
 import quality
 
@@ -90,6 +91,10 @@ def build_for_sku(sku, specs, provider, use_ollama, reanalyze, ext="webp",
     primary_raw = raws[0]
     cutout = make_cutout(primary_raw, sku)
     cont = get_profile(sku, folder, use_ollama, reanalyze, allow_fallback)
+    # Colour the whole set from the product itself, so a pink scooter and a
+    # green plant dome stop shipping in the same corporate blue and red. A theme
+    # pinned in product.json wins.
+    cont["theme"] = palette.as_theme(cont.get("theme")) or palette.extract_theme(cutout)
     sp = specs_for(specs, sku)
     made = []
 

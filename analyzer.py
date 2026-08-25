@@ -17,7 +17,7 @@ import argparse
 import json
 import os
 import sys
-from typing import List
+from typing import Any, Dict, List
 
 from pydantic import BaseModel, Field, ValidationError
 
@@ -55,6 +55,8 @@ class ProductProfile(BaseModel):
     callout: str                    # 2-3 word highlight
     detail_caption: str
     scene_prompts: List[str]        # 2 lifestyle background prompts
+    theme: Dict[str, Any] = Field(default_factory=dict)   # pin colours here to
+    # override the palette derived from the product's own pixels (see palette.py)
 
 
 PROMPT = (
@@ -167,7 +169,7 @@ def _request_schema() -> dict:
     """The schema the model is asked to fill — bookkeeping fields removed so it
     does not waste tokens inventing an sku or a source it cannot know."""
     schema = ProductProfile.model_json_schema()
-    for field in ("sku", "source"):
+    for field in ("sku", "source", "theme"):
         schema.get("properties", {}).pop(field, None)
         if field in schema.get("required", []):
             schema["required"].remove(field)
