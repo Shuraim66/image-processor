@@ -52,7 +52,26 @@ def check_image(path, is_main):
     return checks
 
 
-def check_gallery(sku, out_dir, cutout_path=None, copy_source="", copy_flags=()):
+# The product fills roughly this much of the hero canvas, so a cutout shorter
+# than SIZE * this on its longest side gets upscaled and looks soft.
+PRODUCT_FILL = 0.66
+
+
+def check_source(cutout_path, render_size):
+    """Is there enough real detail in the photo to fill the canvas sharply?"""
+    with Image.open(cutout_path) as cut:
+        longest = max(cut.size)
+    needed = int(render_size * PRODUCT_FILL)
+    scale = needed / longest
+    status = "pass" if scale <= 1.0 else ("warn" if scale <= 1.35 else "fail")
+    detail = f"cutout {cut.size[0]}x{cut.size[1]}, needs {needed}px -> x{scale:.2f}"
+    if status != "pass":
+        detail += " (source photo too small; re-shoot at full resolution)"
+    return {"check": "source_resolution", "status": status, "detail": detail}
+
+
+def check_gallery(sku, out_dir, cutout_path=None, copy_source="", copy_flags=(),
+                  render_size=1600):
     report = {"sku": sku, "status": "pass", "copy_source": copy_source,
               "copy_flags": list(copy_flags), "images": []}
     if copy_flags:
@@ -73,6 +92,10 @@ def check_gallery(sku, out_dir, cutout_path=None, copy_source="", copy_flags=())
         report["images"].append({"image": f, "checks": checks})
 
     if cutout_path and os.path.exists(cutout_path):
+        src = check_source(cutout_path, render_size)
+        report["source"] = src
+        if src["status"] == "fail":
+            report["status"] = "review"
         cut = Image.open(cutout_path)
         if cut.mode == "RGBA":
             h = cut.getchannel("A").histogram()          # opaque-pixel fraction

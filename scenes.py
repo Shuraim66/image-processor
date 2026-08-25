@@ -45,7 +45,11 @@ CATEGORY_KEYWORDS = {
                 "number", "laptop", "science", "board game", "wooden",
                 "montessori", "reading", "maths", "math"),
     "nursery": ("plush", "soft toy", "stuffed", "teddy", "baby", "infant",
-                "cuddle", "doll", "rattle", "night lamp"),
+                "cuddle", "doll", "rattle", "night lamp", "night light",
+                "nightlight", "lamp", "projector", "bedside", "sleep"),
+    "kitchen": ("tumbler", "mug", "cup", "bottle", "flask", "thermos",
+                "drinkware", "water bottle", "sipper", "straw cup", "lunch box",
+                "bento", "coffee", "kettle", "kitchen", "insulated"),
     "creative": ("art", "craft", "crafts", "paint", "painting", "drawing",
                  "colouring", "coloring", "beads", "jewellery", "clay",
                  "sticker", "creative", "make your own", "diy"),
@@ -68,6 +72,8 @@ PALETTES = {
                  "B": ((240, 236, 248), (214, 206, 212))},
     "creative": {"A": ((250, 244, 232), (208, 190, 166)),
                  "B": ((244, 240, 248), (200, 186, 168))},
+    "kitchen":  {"A": ((242, 240, 236), (196, 186, 172)),
+                 "B": ((236, 240, 242), (186, 182, 176))},
 }
 
 
@@ -95,6 +101,7 @@ SILHOUETTES = {
     "desk":     [(.72, .22, .14, .44), (.86, .18, .12, .48), (-.04, .34, .14, .32)],
     "nursery":  [(-.05, .22, .24, .34), (.80, .16, .26, .40)],
     "creative": [(.74, .26, .18, .40), (.88, .20, .14, .46), (-.06, .30, .18, .34)],
+    "kitchen":  [(.78, .10, .26, .50), (-.05, .16, .18, .44), (.60, .30, .14, .28)],
 }
 
 
@@ -324,6 +331,8 @@ SCENE_PROMPTS = {
                 "wide clear carpet across the foreground",
     "creative": "empty craft table with paper and paint pots pushed to the far "
                 "right, plain wall on the left, wide clear tabletop in front",
+    "kitchen":  "empty bright kitchen worktop, plain tiled wall on the left, "
+                "wide clear stone counter across the foreground",
 }
 PROMPT_SUFFIX = ("soft daylight from the {side}, shallow depth of field, "
                  "product photography backdrop, no people, no toys, no text")

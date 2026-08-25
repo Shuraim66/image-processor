@@ -14,6 +14,7 @@ Fails loudly if the model is unavailable; pass --allow-fallback to write\nplaceh
 """
 
 import argparse
+import io
 import json
 import os
 import sys
@@ -25,6 +26,11 @@ from pydantic import BaseModel, Field, ValidationError
 import copyguard
 
 OLLAMA_MODEL = os.environ.get("OLLAMA_VLM", "qwen3-vl:8b")
+# A vision model reads a product fine at this size, and full-resolution phone
+# photos do not: five 2296x4080 shots came to 12857 tokens against an 8192
+# context, while the same five at 1024px come to roughly 810.
+VLM_MAX_PX = int(os.environ.get("OLLAMA_VLM_MAX_PX", "1024"))
+VLM_MAX_IMAGES = int(os.environ.get("OLLAMA_VLM_MAX_IMAGES", "6"))
 INPUT_DIR = "input"
 VALID_EXTS = (".jpg", ".jpeg", ".png", ".webp")
 # Icons the templates can draw (make_hero.ICON_DRAWERS). Kept wide so features
@@ -105,6 +111,32 @@ PROMPT = (
     "can see one — describe the product generically (a 'superhero plush', a "
     "'footballer figure') so the listing does not trade on someone else's mark."
 )
+
+
+def encode_images(paths, max_px=None, limit=None):
+    """Downscaled JPEG bytes for the model, newest constraint applied last.
+
+    Shrinking here rather than raising num_ctx keeps the context small, the
+    analysis fast, and the memory footprint low — which matters when the same
+    machine has to run rembg afterwards.
+    """
+    from PIL import Image
+
+    max_px = max_px or VLM_MAX_PX
+    out = []
+    for path in paths[:limit or VLM_MAX_IMAGES]:
+        with Image.open(path) as img:
+            img = img.convert("RGB")
+            img.thumbnail((max_px, max_px), Image.LANCZOS)
+            buf = io.BytesIO()
+            img.save(buf, format="JPEG", quality=88)
+            out.append(buf.getvalue())
+    return out
+
+
+def _is_context_error(exc):
+    text = str(exc).lower()
+    return "context" in text and ("exceed" in text or "size" in text)
 
 
 class AnalyzerError(RuntimeError):
@@ -221,27 +253,31 @@ def analyze(sku: str, image_paths: List[str], use_ollama: bool = True,
     try:
         import ollama
         model = resolve_model()
-        resp = ollama.chat(
-            model=model,
-            messages=[{"role": "user", "content": PROMPT, "images": image_paths}],
-            format=_request_schema(),                    # structured output
-            options={"temperature": 0.4,
-                     "num_ctx": int(os.environ.get("OLLAMA_NUM_CTX", "8192"))},
-        )
+        ctx = int(os.environ.get("OLLAMA_NUM_CTX", "8192"))
+
+        def ask(images, prompt=PROMPT, temperature=0.4):
+            return ollama.chat(
+                model=model,
+                messages=[{"role": "user", "content": prompt, "images": images}],
+                format=_request_schema(),                # structured output
+                options={"temperature": temperature, "num_ctx": ctx},
+            )
+
+        try:
+            resp = ask(encode_images(image_paths))
+        except Exception as exc:                         # noqa: BLE001
+            if not _is_context_error(exc):
+                raise
+            # Too many pixels for the window: fewer images, smaller.
+            print(f"  [analyzer] {sku}: context full, retrying smaller", file=sys.stderr)
+            resp = ask(encode_images(image_paths, max_px=768, limit=3))
         data = _normalize(json.loads(resp["message"]["content"]), sku)
 
         # A drawback described as a feature gets printed onto two images, so it
         # is worth one corrective round-trip before falling back to repair.
         if copyguard.negative_features(data):
-            retry = ollama.chat(
-                model=model,
-                messages=[{"role": "user",
-                           "content": PROMPT + "\n\n" + copyguard.RETRY_NOTE,
-                           "images": image_paths}],
-                format=_request_schema(),
-                options={"temperature": 0.2,
-                         "num_ctx": int(os.environ.get("OLLAMA_NUM_CTX", "8192"))},
-            )
+            retry = ask(encode_images(image_paths),
+                        PROMPT + "\n\n" + copyguard.RETRY_NOTE, temperature=0.2)
             data = _normalize(json.loads(retry["message"]["content"]), sku)
 
         for note in copyguard.repair_features(data):

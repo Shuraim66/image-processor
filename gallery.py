@@ -81,18 +81,30 @@ def render_infographic(cutout_path, content, out_path):
         icx, icy = int(W * fx) + r, int(W * fy)
         col = theme["primary"] if side == "L" else theme["accent"]
         d = ImageDraw.Draw(bg)
+        lines = feat["label"].split("\n")
+
         if side == "L":
             tx = icx + 2 * r
             avail = max(int(W * 0.08), px - tx - gutter)
-            _dotted_line(d, (icx + r, icy), (px - gutter // 2, icy), (*theme["ink"], 120))
         else:
             tx = icx - 2 * r
             avail = max(int(W * 0.08), tx - (px + pw) - gutter)
-            _dotted_line(d, (icx - r, icy), (px + pw + gutter // 2, icy), (*theme["ink"], 120))
+
+        ff = mh._fit_font("Montserrat-Bold.otf", lines, avail, 34, 22)
+        text_w = max(ff.getbbox(ln)[2] for ln in lines)
+
+        # Connector runs from the END of the label to the product, not from the
+        # icon — drawn from the icon it passed straight through the words.
+        pad = int(W * 0.012)
+        if side == "L":
+            start, end = tx + text_w + pad, px - gutter // 2
+        else:
+            start, end = tx - text_w - pad, px + pw + gutter // 2
+        if abs(end - start) > pad:
+            _dotted_line(d, (start, icy), (end, icy), (*theme["ink"], 120))
+
         mh.draw_feature_icon(bg, icx, icy, r, feat["icon"], col)
 
-        lines = feat["label"].split("\n")
-        ff = mh._fit_font("Montserrat-Bold.otf", lines, avail, 34, 22)
         asc, desc = ff.getmetrics()
         lh = asc + desc
         ty = icy - (len(lines) * lh) // 2

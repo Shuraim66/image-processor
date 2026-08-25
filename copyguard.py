@@ -54,6 +54,12 @@ TRADEMARK_TERMS = (
     "harry potter", "minecraft", "roblox", "fortnite", "cocomelon",
     "ronaldo", "messi", "neymar", "real madrid", "barcelona", "manchester",
     "ferrari", "lamborghini", "bugatti", "nerf", "play-doh", "fisher-price",
+    # Sanrio and friends turn up constantly on lights, plushes and stationery
+    "sanrio", "kuromi", "my melody", "cinnamoroll", "pompompurin", "gudetama",
+    "keroppi", "badtz-maru", "little twin stars", "stitch", "winnie the pooh",
+    "snoopy", "doraemon", "totoro", "ghibli", "squishmallow", "jellycat",
+    # drinkware brands, for the tumblers
+    "stanley", "yeti", "hydro flask", "owala", "contigo", "thermos brand",
 )
 
 # Fields worth scanning for trademarks: these are what a crawler indexes.

@@ -322,12 +322,19 @@ def find_sku_folders(root: str) -> list[str]:
     )
 
 
+# Photos whose name starts with one of these are the product's main shot. Every
+# rendered image is built from raw_images_in()[0], and plain alphabetical order
+# put "angle2.jpg" ahead of "front.jpg" — so the main catalog shot was silently
+# coming from a secondary angle on every multi-photo product.
+PRIMARY_STEMS = ("front", "main", "hero", "01", "1_")
+
+
 def raw_images_in(folder: str) -> list[str]:
-    return sorted(
-        os.path.join(folder, f)
-        for f in os.listdir(folder)
-        if f.lower().endswith(VALID_EXTENSIONS)
-    )
+    """Photos for a SKU, primary shot first, the rest in filename order."""
+    names = sorted(f for f in os.listdir(folder)
+                   if f.lower().endswith(VALID_EXTENSIONS))
+    names.sort(key=lambda f: not f.lower().startswith(PRIMARY_STEMS))
+    return [os.path.join(folder, f) for f in names]
 
 
 def main(dry_run: bool = False) -> int:

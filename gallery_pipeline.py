@@ -179,7 +179,8 @@ def build_for_sku(sku, specs, provider, use_ollama, reanalyze, ext="webp",
     # quality report (deterministic checks + optional VLM semantic check)
     report = quality.check_gallery(sku, out_dir, cutout_path=cutout,
                                    copy_source=cont.get("source", ""),
-                                   copy_flags=cont.get("review_flags", []))
+                                   copy_flags=cont.get("review_flags", []),
+                                   render_size=mh.SIZE)
     if skipped:
         report["skipped_slots"] = skipped
     if vlm:   # step 6: does the lifestyle image faithfully show the real product?
