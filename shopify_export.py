@@ -25,6 +25,7 @@ import re
 import sys
 
 import analyzer
+import copyguard
 
 PRODUCTS_DIR = "input"
 GALLERY_DIR = "gallery_out"
@@ -40,8 +41,32 @@ COLUMNS = [
 ]
 
 
-def slug(sku):
-    return re.sub(r"[^a-z0-9]+", "-", sku.lower()).strip("-")
+MAX_HANDLE = 70          # Shopify truncates long handles; keep them readable
+
+
+def slug(text):
+    return re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")
+
+
+def handle_for(profile, sku, mode, seen):
+    """The product's URL. Derived from the title by default, not the SKU.
+
+    The handle is what Shopify publishes and what search engines index, so a SKU
+    like FIGURE-RONALDO-DANCE puts a trademarked name in the URL even after the
+    copy has been cleaned of it. Titles are already sanitized, so they are the
+    safer and more searchable source. Collisions fall back to the SKU.
+    """
+    base = slug(profile.title)[:MAX_HANDLE] if mode == "title" else ""
+    if not base:
+        base = slug(sku)
+    handle = base if base not in seen else f"{base}-{slug(sku)}"[:MAX_HANDLE]
+    seen.add(handle)
+
+    leaked = copyguard._hits(handle.replace("-", " "), copyguard.TRADEMARK_TERMS)
+    if leaked:
+        print(f"  ! {sku}: handle '{handle}' still contains {', '.join(leaked)}",
+              file=sys.stderr)
+    return handle
 
 
 def body_html(p: "analyzer.ProductProfile"):
@@ -63,17 +88,24 @@ def images_for(sku, base_url, per_product=False):
     return [f"{base_url}{sku}/{f}" if base_url else os.path.join(d, f) for f in files]
 
 
-def rows_for(sku, folder, args):
+def rows_for(sku, folder, args, seen_handles):
     prof_path = os.path.join(folder, "product.json")
     if not os.path.exists(prof_path):
         print(f"  ! {sku}: no product.json (run analyzer.py first)", file=sys.stderr)
         return []
     p = analyzer.ProductProfile.model_validate_json(open(prof_path, encoding="utf-8").read())
+
+    # The CSV is the last gate before a listing is live, so a product the copy
+    # checks flagged does not slip through on its own.
+    if p.review_flags and not args.include_flagged:
+        print(f"  ! {sku}: held back — {'; '.join(p.review_flags)}", file=sys.stderr)
+        return []
+
     imgs = images_for(sku, args.image_base_url, per_product=args.per_product)
     if not imgs:
         print(f"  ! {sku}: no gallery images in {GALLERY_DIR}/{sku}", file=sys.stderr)
 
-    handle = slug(sku)
+    handle = handle_for(p, sku, args.handle_from, seen_handles)
     base = {c: "" for c in COLUMNS}
     base.update({
         "Handle": handle,
@@ -120,6 +152,12 @@ def main():
     ap.add_argument("--qty", type=int, default=0, help="inventory quantity")
     ap.add_argument("--per-product", action="store_true",
                     help="read images from input/<SKU>/output/ (matches --per-product build)")
+    ap.add_argument("--handle-from", choices=["title", "sku"], default="title",
+                    help="source for the product URL (default title: SEO-friendly "
+                         "and free of SKU codes)")
+    ap.add_argument("--include-flagged", action="store_true",
+                    help="export products the copy checks flagged for review "
+                         "(held back by default)")
     ap.add_argument("--image-base-url", default="",
                     help="public URL prefix for images (Shopify fetches Image Src over HTTP)")
     args = ap.parse_args()
@@ -130,18 +168,24 @@ def main():
             sorted(d for d in os.listdir(PRODUCTS_DIR)
                    if os.path.isdir(os.path.join(PRODUCTS_DIR, d))))
 
-    all_rows = []
+    all_rows, seen_handles, held = [], set(), 0
     for sku in skus:
-        rows = rows_for(sku, os.path.join(PRODUCTS_DIR, sku), args)
+        rows = rows_for(sku, os.path.join(PRODUCTS_DIR, sku), args, seen_handles)
         if rows:
             print(f"[{sku}] {len(rows)} row(s)")
             all_rows.extend(rows)
+        else:
+            held += 1
 
     with open(args.out, "w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=COLUMNS)
         w.writeheader()
         w.writerows(all_rows)
-    print(f"\nWrote {len(all_rows)} rows for {len(skus)} product(s) to '{args.out}'.")
+    exported = len(skus) - held
+    print(f"\nWrote {len(all_rows)} rows for {exported} product(s) to '{args.out}'.")
+    if held:
+        print(f"{held} product(s) held back. Fix the flags in product.json, or pass "
+              f"--include-flagged to export anyway.", file=sys.stderr)
     if not args.image_base_url:
         print("Note: Image Src is relative — set --image-base-url to public URLs "
               "before importing to Shopify.", file=sys.stderr)
