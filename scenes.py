@@ -77,58 +77,105 @@ def category_for(content):
 # --------------------------------------------------------------------------- #
 # Placeholder plates
 # --------------------------------------------------------------------------- #
+# Soft silhouettes per category, as (x, y, w, h) fractions. Blurred hard at the
+# end, so these read as out-of-focus furniture rather than shapes.
+SILHOUETTES = {
+    "playroom": [(-.06, .30, .22, .38), (.80, .24, .28, .44), (.62, .44, .16, .24)],
+    "outdoor":  [(-.10, .10, .30, .52), (.78, .04, .34, .58)],
+    "garden":   [(-.08, .06, .28, .40), (.76, .00, .32, .40), (.86, .40, .20, .28)],
+    "desk":     [(.72, .22, .14, .44), (.86, .18, .12, .48), (-.04, .34, .14, .32)],
+    "nursery":  [(-.05, .22, .24, .34), (.80, .16, .26, .40)],
+}
+
+
+def _perspective_floor(img, horizon, floor, size, rng):
+    """Converging floor lines. This is what makes a gradient read as a room."""
+    d = ImageDraw.Draw(img, "RGBA")
+    vx = int(size * 0.5)
+    line = tuple(int(c * 0.86) for c in floor)
+
+    # boards running away from the viewer, toward a vanishing point
+    for i in range(-9, 10):
+        x_bottom = vx + i * int(size * 0.17)
+        d.line([(vx, horizon), (x_bottom, size)], fill=line + (58,), width=max(1, size // 700))
+
+    # cross-joints, spaced so they crowd toward the horizon
+    depth = size - horizon
+    for step in range(1, 9):
+        y = horizon + depth * (step / 9) ** 2.1
+        d.line([(0, y), (size, y)], fill=line + (44,), width=max(1, size // 800))
+
+
+def _window_light(img, horizon, size, from_left):
+    """A soft bright panel on the wall plus its spill on the floor."""
+    glow = Image.new("L", (size, size), 0)
+    g = ImageDraw.Draw(glow)
+    x0 = int(size * (0.04 if from_left else 0.62))
+    g.rectangle([x0, int(size * 0.06), x0 + int(size * 0.34), int(horizon * 0.92)], fill=210)
+    # spill, widening as it falls across the floor
+    spill_x = x0 + int(size * (0.10 if from_left else 0.06))
+    g.polygon([(spill_x, horizon), (spill_x + int(size * 0.26), horizon),
+               (spill_x + int(size * 0.46), size), (spill_x - int(size * 0.20), size)],
+              fill=120)
+    glow = glow.filter(ImageFilter.GaussianBlur(size // 14))
+    return Image.composite(Image.new("RGBA", (size, size), (255, 253, 246, 255)), img, glow)
+
+
 def make_plate(category, variant, size=PLATE_PX):
-    """A soft, out-of-focus room: tinted wall, floor plane, depth blobs.
+    """A soft, out-of-focus room: wall, perspective floor, window light, depth.
 
     Composed for the hero templates — the left third stays calm so headline text
-    stays readable, and the horizon sits where products are placed so they look
-    like they are standing on something.
+    stays readable, and the floor plane runs through where products are placed so
+    they look like they are standing on something rather than floating.
     """
     wall, floor = PALETTES.get(category, PALETTES[DEFAULT_CATEGORY])[variant]
     rng = random.Random(f"{category}{variant}")          # deterministic plates
+    horizon = int(size * 0.66)
     img = Image.new("RGB", (size, size), wall)
     d = ImageDraw.Draw(img)
 
-    # wall gradient, lighter toward the horizon
-    horizon = int(size * 0.66)
+    # wall, lightening toward the horizon
     for y in range(horizon):
         t = y / horizon
         d.line([(0, y), (size, y)],
-               fill=tuple(int(c + (255 - c) * (t * 0.55)) for c in wall))
+               fill=tuple(int(c + (255 - c) * (t * 0.5)) for c in wall))
 
-    # floor plane, receding darker toward the bottom
+    # floor, darkening toward the viewer
     for y in range(horizon, size):
         t = (y - horizon) / max(1, size - horizon)
         d.line([(0, y), (size, y)],
-               fill=tuple(int(c * (1 - t * 0.22)) for c in floor))
+               fill=tuple(int(c * (1 - t * 0.26)) for c in floor))
 
-    # depth blobs — furniture, foliage, light. Kept off the left third.
-    blobs = Image.new("RGBA", (size, size), (0, 0, 0, 0))
-    bd = ImageDraw.Draw(blobs)
-    for _ in range(7):
-        cx = rng.randint(int(size * 0.34), int(size * 1.02))
-        cy = rng.randint(int(size * 0.10), horizon)
-        r = rng.randint(int(size * 0.07), int(size * 0.20))
-        shade = rng.choice([(255, 255, 255, 70), (0, 0, 0, 26),
-                            tuple(int(c * 0.82) for c in floor) + (44,)])
-        bd.ellipse([cx - r, cy - r, cx + r, cy + r], fill=shade)
-    img = Image.alpha_composite(img.convert("RGBA"),
-                                blobs.filter(ImageFilter.GaussianBlur(size // 26)))
+    img = img.convert("RGBA")
+    _perspective_floor(img, horizon, floor, size, rng)
 
-    # contact shading along the horizon so products do not look pasted on
+    # furniture and foliage, pushed to the edges to keep the middle usable
+    shapes = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    sd = ImageDraw.Draw(shapes)
+    for fx, fy, fw, fh in SILHOUETTES.get(category, SILHOUETTES[DEFAULT_CATEGORY]):
+        box = [fx * size, fy * size, (fx + fw) * size, (fy + fh) * size]
+        tone = tuple(int(c * 0.74) for c in floor) + (rng.randint(52, 78),)
+        sd.rounded_rectangle(box, radius=size * 0.06, fill=tone)
+    img = Image.alpha_composite(img, shapes.filter(ImageFilter.GaussianBlur(size // 22)))
+
+    img = _window_light(img, horizon, size, from_left=(variant == "A"))
+
+    # contact shading where wall meets floor, so products sit rather than float
     band = Image.new("RGBA", (size, size), (0, 0, 0, 0))
-    ImageDraw.Draw(band).rectangle([0, horizon - size // 90, size, horizon + size // 60],
-                                   fill=(0, 0, 0, 34))
-    img = Image.alpha_composite(img, band.filter(ImageFilter.GaussianBlur(size // 45)))
+    ImageDraw.Draw(band).rectangle(
+        [0, horizon - size // 120, size, horizon + size // 44], fill=(0, 0, 0, 42))
+    img = Image.alpha_composite(img, band.filter(ImageFilter.GaussianBlur(size // 50)))
 
     # vignette keeps attention centred
     vig = Image.new("L", (size, size), 0)
-    ImageDraw.Draw(vig).ellipse([-size // 5, -size // 5, size + size // 5, size + size // 5],
-                                fill=255)
+    ImageDraw.Draw(vig).ellipse(
+        [-size // 5, -size // 5, size + size // 5, size + size // 5], fill=255)
     vig = vig.filter(ImageFilter.GaussianBlur(size // 12))
-    dark = Image.new("RGBA", (size, size), (26, 30, 40, 62))
+    dark = Image.new("RGBA", (size, size), (26, 30, 40, 66))
     img = Image.composite(img, Image.alpha_composite(img, dark), vig)
-    return img.convert("RGB").filter(ImageFilter.GaussianBlur(size / 340))
+
+    # shallow depth of field: the whole plate is background, so none of it is sharp
+    return img.convert("RGB").filter(ImageFilter.GaussianBlur(size / 190))
 
 
 def write_plates(out_dir=BG_DIR, overwrite=False):
