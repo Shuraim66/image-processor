@@ -17,7 +17,7 @@ Background provider for slots 3-4 is pluggable:
 
     python gallery_pipeline.py                       # all SKUs, procedural
     python gallery_pipeline.py --sku SCOOTER-LED-PINK --bg-provider drawthings
-    python gallery_pipeline.py --no-gemini           # deterministic copy, no API
+    python gallery_pipeline.py --no-ollama          # deterministic copy, no model
 """
 
 import argparse
@@ -49,7 +49,7 @@ def specs_for(specs, sku):
     return {**specs.get("_default", {}), **specs.get(sku, {})}
 
 
-def get_profile(sku, folder, use_ollama, reanalyze):
+def get_profile(sku, folder, use_ollama, reanalyze, allow_fallback=False):
     """Load input/<SKU>/product.json, or generate it via the analyzer.
 
     Returns the content dict the templates consume (a superset of the fields
@@ -60,7 +60,8 @@ def get_profile(sku, folder, use_ollama, reanalyze):
         profile = analyzer.ProductProfile.model_validate_json(
             open(path, encoding="utf-8").read())
     else:
-        profile = analyzer.analyze_folder(folder, use_ollama=use_ollama)
+        profile = analyzer.analyze_folder(folder, use_ollama=use_ollama,
+                                          allow_fallback=allow_fallback)
     return profile.model_dump()
 
 
@@ -75,7 +76,8 @@ def make_cutout(raw_path, sku):
 
 
 def build_for_sku(sku, specs, provider, use_ollama, reanalyze, ext="webp",
-                  per_product=False, cache_bg=False, vlm=False):
+                  per_product=False, cache_bg=False, vlm=False,
+                  allow_fallback=False):
     folder = os.path.join(pp.INPUT_DIR, sku)
     raws = pp.raw_images_in(folder)
     if not raws:
@@ -87,16 +89,18 @@ def build_for_sku(sku, specs, provider, use_ollama, reanalyze, ext="webp",
 
     primary_raw = raws[0]
     cutout = make_cutout(primary_raw, sku)
-    cont = get_profile(sku, folder, use_ollama, reanalyze)
+    cont = get_profile(sku, folder, use_ollama, reanalyze, allow_fallback)
     sp = specs_for(specs, sku)
     made = []
 
     def op(name):
         return os.path.join(out_dir, f"{name}.{ext}")
 
-    # 01 — pure white main (no watermark; marketplace-safe), matched to gallery size
+    # 01 — pure white main (no watermark; marketplace-safe), matched to gallery size.
+    # Built from the cached cutout: process_image() would re-run rembg on a photo
+    # we have already segmented, doubling the slowest step in the pipeline.
     p = op("01_main")
-    (pp.process_image(primary_raw, None)
+    (pp.standardize(Image.open(cutout).convert("RGBA")).convert("RGB")
        .resize((mh.SIZE, mh.SIZE), Image.LANCZOS)
        .save(p, quality=92)); made.append(p)
 
@@ -128,7 +132,8 @@ def build_for_sku(sku, specs, provider, use_ollama, reanalyze, ext="webp",
                 sp.get("detail_label", "CLOSER LOOK"), cont, op("07_detail")))
 
     # quality report (deterministic checks + optional VLM semantic check)
-    report = quality.check_gallery(sku, out_dir, mh.SIZE, cutout_path=cutout)
+    report = quality.check_gallery(sku, out_dir, cutout_path=cutout,
+                                   copy_source=cont.get("source", ""))
     if vlm:   # step 6: does the lifestyle image faithfully show the real product?
         v = quality.vlm_check(primary_raw, op("03_lifestyle_a"))
         report["vlm_check"] = v
@@ -157,6 +162,8 @@ def main():
                     help="save generated scenes to backgrounds/ for reuse (memory sequencing)")
     ap.add_argument("--vlm-check", action="store_true",
                     help="VLM check that the lifestyle image matches the real product")
+    ap.add_argument("--allow-fallback", action="store_true",
+                    help="use placeholder copy when analysis fails instead of skipping the SKU")
     args = ap.parse_args()
 
     specs = load_specs()
@@ -172,7 +179,8 @@ def main():
                                    reanalyze=args.reanalyze, ext=args.format,
                                    per_product=args.per_product,
                                    cache_bg=args.cache_backgrounds,
-                                   vlm=args.vlm_check):
+                                   vlm=args.vlm_check,
+                                   allow_fallback=args.allow_fallback):
                 print(f"  -> {p}")
         except Exception as exc:  # keep the batch alive
             print(f"  ! {sku} failed: {exc}", file=sys.stderr)

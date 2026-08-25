@@ -14,6 +14,8 @@ dict (which the free Gemini *text* model can fill in — see build_content()).
 """
 
 import os
+from functools import lru_cache
+
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
 # --------------------------------------------------------------------------- #
@@ -44,7 +46,10 @@ THEME = {
 W = SIZE * SS
 
 
+@lru_cache(maxsize=256)
 def _font(name, px):
+    """Cached: _fit_font() searches by re-rendering, so an uncached load here
+    means re-reading the same .otf from disk dozens of times per text element."""
     for d in _FONT_DIRS:
         p = os.path.join(d, name)
         if os.path.exists(p):
@@ -110,10 +115,18 @@ def add_podium(bg, cx, base_y):
 # --------------------------------------------------------------------------- #
 # Product
 # --------------------------------------------------------------------------- #
-def place_product(bg, cutout, cx, base_y, target_h):
-    """Scale cutout to target_h, drop a soft shadow, sit it on base_y."""
+def place_product(bg, cutout, cx, base_y, target_h, max_w=None):
+    """Scale cutout into a target_h x max_w box, shadow it, sit it on base_y.
+
+    Returns (bg, (x, y, w, h)) so callers can lay text out around the product
+    instead of guessing where it ended up. Capping the width matters: a wide
+    product scaled by height alone spills into the text column.
+    """
     scale = target_h / cutout.height
-    prod = cutout.resize((max(1, int(cutout.width * scale)), target_h), Image.LANCZOS)
+    if max_w:
+        scale = min(scale, max_w / cutout.width)
+    prod = cutout.resize((max(1, int(cutout.width * scale)),
+                          max(1, int(cutout.height * scale))), Image.LANCZOS)
     px = cx - prod.width // 2
     py = base_y - prod.height + int(0.02 * W)  # slight overlap into podium
 
@@ -126,7 +139,7 @@ def place_product(bg, cutout, cx, base_y, target_h):
     bg.alpha_composite(shadow)
 
     bg.alpha_composite(prod.convert("RGBA"), (px, py))
-    return bg
+    return bg, (px, py, prod.width, prod.height)
 
 
 # --------------------------------------------------------------------------- #
@@ -261,7 +274,7 @@ def overlay_hero_text(bg, content, theme):
     ribbon, side callout and brand logo. All text auto-shrinks to its zone so it
     never overlaps the product (centred right) or runs off-canvas."""
     x0, y0 = int(W * 0.05), int(W * 0.06)
-    LEFT_W = int(W * 0.42)          # text column keeps clear of the product
+    LEFT_W = int(W * 0.40)          # text column keeps clear of the product
 
     # --- headline banners (top-left) ---
     f_ban = _fit_font("Montserrat-ExtraBold.otf",
@@ -323,7 +336,8 @@ def render_hero(cutout_path, content, out_path, background=None):
     studio background is generated. The real product cutout is always composited
     on top — the scene is never trusted to contain the product."""
     theme = {**THEME, **content.get("theme", {})}
-    cx, base_y = int(W * 0.60), int(W * 0.86)
+    # Product column sits to the right of the 0.40W text column, with a gutter.
+    cx, base_y = int(W * 0.71), int(W * 0.86)
 
     if background is None:
         bg = make_background(theme)
@@ -332,7 +346,8 @@ def render_hero(cutout_path, content, out_path, background=None):
 
     bg = add_podium(bg, cx, base_y)
     cutout = Image.open(cutout_path).convert("RGBA")
-    bg = place_product(bg, cutout, cx, base_y, target_h=int(W * 0.66))
+    bg, _ = place_product(bg, cutout, cx, base_y,
+                          target_h=int(W * 0.66), max_w=int(W * 0.48))
 
     overlay_hero_text(bg, content, theme)
     final = bg.convert("RGB").resize((SIZE, SIZE), Image.LANCZOS)

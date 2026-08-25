@@ -11,7 +11,7 @@ pip install -r requirements.txt
 
 ## 2. Smoke-test the whole pipeline FREE first (no Draw Things needed)
 ```bash
-python gallery_pipeline.py --sku SCOOTER-LED-PINK --bg-provider procedural --no-gemini
+python gallery_pipeline.py --sku SCOOTER-LED-PINK --bg-provider procedural --no-ollama
 ```
 If `gallery_out/SCOOTER-LED-PINK/01..07` appear, the move worked. ✅
 (Fonts are bundled in `assets/fonts`, so rendering is OS-independent now.)

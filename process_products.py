@@ -38,6 +38,12 @@ import traceback
 
 from PIL import Image, ImageFilter
 
+try:                                    # optional: sharpens cutout framing
+    import numpy as _np
+    from scipy import ndimage as _ndimage
+except ImportError:                     # pragma: no cover - degraded fallback
+    _np = _ndimage = None
+
 # --------------------------------------------------------------------------- #
 # Configuration — adjust freely
 # --------------------------------------------------------------------------- #
@@ -60,6 +66,12 @@ SHADOW_BLUR = 40                        # Gaussian blur radius in px
 SHADOW_OFFSET = (0, 45)                 # (x, y) shadow offset in px
 
 VALID_EXTENSIONS = (".jpg", ".jpeg", ".png", ".webp")
+
+# Cutout cleanup (see trim_to_content). ALPHA_FLOOR is the alpha below which a
+# pixel is treated as background haze rather than product; BLOB_KEEP_RATIO is
+# the minimum size of a blob, relative to the largest one, that is kept.
+ALPHA_FLOOR = int(os.environ.get("CUTOUT_ALPHA_FLOOR", "40"))
+BLOB_KEEP_RATIO = float(os.environ.get("CUTOUT_BLOB_KEEP", "0.05"))
 
 # Gemini
 GEMINI_MODEL = "gemini-3.6-flash"
@@ -94,10 +106,53 @@ def remove_background(image: Image.Image) -> Image.Image:
     return cutout.convert("RGBA")
 
 
+def _solid_bbox_pil(alpha: Image.Image, floor: int):
+    """Threshold-only bbox. Fallback when SciPy is unavailable."""
+    return alpha.point(lambda a: 255 if a > floor else 0).getbbox()
+
+
 def trim_to_content(image: Image.Image) -> Image.Image:
-    """Crop transparent margins so padding is measured from the real object."""
-    bbox = image.getbbox()
-    return image.crop(bbox) if bbox else image
+    """Crop to the real object and drop stray blobs around it.
+
+    rembg does not return a clean binary mask — it leaves a haze of alpha 1-20
+    across the whole frame. A plain getbbox() (which measures alpha > 0)
+    therefore returns the ENTIRE image, so the object gets scaled down to fit
+    its own leftover background and ends up small and off-centre in every slot.
+
+    Instead: threshold the alpha, keep only blobs of a meaningful size (so a
+    floor line, a price tag or a neighbouring toy stops inflating the box),
+    zero everything outside them, and crop to what is left. Anti-aliased edges
+    survive because the keep-mask is dilated a few pixels before it is applied.
+    """
+    if image.mode != "RGBA":
+        image = image.convert("RGBA")
+    alpha = image.getchannel("A")
+
+    if _np is None or _ndimage is None:      # SciPy/NumPy missing — threshold only
+        bbox = _solid_bbox_pil(alpha, ALPHA_FLOOR)
+        return image.crop(bbox) if bbox else image
+
+    a = _np.asarray(alpha)
+    mask = a > ALPHA_FLOOR
+    if not mask.any():
+        bbox = image.getbbox()               # nothing solid — keep old behaviour
+        return image.crop(bbox) if bbox else image
+
+    labels, count = _ndimage.label(mask)
+    sizes = _ndimage.sum_labels(mask, labels, index=range(1, count + 1))
+    cutoff = sizes.max() * BLOB_KEEP_RATIO
+    keep_ids = [i + 1 for i, s in enumerate(sizes) if s >= cutoff]
+    keep = _np.isin(labels, keep_ids)
+
+    # Grow the keep-mask so the object's soft edge (alpha below the floor but
+    # touching the solid core) is not clipped into a hard, jagged outline.
+    grow = max(2, min(image.size) // 400)
+    keep = _ndimage.binary_dilation(keep, iterations=grow)
+
+    trimmed = image.copy()
+    trimmed.putalpha(Image.fromarray(_np.where(keep, a, 0).astype("uint8")))
+    bbox = trimmed.getchannel("A").getbbox()
+    return trimmed.crop(bbox) if bbox else trimmed
 
 
 def make_shadow(cutout: Image.Image, canvas_size: int) -> Image.Image:

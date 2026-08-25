@@ -31,7 +31,7 @@ Save each result into `backgrounds/` named:
 ### 3. Run
 ```bash
 .venv/bin/python gallery_pipeline.py --sku SCOOTER-LED-PINK --bg-provider folder
-# add --no-gemini to skip the copy API
+# add --no-ollama to skip the copy API
 ```
 Any missing background just falls back to the procedural studio look — nothing breaks.
 

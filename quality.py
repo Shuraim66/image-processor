@@ -28,7 +28,7 @@ def _corner_means(img, s=14):
     return out
 
 
-def check_image(path, expect_size, is_main):
+def check_image(path, is_main):
     checks = []
     img = Image.open(path).convert("RGB")
 
@@ -52,14 +52,17 @@ def check_image(path, expect_size, is_main):
     return checks
 
 
-def check_gallery(sku, out_dir, expect_size, cutout_path=None):
-    report = {"sku": sku, "status": "pass", "images": []}
+def check_gallery(sku, out_dir, cutout_path=None, copy_source=""):
+    report = {"sku": sku, "status": "pass", "copy_source": copy_source, "images": []}
+    if copy_source.startswith("fallback"):
+        report["status"] = "review"
+        report["note"] = f"copy is placeholder text ({copy_source}) — not written by the model"
     files = sorted(f for f in os.listdir(out_dir)
                    if f.lower().endswith(IMG_EXTS))
     for f in files:
         is_main = f.startswith("01")
         try:
-            checks = check_image(os.path.join(out_dir, f), expect_size, is_main)
+            checks = check_image(os.path.join(out_dir, f), is_main)
         except Exception as exc:  # noqa: BLE001
             checks = [{"check": "open", "status": "fail", "detail": str(exc)}]
         if any(c["status"] == "fail" for c in checks):
@@ -75,10 +78,10 @@ def check_gallery(sku, out_dir, expect_size, cutout_path=None):
             report["cutout_coverage"] = round(frac, 3)
             if frac < 0.05:                              # product almost entirely removed
                 report["status"] = "review"
-                report["note"] = "cutout nearly empty — background removal may have failed"
+                report.setdefault("note", "cutout nearly empty — background removal may have failed")
             elif frac > 0.97:                            # nothing removed — likely kept the bg
                 report["status"] = "review"
-                report["note"] = "cutout almost fully opaque — background may not have been removed"
+                report.setdefault("note", "cutout almost fully opaque — background may not have been removed")
     return report
 
 

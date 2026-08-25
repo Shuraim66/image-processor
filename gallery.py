@@ -59,32 +59,44 @@ def render_infographic(cutout_path, content, out_path):
               content.get("info_title", "WHY YOU'LL LOVE IT"),
               f_title, theme["ink"], anchor="left")
 
-    # product centred
-    cx, base_y = int(W * 0.5), int(W * 0.82)
+    # Product centred, width-capped so it cannot grow into the label columns.
+    cx, base_y = int(W * 0.5), int(W * 0.78)
     cutout = Image.open(cutout_path).convert("RGBA")
-    bg = mh.place_product(bg, cutout, cx, base_y, target_h=int(W * 0.52))
+    bg, (px, py, pw, ph) = mh.place_product(bg, cutout, cx, base_y,
+                                            target_h=int(W * 0.52),
+                                            max_w=int(W * 0.30))
 
-    # four features: two left, two right, with dotted connectors
-    f_feat = mh._font("Montserrat-Bold.otf", 34)
-    r = int(W * 0.033)
+    # Four features: two left, two right, with dotted connectors. Labels are
+    # fitted to the gap that is actually left between their icon and the
+    # product, so a long feature name shrinks instead of running over the toy.
+    r = int(W * 0.030)
+    gutter = int(W * 0.02)
     feats = content["features"][:4]
-    slots = [(0.07, 0.40, "L"), (0.07, 0.62, "L"),
-             (0.79, 0.40, "R"), (0.79, 0.62, "R")]
+    slots = [(0.045, 0.40, "L"), (0.045, 0.62, "L"),
+             (0.865, 0.40, "R"), (0.865, 0.62, "R")]
     for feat, (fx, fy, side) in zip(feats, slots):
         icx, icy = int(W * fx) + r, int(W * fy)
-        col = theme["primary"] if (fx < 0.5) else theme["accent"]
+        col = theme["primary"] if side == "L" else theme["accent"]
         d = ImageDraw.Draw(bg)
-        anchor = (icx + r, icy) if side == "L" else (icx - r, icy)
-        _dotted_line(d, anchor, (cx + (-int(W*0.16) if side=="L" else int(W*0.16)), icy),
-                     (*theme["ink"], 120))
+        if side == "L":
+            tx = icx + 2 * r
+            avail = max(int(W * 0.08), px - tx - gutter)
+            _dotted_line(d, (icx + r, icy), (px - gutter // 2, icy), (*theme["ink"], 120))
+        else:
+            tx = icx - 2 * r
+            avail = max(int(W * 0.08), tx - (px + pw) - gutter)
+            _dotted_line(d, (icx - r, icy), (px + pw + gutter // 2, icy), (*theme["ink"], 120))
         mh.draw_feature_icon(bg, icx, icy, r, feat["icon"], col)
+
         lines = feat["label"].split("\n")
-        tx = icx + 2 * r if side == "L" else icx - 2 * r
-        ty = icy - (len(lines) * 42 * SS) // 2
+        ff = mh._fit_font("Montserrat-Bold.otf", lines, avail, 34, 20)
+        asc, desc = ff.getmetrics()
+        lh = asc + desc
+        ty = icy - (len(lines) * lh) // 2
         for ln in lines:
-            wln = f_feat.getbbox(ln)[2]
-            d.text((tx if side == "L" else tx - wln, ty), ln, font=f_feat, fill=theme["ink"])
-            ty += 44 * SS
+            wln = ff.getbbox(ln)[2]
+            d.text((tx if side == "L" else tx - wln, ty), ln, font=ff, fill=theme["ink"])
+            ty += lh
 
     _logo(bg, x_frac=0.86, y_frac=0.035)
     bg.convert("RGB").resize((SIZE, SIZE), Image.LANCZOS).save(out_path, quality=94)
@@ -106,8 +118,9 @@ def render_size_card(cutout_path, specs, out_path):
 
     cx, base_y = int(W * 0.52), int(W * 0.74)
     cutout = Image.open(cutout_path).convert("RGBA")
-    scale = int(W * 0.5) / cutout.height
-    prod = cutout.resize((int(cutout.width * scale), int(W * 0.5)), Image.LANCZOS)
+    scale = min(int(W * 0.5) / cutout.height, int(W * 0.5) / cutout.width)
+    prod = cutout.resize((max(1, int(cutout.width * scale)),
+                          max(1, int(cutout.height * scale))), Image.LANCZOS)
     px, py = cx - prod.width // 2, base_y - prod.height
     bg.alpha_composite(prod, (px, py))
 

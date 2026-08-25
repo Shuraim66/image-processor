@@ -6,11 +6,11 @@ Sends ALL of a product's photos together to a local vision model and returns a
 validated ProductProfile (Pydantic), saved as product.json. Replaces the cloud
 Gemini call: fully local, no API key, no quota.
 
-    ollama pull qwen3-vl:8b            # once, on the Mac
+    ollama pull qwen3-vl:8b            # once, on the Mac\n    export OLLAMA_VLM=qwen3-vl:8b-instruct-q4_K_M   # or pin your tag
     python analyzer.py input/SCOOTER-LED-PINK
     python analyzer.py --all           # every SKU under input/
 
-Falls back to deterministic copy if Ollama is unavailable, so nothing crashes.
+Fails loudly if the model is unavailable; pass --allow-fallback to write\nplaceholder copy instead. Every profile records which model wrote it.
 """
 
 import argparse
@@ -37,6 +37,7 @@ class Feature(BaseModel):
 
 class ProductProfile(BaseModel):
     sku: str = ""
+    source: str = ""                # model tag that wrote this, or "fallback:<why>"
     name: str                       # short punchy name for the hero wordmark (CAPS)
     title: str                      # full marketplace product title
     tagline_top: str
@@ -86,13 +87,42 @@ PROMPT = (
 )
 
 
+class AnalyzerError(RuntimeError):
+    """Analysis could not be completed and fallback copy was not permitted."""
+
+
+def resolve_model(name: str = OLLAMA_MODEL) -> str:
+    """Return an Ollama tag that is actually installed, or raise.
+
+    Tag names are exact in Ollama: asking for 'qwen3-vl:8b' when only
+    'qwen3-vl:8b-instruct-q4_K_M' is pulled is a hard error, not a near miss.
+    Rather than let that surface as generic filler copy on every product, match
+    on the model family and say plainly which tag was chosen.
+    """
+    import ollama
+    installed = [m.model for m in ollama.list().models]
+    if name in installed:
+        return name
+    family = name.split(":")[0]
+    matches = sorted((t for t in installed if t.split(":")[0] == family), key=len)
+    if matches:
+        print(f"  [analyzer] '{name}' is not installed; using '{matches[0]}'. "
+              f"Set OLLAMA_VLM to silence this.", file=sys.stderr)
+        return matches[0]
+    raise AnalyzerError(
+        f"no Ollama model matching '{name}' is installed "
+        f"(found: {', '.join(installed) or 'none'}). "
+        f"Run 'ollama pull {name}' or set OLLAMA_VLM to an installed tag.")
+
+
 # --------------------------------------------------------------------------- #
 # Fallback (no Ollama)
 # --------------------------------------------------------------------------- #
-def _fallback(sku: str) -> ProductProfile:
+def _fallback(sku: str, why: str = "unspecified") -> ProductProfile:
     pretty = sku.replace("-", " ").title()
     return ProductProfile(
-        sku=sku, name=sku.split("-")[0].upper(), title=pretty,
+        sku=sku, source=f"fallback:{why}",
+        name=sku.split("-")[0].upper(), title=pretty,
         tagline_top="BUILT FOR", tagline_sub="BIG SMILES!",
         description=f"The {pretty} is a fun, well-made toy kids will love.",
         bullet_points=[f"{pretty} — great gift", "Fun and durable",
@@ -117,7 +147,7 @@ def _fallback(sku: str) -> ProductProfile:
 def _normalize(data: dict, sku: str) -> dict:
     data["sku"] = sku
     feats = [f for f in data.get("features", []) if f.get("icon") in ICONS][:4]
-    fb = _fallback(sku).features
+    fb = _fallback(sku, "padding").features
     while len(feats) < 4:
         f = fb[len(feats)]
         feats.append({"icon": f.icon, "label": f.label})
@@ -133,41 +163,69 @@ def images_in(folder: str) -> List[str]:
                   if f.lower().endswith(VALID_EXTS))
 
 
-def analyze(sku: str, image_paths: List[str], use_ollama: bool = True) -> ProductProfile:
-    if not (use_ollama and image_paths):
-        return _fallback(sku)
+def _request_schema() -> dict:
+    """The schema the model is asked to fill — bookkeeping fields removed so it
+    does not waste tokens inventing an sku or a source it cannot know."""
+    schema = ProductProfile.model_json_schema()
+    for field in ("sku", "source"):
+        schema.get("properties", {}).pop(field, None)
+        if field in schema.get("required", []):
+            schema["required"].remove(field)
+    return schema
+
+
+def analyze(sku: str, image_paths: List[str], use_ollama: bool = True,
+            allow_fallback: bool = False) -> ProductProfile:
+    """Analyze a product's photos into a validated profile.
+
+    On failure this raises AnalyzerError unless `allow_fallback` is set. That is
+    deliberate: silently substituting generic copy is invisible at one product
+    and catastrophic at a thousand, where it would fill a live storefront with
+    "a fun, well-made toy kids will love" and nothing would flag it.
+    """
+    if not use_ollama:
+        return _fallback(sku, "requested")       # explicit --no-ollama
+    if not image_paths:
+        if allow_fallback:
+            print(f"  [analyzer] no photos for {sku}; using fallback", file=sys.stderr)
+            return _fallback(sku, "no-photos")
+        raise AnalyzerError(f"no photos to analyze in the {sku} folder")
+
     try:
         import ollama
+        model = resolve_model()
         resp = ollama.chat(
-            model=OLLAMA_MODEL,
+            model=model,
             messages=[{"role": "user", "content": PROMPT, "images": image_paths}],
-            format=ProductProfile.model_json_schema(),   # structured output
+            format=_request_schema(),                    # structured output
             options={"temperature": 0.4,
                      "num_ctx": int(os.environ.get("OLLAMA_NUM_CTX", "8192"))},
         )
         data = _normalize(json.loads(resp["message"]["content"]), sku)
+        data["source"] = model
         return ProductProfile(**data)
-    except (ImportError, ConnectionError) as exc:
-        print(f"  [analyzer] Ollama unavailable ({exc}); using fallback", file=sys.stderr)
-        return _fallback(sku)
-    except (ValidationError, json.JSONDecodeError, KeyError) as exc:
-        print(f"  [analyzer] bad model output for {sku} ({exc}); using fallback",
-              file=sys.stderr)
-        return _fallback(sku)
-    except Exception as exc:  # network/model errors — keep the batch alive
-        print(f"  [analyzer] error for {sku} ({exc}); using fallback", file=sys.stderr)
-        return _fallback(sku)
+    except AnalyzerError:
+        if not allow_fallback:
+            raise
+        print(f"  [analyzer] {sku}: model unavailable; using fallback", file=sys.stderr)
+        return _fallback(sku, "no-model")
+    except Exception as exc:  # noqa: BLE001 — import/network/parse/validation
+        if not allow_fallback:
+            raise AnalyzerError(f"{sku}: analysis failed ({type(exc).__name__}: {exc})") from exc
+        print(f"  [analyzer] {sku}: analysis failed ({exc}); using fallback", file=sys.stderr)
+        return _fallback(sku, "error")
 
 
-def analyze_folder(sku_folder: str, use_ollama: bool = True) -> ProductProfile:
+def analyze_folder(sku_folder: str, use_ollama: bool = True,
+                   allow_fallback: bool = False) -> ProductProfile:
     sku = os.path.basename(os.path.normpath(sku_folder))
     imgs = images_in(sku_folder)
     print(f"[{sku}] {len(imgs)} photo(s) -> {OLLAMA_MODEL if use_ollama else 'fallback'}")
-    profile = analyze(sku, imgs, use_ollama=use_ollama)
+    profile = analyze(sku, imgs, use_ollama=use_ollama, allow_fallback=allow_fallback)
     out = os.path.join(sku_folder, "product.json")
     with open(out, "w", encoding="utf-8") as f:
         f.write(profile.model_dump_json(indent=2))
-    print(f"  -> {out}")
+    print(f"  -> {out}  [{profile.source}]")
     return profile
 
 
@@ -176,6 +234,9 @@ def main():
     ap.add_argument("folder", nargs="?", help="a single SKU folder (e.g. input/SCOOTER-LED-PINK)")
     ap.add_argument("--all", action="store_true", help="every SKU folder under input/")
     ap.add_argument("--no-ollama", action="store_true", help="skip the model; deterministic fallback")
+    ap.add_argument("--allow-fallback", action="store_true",
+                    help="write placeholder copy instead of failing when analysis breaks "
+                         "(off by default so a batch cannot silently fill with filler)")
     args = ap.parse_args()
 
     if args.all:
@@ -186,8 +247,25 @@ def main():
     else:
         ap.error("give a SKU folder or --all")
 
+    failed, fell_back = [], []
     for f in folders:
-        analyze_folder(f, use_ollama=not args.no_ollama)
+        try:
+            profile = analyze_folder(f, use_ollama=not args.no_ollama,
+                                     allow_fallback=args.allow_fallback)
+        except AnalyzerError as exc:
+            print(f"  ! {exc}", file=sys.stderr)
+            failed.append(os.path.basename(os.path.normpath(f)))
+            continue
+        if profile.source.startswith("fallback"):
+            fell_back.append(profile.sku)
+
+    print(f"\nAnalyzed {len(folders) - len(failed)}/{len(folders)}.")
+    if fell_back:
+        print(f"Placeholder copy (review before publishing): {', '.join(fell_back)}",
+              file=sys.stderr)
+    if failed:
+        print(f"Failed: {', '.join(failed)}", file=sys.stderr)
+        return 1
     return 0
 
 
