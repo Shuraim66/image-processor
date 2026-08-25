@@ -16,3 +16,4 @@ backgrounds/
 woocommerce_import.csv
 input/**/product.json
 shopify_import.csv
+specs.csv

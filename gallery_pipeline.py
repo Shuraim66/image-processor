@@ -37,6 +37,7 @@ import analyzer
 import palette
 import providers
 import scenes
+import specs as specs_mod
 import quality
 
 OUTPUT_ROOT = "gallery_out"
@@ -52,12 +53,11 @@ WORKER_PEAK_GB = 3.5
 
 
 def load_specs():
-    with open(SPECS_PATH, encoding="utf-8") as f:
-        return json.load(f)
+    return specs_mod.load(SPECS_PATH)
 
 
 def specs_for(specs, sku):
-    return {**specs.get("_default", {}), **specs.get(sku, {})}
+    return specs_mod.for_sku(specs, sku)
 
 
 def get_profile(sku, folder, use_ollama, reanalyze, allow_fallback=False):
@@ -138,13 +138,22 @@ def build_for_sku(sku, specs, provider, use_ollama, reanalyze, ext="webp",
     # 05 — feature infographic
     made.append(gallery.render_infographic(cutout, cont, op("05_infographic")))
 
-    # 06 — size & age card
-    made.append(gallery.render_size_card(cutout, {
-        "title": sp.get("title", "SIZE & SPECS"),
-        "height": sp["height"], "length": sp["length"], "badges": sp["badges"],
-        "theme": cont.get("theme", {}),
-        "category": cont.get("category"),
-    }, op("06_size")))
+    # 06 — size & age card. Skipped without real measurements: a card reading
+    # "≈ — cm" with arrows spanning nothing looks like a specification and is
+    # worse than a six-image gallery. `python specs.py` lists what is missing.
+    skipped = []
+    if specs_mod.has_dimensions(sp):
+        made.append(gallery.render_size_card(cutout, {
+            "title": sp.get("title", "SIZE & SPECS"),
+            "height": sp["height"], "length": sp["length"], "badges": sp["badges"],
+            "theme": cont.get("theme", {}),
+            "category": cont.get("category"),
+        }, op("06_size")))
+    else:
+        skipped.append("06_size (no dimensions in specs.json/specs.csv)")
+        stale = op("06_size")
+        if os.path.exists(stale):        # drop a card built before the data went away
+            os.remove(stale)
 
     # 07 — detail close-up
     made.append(gallery.render_detail(primary_raw, tuple(sp["detail_crop"]),
@@ -154,6 +163,8 @@ def build_for_sku(sku, specs, provider, use_ollama, reanalyze, ext="webp",
     report = quality.check_gallery(sku, out_dir, cutout_path=cutout,
                                    copy_source=cont.get("source", ""),
                                    copy_flags=cont.get("review_flags", []))
+    if skipped:
+        report["skipped_slots"] = skipped
     if vlm:   # step 6: does the lifestyle image faithfully show the real product?
         v = quality.vlm_check(primary_raw, op("03_lifestyle_a"))
         report["vlm_check"] = v
