@@ -193,24 +193,33 @@ def write_plates(out_dir=BG_DIR, overwrite=False):
     return written
 
 
-def _list_categories():
-    for path in sorted(glob.glob(os.path.join("input", "*", "product.json"))):
+def _list_categories(out_dir="output"):
+    paths = sorted(glob.glob(os.path.join(out_dir, "*", "product.json")))
+    if not paths:   # pre-output-root runs kept profiles beside the photos
+        paths = sorted(glob.glob(os.path.join("input", "*", "product.json")))
+    if not paths:
+        print("No product.json found — run analyzer.py first.")
+        return
+    for path in paths:
         with open(path, encoding="utf-8") as fh:
             content = json.load(fh)
         sku = os.path.basename(os.path.dirname(path))
-        print(f"{sku:26s} -> {category_for(content)}")
+        print(f"  {sku:26s} -> {category_for(content):9s} "
+              f"({', '.join(content.get('tags', [])[:4])})")
 
 
 def main():
     ap = argparse.ArgumentParser(description="Scene categories and placeholder plates.")
     ap.add_argument("--list", action="store_true",
                     help="show the category each SKU resolves to, and stop")
+    ap.add_argument("--out-dir", default="output", metavar="DIR",
+                    help="where product.json files live (default output/)")
     ap.add_argument("--overwrite", action="store_true",
                     help="replace plates that already exist (e.g. your real ones)")
     args = ap.parse_args()
 
     if args.list:
-        _list_categories()
+        _list_categories(args.out_dir)
         return 0
     write_plates(overwrite=args.overwrite)
     print("\nThese are placeholders. Replace them with Draw Things plates using "
