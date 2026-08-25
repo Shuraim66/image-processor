@@ -96,6 +96,8 @@ def build_for_sku(sku, specs, provider, use_ollama, reanalyze, ext="webp",
     # green plant dome stop shipping in the same corporate blue and red. A theme
     # pinned in product.json wins.
     cont["theme"] = palette.as_theme(cont.get("theme")) or palette.extract_theme(cutout)
+    # Category drives both the scene plate and the display typeface.
+    cont["category"] = scenes.category_for(cont)
     sp = specs_for(specs, sku)
     made = []
 
@@ -118,7 +120,7 @@ def build_for_sku(sku, specs, provider, use_ollama, reanalyze, ext="webp",
     for slot, variant, prompt in [("03_lifestyle_a", "A", prompts[0]),
                                   ("04_lifestyle_b", "B", prompts[1])]:
         scene = provider.scene(sku, cutout, primary_raw, variant, prompt,
-                               scenes.category_for(cont))
+                               cont["category"])
         if cache_bg:   # step 7: save the scene so a later --bg-provider folder run reuses it
             os.makedirs("backgrounds", exist_ok=True)
             scene.convert("RGB").save(os.path.join("backgrounds", f"{sku}_{variant.lower()}.{ext}"))
@@ -132,6 +134,7 @@ def build_for_sku(sku, specs, provider, use_ollama, reanalyze, ext="webp",
         "title": sp.get("title", "SIZE & SPECS"),
         "height": sp["height"], "length": sp["length"], "badges": sp["badges"],
         "theme": cont.get("theme", {}),
+        "category": cont.get("category"),
     }, op("06_size")))
 
     # 07 — detail close-up

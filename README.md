@@ -83,7 +83,7 @@ Writes `gallery_out/<SKU>/01_main … 07_detail`:
 input/<SKU>/*.jpg     raw product photos (one folder per SKU)
 logo.png              brand watermark / badge (transparent)
 specs.json            per-SKU size-card data (dimensions, badges)
-assets/fonts/         bundled Montserrat (OS-portable rendering)
+assets/fonts/         bundled faces + licences (OS-portable rendering)
 backgrounds/          scene plates, one pair per category (see scenes.py)
 process_products.py   catalog + CSV, cutout trimming
 gallery_pipeline.py   7-slot gallery orchestrator
@@ -92,11 +92,14 @@ gallery.py            infographic / size / detail slots
 analyzer.py           local VLM -> product.json
 palette.py            per-product colours from the cutout
 scenes.py             scene categories + placeholder plates
+typeset.py            per-category display typography
 providers.py          background providers
 ```
 
 ## Notes
 - Fonts are bundled, so rendering works on macOS/Linux without system fonts.
+  Anton, Baloo 2, Fredoka and Montserrat are SIL OFL; Luckiest Guy is Apache 2.0.
+  Each product's display face follows its scene category — see `typeset.py`.
 - `specs.json` numbers are placeholders — fill in real supplier dimensions.
 - Never commit API keys; pass `GEMINI_API_KEY` via the environment.
 - The `main` catalog image is kept pure white (no watermark) for marketplace rules.

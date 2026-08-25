@@ -18,6 +18,8 @@ from functools import lru_cache
 
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
+import typeset
+
 # --------------------------------------------------------------------------- #
 # Config
 # --------------------------------------------------------------------------- #
@@ -47,14 +49,26 @@ W = SIZE * SS
 
 
 @lru_cache(maxsize=256)
-def _font(name, px):
-    """Cached: _fit_font() searches by re-rendering, so an uncached load here
-    means re-reading the same .otf from disk dozens of times per text element."""
+def _font(spec, px):
+    """Load a bundled face at `px` (pre-supersample).
+
+    `spec` is a filename, or (filename, instance) for a variable font such as
+    Baloo 2 — PIL loads the default instance otherwise, which is far too light
+    for a headline. Cached because _fit_font() searches by re-measuring, so an
+    uncached load re-reads the same file from disk dozens of times per element.
+    """
+    name, variation = spec if isinstance(spec, tuple) else (spec, None)
+    font = None
     for d in _FONT_DIRS:
         p = os.path.join(d, name)
         if os.path.exists(p):
-            return ImageFont.truetype(p, px * SS)
-    return ImageFont.truetype(name, px * SS)  # let PIL raise a clear error
+            font = ImageFont.truetype(p, px * SS)
+            break
+    if font is None:
+        font = ImageFont.truetype(name, px * SS)  # let PIL raise a clear error
+    if variation:
+        font.set_variation_by_name(variation)
+    return font
 
 
 # --------------------------------------------------------------------------- #
@@ -190,8 +204,11 @@ def banner(base, xy, text, font, fill, text_fill=(255, 255, 255),
            pad_x=26, pad_y=12, radius=26, angle=0, anchor="left"):
     """Rounded 'brush' banner with centered text (supports '\\n'); optional rotation.
 
-    anchor='right' treats xy as the top-RIGHT corner so the banner grows leftward
-    and stays on-canvas.
+    `anchor` says what xy means: 'left' the top-left corner, 'right' the
+    top-RIGHT so the banner grows leftward, 'center' the horizontal midpoint.
+    The banner is only measurable once rendered, so anchoring has to happen here
+    rather than at the call site — which is why a title placed at 0.5W with the
+    default anchor sat off-centre and, with a wide display face, ran off-canvas.
     """
     lines = text.split("\n")
     asc, desc = font.getmetrics()
@@ -211,6 +228,8 @@ def banner(base, xy, text, font, fill, text_fill=(255, 255, 255),
     x, y = xy
     if anchor == "right":
         x -= lay.size[0]
+    elif anchor == "center":
+        x -= lay.size[0] // 2
     base.alpha_composite(lay, (x, y))
     return lay.size
 
@@ -266,17 +285,57 @@ def draw_feature_icon(base, cx, cy, r, kind, circle_color):
 # --------------------------------------------------------------------------- #
 # Compose
 # --------------------------------------------------------------------------- #
-def _fit_font(fontname, lines, max_w, start_px, min_px=16):
-    """Largest font (<= start_px) whose widest line fits within max_w px."""
+def _fit_font(fontname, lines, max_w, start_px, min_px=16, max_h=None):
+    """Largest font (<= start_px) that fits inside max_w, and max_h if given.
+
+    The height ceiling matters now that display faces vary: a condensed face
+    like Anton satisfies a width budget at a point size that would make a short
+    wordmark absurdly tall, so width alone is no longer a sufficient test.
+    """
     if isinstance(lines, str):
         lines = [lines]
     px = start_px
     while px > min_px:
         f = _font(fontname, px)
-        if max(f.getbbox(ln)[2] for ln in lines) <= max_w:
+        boxes = [f.getbbox(ln) for ln in lines]
+        if (max(b[2] for b in boxes) <= max_w
+                and (max_h is None or max(b[3] - b[1] for b in boxes) <= max_h)):
             return f
         px -= 2
     return _font(fontname, min_px)
+
+
+def fit_wrapped(fontspec, text, max_w, start_px, min_px=16, max_lines=2):
+    """Wrap `text` to max_w and shrink until it fits in max_lines. -> (font, lines).
+
+    A caption is a sentence, not a label: measuring it as one line and centring
+    that meant anything longer than the canvas simply ran off both edges.
+    """
+    words = text.split()
+    px = start_px
+    while True:
+        font = _font(fontspec, px)
+        lines, cur = [], ""
+        for word in words:
+            trial = f"{cur} {word}".strip()
+            if not cur or font.getbbox(trial)[2] <= max_w:
+                cur = trial
+            else:
+                lines.append(cur)
+                cur = word
+        if cur:
+            lines.append(cur)
+        if (len(lines) <= max_lines
+                and all(font.getbbox(ln)[2] <= max_w for ln in lines)) or px <= min_px:
+            return font, lines
+        px -= 2
+
+
+def display_font(content, lines, max_w, max_h):
+    """The category's display face, fitted to the space it has."""
+    fonts = typeset.fonts_for(content.get("category"))
+    return _fit_font(fonts["display"], lines, max_w, fonts["hero_px"], 40,
+                     max_h=max_h)
 
 
 def _centred(base, layer, y):
@@ -351,7 +410,7 @@ def overlay_poster_text(bg, content, theme):
 
     # wordmark — the loudest element on the image
     name = content["name"]
-    f_word = _fit_font("Montserrat-Black.otf", name, int(W * 0.86), 190, 60)
+    f_word = display_font(content, name, int(W * 0.86), int(W * 0.115))
     tw, th, ox, oy = _text_size(f_word, name)
     sticker_text(bg, ((W - tw) // 2, int(W * 0.30)), name, f_word,
                  fill=theme["primary"], outline=(255, 255, 255), outline_w=11,
@@ -384,7 +443,7 @@ def overlay_hero_text(bg, content, theme):
            theme["accent"])
 
     # --- sticker wordmark (fit to the left column) ---
-    f_word = _fit_font("Montserrat-Black.otf", content["name"], LEFT_W, 150, 54)
+    f_word = display_font(content, content["name"], LEFT_W, int(W * 0.13))
     sticker_text(bg, (x0, int(W * 0.24)), content["name"], f_word,
                  fill=theme["primary"], outline=(255, 255, 255), outline_w=10,
                  stroke=theme["ink"], stroke_w=4)

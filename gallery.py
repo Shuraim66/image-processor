@@ -54,10 +54,10 @@ def render_infographic(cutout_path, content, out_path):
     bg = _light_bg(theme)
 
     # title
-    f_title = mh._font("Montserrat-ExtraBold.otf", 52)
-    mh.banner(bg, (int(W * 0.5), int(W * 0.05)),
-              content.get("info_title", "WHY YOU'LL LOVE IT"),
-              f_title, theme["ink"], anchor="left")
+    title = content.get("info_title", "WHY YOU'LL LOVE IT")
+    f_title = mh.display_font(content, title, int(W * 0.52), int(W * 0.05))
+    mh.banner(bg, (int(W * 0.5), int(W * 0.05)), title,
+              f_title, theme["ink"], anchor="center")
 
     # Product centred, width-capped so it cannot grow into the label columns.
     cx, base_y = int(W * 0.5), int(W * 0.78)
@@ -112,9 +112,10 @@ def render_size_card(cutout_path, specs, out_path):
     theme = {**mh.THEME, **specs.get("theme", {})}
     bg = _light_bg(theme)
 
-    f_title = mh._font("Montserrat-ExtraBold.otf", 52)
-    mh.banner(bg, (int(W * 0.5), int(W * 0.05)), specs.get("title", "SIZE & SPECS"),
-              f_title, theme["ink"])
+    title = specs.get("title", "SIZE & SPECS")
+    f_title = mh.display_font(specs, title, int(W * 0.52), int(W * 0.05))
+    mh.banner(bg, (int(W * 0.5), int(W * 0.05)), title, f_title, theme["ink"],
+              anchor="center")
 
     cx, base_y = int(W * 0.52), int(W * 0.74)
     cutout = Image.open(cutout_path).convert("RGBA")
@@ -198,13 +199,19 @@ def render_detail(original_path, crop_frac, label, content, out_path):
                         outline=theme["primary"], width=10*SS)
 
     # label banner + caption
-    f_lab = mh._font("Montserrat-ExtraBold.otf", 48)
-    mh.banner(bg, (int(W*0.5), int(W*0.055)), label, f_lab, theme["accent"])
+    f_lab = mh.display_font(content, label, int(W * 0.52), int(W * 0.05))
+    mh.banner(bg, (int(W*0.5), int(W*0.055)), label, f_lab, theme["accent"],
+              anchor="center")
     if content.get("detail_caption"):
-        f_cap = mh._font("Montserrat-SemiBold.otf", 32)
-        cap = content["detail_caption"]
-        cw = f_cap.getbbox(cap)[2]
-        d.text(((W - cw)//2, fy + card + int(W*0.03)), cap, font=f_cap, fill=theme["ink"])
+        f_cap, cap_lines = mh.fit_wrapped("Montserrat-SemiBold.otf",
+                                          content["detail_caption"],
+                                          int(W * 0.84), 34, 18, max_lines=2)
+        asc, desc = f_cap.getmetrics()
+        ty = fy + card + int(W * 0.03)
+        for ln in cap_lines:
+            cw = f_cap.getbbox(ln)[2]
+            d.text(((W - cw) // 2, ty), ln, font=f_cap, fill=theme["ink"])
+            ty += asc + desc
 
     _logo(bg, x_frac=0.86, y_frac=0.035)
     bg.convert("RGB").resize((SIZE, SIZE), Image.LANCZOS).save(out_path, quality=94)
