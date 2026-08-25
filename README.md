@@ -83,7 +83,7 @@ Writes `gallery_out/<SKU>/01_main … 07_detail`:
 | 01 | pure-white main | catalog |
 | 02 | branded hero | template |
 | 03/04 | lifestyle scenes | **background provider** |
-| 05 | feature infographic | template |
+| 05 | feature infographic | template (14-icon set, chosen per product) |
 | 06 | size & age card | `specs.json` / `specs.csv` — skipped if unmeasured |
 | 07 | detail close-up | template |
 

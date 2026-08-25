@@ -72,8 +72,11 @@ def render_infographic(cutout_path, content, out_path):
     r = int(W * 0.030)
     gutter = int(W * 0.02)
     feats = content["features"][:4]
+    # Mirrored about the centre: the right icons previously sat 0.03W further in
+    # than the left ones, so right-hand labels got a narrower budget and shrank
+    # more, which read as a rendering fault rather than a choice.
     slots = [(0.045, 0.40, "L"), (0.045, 0.62, "L"),
-             (0.865, 0.40, "R"), (0.865, 0.62, "R")]
+             (0.895, 0.40, "R"), (0.895, 0.62, "R")]
     for feat, (fx, fy, side) in zip(feats, slots):
         icx, icy = int(W * fx) + r, int(W * fy)
         col = theme["primary"] if side == "L" else theme["accent"]
@@ -89,7 +92,7 @@ def render_infographic(cutout_path, content, out_path):
         mh.draw_feature_icon(bg, icx, icy, r, feat["icon"], col)
 
         lines = feat["label"].split("\n")
-        ff = mh._fit_font("Montserrat-Bold.otf", lines, avail, 34, 20)
+        ff = mh._fit_font("Montserrat-Bold.otf", lines, avail, 34, 22)
         asc, desc = ff.getmetrics()
         lh = asc + desc
         ty = icy - (len(lines) * lh) // 2

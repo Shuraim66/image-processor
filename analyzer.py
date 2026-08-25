@@ -27,7 +27,10 @@ import copyguard
 OLLAMA_MODEL = os.environ.get("OLLAMA_VLM", "qwen3-vl:8b")
 INPUT_DIR = "input"
 VALID_EXTS = (".jpg", ".jpeg", ".png", ".webp")
-ICONS = ["shield", "arrows", "wheel", "smiley"]     # icons the templates can draw
+# Icons the templates can draw (make_hero.ICON_DRAWERS). Kept wide so features
+# describe the product instead of being bent to fit four glyphs.
+ICONS = ["shield", "arrows", "wheel", "smiley", "bulb", "music", "battery",
+         "book", "heart", "star", "gift", "droplet", "plant", "ruler"]
 
 
 # --------------------------------------------------------------------------- #
@@ -76,10 +79,16 @@ PROMPT = (
     "- tagline_top / tagline_sub: a two-line hook (2-3 words each, in CAPS).\n"
     "- description: 3-5 vivid sentences.\n"
     "- bullet_points: exactly 5 concise selling points.\n"
-    "- features: EXACTLY 4. Each has 'label' (two short CAPS lines joined by \\n) and "
-    "'icon' chosen ONLY from: shield (safety/sturdy), arrows (adjustable/size), "
-    "wheel (movement/smooth), smiley (fun/age). Every label must be a POSITIVE "
-    "selling point, never a drawback.\n"
+    "- features: EXACTLY 4, each describing a DIFFERENT real strength of this "
+    "product. Each has 'label' (two short CAPS lines joined by \\n) and an 'icon' "
+    "chosen ONLY from this list, picking the one that genuinely fits:\n"
+    "    shield=safety/sturdy   arrows=adjustable/size   wheel=rolling/driving\n"
+    "    smiley=fun/age         bulb=lights/LEDs         music=sound/songs\n"
+    "    battery=battery/power  book=learning/education  heart=soft/cuddly\n"
+    "    star=premium/favourite gift=gift-ready          droplet=washable/water\n"
+    "    plant=growing/nature   ruler=size/dimensions\n"
+    "  Do NOT use 'wheel' unless the product actually rolls or drives. Do not "
+    "repeat an icon. Every label must be a POSITIVE selling point.\n"
     "- whats_included: ONLY what you can actually see or read on visible "
     "packaging. If no packaging or box contents are visible, return exactly one "
     "item naming the product itself. Never guess at accessories.\n"
@@ -158,6 +167,12 @@ def _fallback(sku: str, why: str = "unspecified") -> ProductProfile:
 
 def _normalize(data: dict, sku: str) -> dict:
     data["sku"] = sku
+    # Labels are set in a heavy display face at small sizes, where mixed case
+    # reads as a mistake next to its neighbours. The prompt asks for CAPS; this
+    # makes it true regardless.
+    for feat in data.get("features", []) or []:
+        if isinstance(feat.get("label"), str):
+            feat["label"] = feat["label"].upper()
     feats = [f for f in data.get("features", []) if f.get("icon") in ICONS][:4]
     fb = _fallback(sku, "padding").features
     while len(feats) < 4:

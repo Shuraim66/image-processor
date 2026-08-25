@@ -241,44 +241,147 @@ def _icon_circle(d, box, color):
     d.ellipse(box, fill=color)
 
 
+# --------------------------------------------------------------------------- #
+# Glyphs. Each draws white marks on a filled circle, in a local frame centred
+# at (x, y) with radius r. `bg` is the circle colour, for knocked-out details.
+#
+# The set is wide on purpose: with only four glyphs the model had to contort
+# real features to fit them, so a plush was given a wheel for "EASY TO MOVE"
+# and a toy laptop a wheel for "SMOOTH INTERACTION".
+# --------------------------------------------------------------------------- #
+def _g_shield(d, x, y, r, w, bg, lw):
+    d.polygon([(x, y - r * .55), (x + r * .45, y - r * .25), (x + r * .45, y + r * .15),
+               (x, y + r * .6), (x - r * .45, y + r * .15), (x - r * .45, y - r * .25)],
+              fill=w)
+    d.line([(x - r * .18, y + r * .02), (x - r * .02, y + r * .22),
+            (x + r * .28, y - r * .22)], fill=bg, width=lw)
+
+
+def _g_arrows(d, x, y, r, w, bg, lw):
+    d.line([(x, y - r * .55), (x, y + r * .55)], fill=w, width=lw)
+    d.polygon([(x, y - r * .62), (x - r * .22, y - r * .3), (x + r * .22, y - r * .3)], fill=w)
+    d.polygon([(x, y + r * .62), (x - r * .22, y + r * .3), (x + r * .22, y + r * .3)], fill=w)
+
+
+def _g_wheel(d, x, y, r, w, bg, lw):
+    import math
+    d.ellipse([x - r * .55, y - r * .55, x + r * .55, y + r * .55], outline=w, width=lw)
+    d.ellipse([x - r * .14, y - r * .14, x + r * .14, y + r * .14], fill=w)
+    for a in range(0, 360, 45):
+        d.line([(x, y), (x + r * .5 * math.cos(math.radians(a)),
+                         y + r * .5 * math.sin(math.radians(a)))], fill=w, width=lw)
+
+
+def _g_smiley(d, x, y, r, w, bg, lw):
+    d.ellipse([x - r * .55, y - r * .55, x + r * .55, y + r * .55], outline=w, width=lw)
+    for ex in (-.22, .22):
+        d.ellipse([x + r * ex - r * .07, y - r * .2 - r * .07,
+                   x + r * ex + r * .07, y - r * .2 + r * .07], fill=w)
+    d.arc([x - r * .3, y - r * .25, x + r * .3, y + r * .3], 20, 160, fill=w, width=lw)
+
+
+def _g_bulb(d, x, y, r, w, bg, lw):
+    """Lights, LEDs, bright ideas."""
+    import math
+    d.ellipse([x - r * .34, y - r * .52, x + r * .34, y + r * .16], fill=w)
+    d.rectangle([x - r * .16, y + r * .12, x + r * .16, y + r * .42], fill=w)
+    d.line([(x - r * .16, y + r * .26), (x + r * .16, y + r * .26)], fill=bg, width=max(2, lw // 2))
+    for a in (-60, -20, 20, 60):
+        rad = math.radians(a - 90)
+        d.line([(x + r * .52 * math.cos(rad), y + r * .52 * math.sin(rad)),
+                (x + r * .74 * math.cos(rad), y + r * .74 * math.sin(rad))],
+               fill=w, width=lw)
+
+
+def _g_music(d, x, y, r, w, bg, lw):
+    """Sound, music, sing-along."""
+    for dx in (-r * .3, r * .3):
+        d.ellipse([x + dx - r * .2, y + r * .16, x + dx + r * .1, y + r * .46], fill=w)
+        d.line([(x + dx + r * .1, y + r * .31), (x + dx + r * .1, y - r * .42)],
+               fill=w, width=lw)
+    d.polygon([(x - r * .2, y - r * .42), (x + r * .4, y - r * .52),
+               (x + r * .4, y - r * .28), (x - r * .2, y - r * .18)], fill=w)
+
+
+def _g_battery(d, x, y, r, w, bg, lw):
+    """Battery powered, long play time."""
+    d.rounded_rectangle([x - r * .5, y - r * .28, x + r * .38, y + r * .28],
+                        radius=r * .1, fill=w)
+    d.rectangle([x + r * .38, y - r * .12, x + r * .54, y + r * .12], fill=w)
+    d.rectangle([x - r * .38, y - r * .16, x + r * .1, y + r * .16], fill=bg)
+
+
+def _g_book(d, x, y, r, w, bg, lw):
+    """Learning, educational, activities."""
+    d.polygon([(x - r * .52, y - r * .34), (x - r * .04, y - r * .22),
+               (x - r * .04, y + r * .46), (x - r * .52, y + r * .34)], fill=w)
+    d.polygon([(x + r * .52, y - r * .34), (x + r * .04, y - r * .22),
+               (x + r * .04, y + r * .46), (x + r * .52, y + r * .34)], fill=w)
+
+
+def _g_heart(d, x, y, r, w, bg, lw):
+    """Soft, cuddly, much-loved."""
+    d.ellipse([x - r * .46, y - r * .38, x - r * .02, y + r * .06], fill=w)
+    d.ellipse([x + r * .02, y - r * .38, x + r * .46, y + r * .06], fill=w)
+    d.polygon([(x - r * .44, y - r * .1), (x + r * .44, y - r * .1), (x, y + r * .5)], fill=w)
+
+
+def _g_star(d, x, y, r, w, bg, lw):
+    """Favourite, premium, top rated."""
+    import math
+    pts = []
+    for i in range(10):
+        rad = math.radians(-90 + i * 36)
+        rr = r * (.56 if i % 2 == 0 else .24)
+        pts.append((x + rr * math.cos(rad), y + rr * math.sin(rad)))
+    d.polygon(pts, fill=w)
+
+
+def _g_gift(d, x, y, r, w, bg, lw):
+    """Gift ready, boxed."""
+    d.rectangle([x - r * .48, y - r * .12, x + r * .48, y + r * .48], fill=w)
+    d.rectangle([x - r * .54, y - r * .34, x + r * .54, y - r * .1], fill=w)
+    d.rectangle([x - r * .09, y - r * .34, x + r * .09, y + r * .48], fill=bg)
+    d.ellipse([x - r * .34, y - r * .56, x - r * .04, y - r * .3], outline=w, width=lw)
+    d.ellipse([x + r * .04, y - r * .56, x + r * .34, y - r * .3], outline=w, width=lw)
+
+
+def _g_droplet(d, x, y, r, w, bg, lw):
+    """Washable, water play, bath safe."""
+    d.polygon([(x, y - r * .58), (x + r * .38, y + r * .1), (x - r * .38, y + r * .1)], fill=w)
+    d.ellipse([x - r * .38, y - r * .18, x + r * .38, y + r * .5], fill=w)
+
+
+def _g_plant(d, x, y, r, w, bg, lw):
+    """Growing, nature, garden."""
+    d.line([(x, y + r * .52), (x, y - r * .3)], fill=w, width=lw)
+    d.ellipse([x - r * .52, y - r * .34, x - r * .02, y + r * .04], fill=w)
+    d.ellipse([x + r * .02, y - r * .5, x + r * .52, y - r * .12], fill=w)
+
+
+def _g_ruler(d, x, y, r, w, bg, lw):
+    """Size, dimensions, measure."""
+    d.rectangle([x - r * .56, y - r * .2, x + r * .56, y + r * .2], fill=w)
+    for i in (-.34, -.1, .14, .38):
+        d.line([(x + r * i, y - r * .2), (x + r * i, y + r * .02)],
+               fill=bg, width=max(2, lw // 2))
+
+
+ICON_DRAWERS = {
+    "shield": _g_shield, "arrows": _g_arrows, "wheel": _g_wheel, "smiley": _g_smiley,
+    "bulb": _g_bulb, "music": _g_music, "battery": _g_battery, "book": _g_book,
+    "heart": _g_heart, "star": _g_star, "gift": _g_gift, "droplet": _g_droplet,
+    "plant": _g_plant, "ruler": _g_ruler,
+}
+
+
 def draw_feature_icon(base, cx, cy, r, kind, circle_color):
     lay = Image.new("RGBA", (r * 2 + 8 * SS, r * 2 + 8 * SS), (0, 0, 0, 0))
     d = ImageDraw.Draw(lay)
     o = 4 * SS
     _icon_circle(d, [o, o, o + 2 * r, o + 2 * r], circle_color)
-    cxl, cyl = o + r, o + r
-    w = (255, 255, 255, 255)
-    lw = max(3, r // 8)
-    if kind == "shield":
-        d.polygon([(cxl, cyl - r * 0.55), (cxl + r * 0.45, cyl - r * 0.25),
-                   (cxl + r * 0.45, cyl + r * 0.15), (cxl, cyl + r * 0.6),
-                   (cxl - r * 0.45, cyl + r * 0.15), (cxl - r * 0.45, cyl - r * 0.25)],
-                  fill=w)
-        d.line([(cxl - r * 0.18, cyl + r * 0.02), (cxl - r * 0.02, cyl + r * 0.22),
-                (cxl + r * 0.28, cyl - r * 0.22)], fill=circle_color, width=lw)
-    elif kind == "arrows":  # adjustable height: up/down arrow
-        d.line([(cxl, cyl - r * 0.55), (cxl, cyl + r * 0.55)], fill=w, width=lw)
-        d.polygon([(cxl, cyl - r * 0.62), (cxl - r * 0.22, cyl - r * 0.3),
-                   (cxl + r * 0.22, cyl - r * 0.3)], fill=w)
-        d.polygon([(cxl, cyl + r * 0.62), (cxl - r * 0.22, cyl + r * 0.3),
-                   (cxl + r * 0.22, cyl + r * 0.3)], fill=w)
-    elif kind == "wheel":
-        d.ellipse([cxl - r * 0.55, cyl - r * 0.55, cxl + r * 0.55, cyl + r * 0.55],
-                  outline=w, width=lw)
-        d.ellipse([cxl - r * 0.14, cyl - r * 0.14, cxl + r * 0.14, cyl + r * 0.14], fill=w)
-        import math
-        for a in range(0, 360, 45):
-            d.line([(cxl, cyl),
-                    (cxl + r * 0.5 * math.cos(math.radians(a)),
-                     cyl + r * 0.5 * math.sin(math.radians(a)))], fill=w, width=lw)
-    elif kind == "smiley":
-        d.ellipse([cxl - r * 0.55, cyl - r * 0.55, cxl + r * 0.55, cyl + r * 0.55],
-                  outline=w, width=lw)
-        for ex in (-0.22, 0.22):
-            d.ellipse([cxl + r * ex - r * 0.07, cyl - r * 0.2 - r * 0.07,
-                       cxl + r * ex + r * 0.07, cyl - r * 0.2 + r * 0.07], fill=w)
-        d.arc([cxl - r * 0.3, cyl - r * 0.25, cxl + r * 0.3, cyl + r * 0.3],
-              20, 160, fill=w, width=lw)
+    draw = ICON_DRAWERS.get(kind, _g_smiley)
+    draw(d, o + r, o + r, r, (255, 255, 255, 255), circle_color, max(3, r // 8))
     base.alpha_composite(lay, (cx - r - o, cy - r - o))
 
 

@@ -62,10 +62,13 @@ _TM_FIELDS = ("name", "title", "seo_title", "meta_description", "tags",
 
 # Replacements when a feature label has to be thrown away, by icon.
 _SAFE_LABELS = {
-    "shield": "SAFE &\nSTURDY",
-    "arrows": "JUST THE\nRIGHT SIZE",
-    "wheel": "SMOOTH &\nRELIABLE",
-    "smiley": "HOURS OF\nFUN",
+    "shield": "SAFE &\nSTURDY",     "arrows": "JUST THE\nRIGHT SIZE",
+    "wheel": "SMOOTH &\nRELIABLE",  "smiley": "HOURS OF\nFUN",
+    "bulb": "BRIGHT\nLIGHT-UP FUN", "music": "FUN\nSOUNDS",
+    "battery": "LONG\nPLAY TIME",   "book": "LEARN &\nPLAY",
+    "heart": "SOFT &\nHUGGABLE",    "star": "A KID\nFAVOURITE",
+    "gift": "GIFT\nREADY",          "droplet": "EASY TO\nWIPE CLEAN",
+    "plant": "GROW &\nDISCOVER",    "ruler": "JUST THE\nRIGHT SIZE",
 }
 
 
