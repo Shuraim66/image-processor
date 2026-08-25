@@ -24,8 +24,12 @@ import glob
 import json
 import os
 import random
+import shutil
+import subprocess
+import sys
 
-from PIL import Image, ImageDraw, ImageFilter
+import numpy as np
+from PIL import Image, ImageDraw, ImageFilter, ImageOps
 
 BG_DIR = "backgrounds"
 PLATE_PX = 1600
@@ -38,10 +42,13 @@ CATEGORY_KEYWORDS = {
     "garden":  ("plant", "grow", "garden", "seed", "greenhouse", "flower",
                 "nature", "botany", "terrarium"),
     "desk":    ("stem", "educational", "learning", "learn", "puzzle", "alphabet",
-                "number", "laptop", "science", "craft", "art", "drawing",
-                "board game", "wooden", "montessori"),
+                "number", "laptop", "science", "board game", "wooden",
+                "montessori", "reading", "maths", "math"),
     "nursery": ("plush", "soft toy", "stuffed", "teddy", "baby", "infant",
                 "cuddle", "doll", "rattle", "night lamp"),
+    "creative": ("art", "craft", "crafts", "paint", "painting", "drawing",
+                 "colouring", "coloring", "beads", "jewellery", "clay",
+                 "sticker", "creative", "make your own", "diy"),
 }
 DEFAULT_CATEGORY = "playroom"
 CATEGORIES = tuple(CATEGORY_KEYWORDS) + (DEFAULT_CATEGORY,)
@@ -59,6 +66,8 @@ PALETTES = {
                  "B": ((234, 238, 244), (188, 172, 152))},
     "nursery":  {"A": ((248, 236, 240), (222, 210, 206)),
                  "B": ((240, 236, 248), (214, 206, 212))},
+    "creative": {"A": ((250, 244, 232), (208, 190, 166)),
+                 "B": ((244, 240, 248), (200, 186, 168))},
 }
 
 
@@ -85,6 +94,7 @@ SILHOUETTES = {
     "garden":   [(-.08, .06, .28, .40), (.76, .00, .32, .40), (.86, .40, .20, .28)],
     "desk":     [(.72, .22, .14, .44), (.86, .18, .12, .48), (-.04, .34, .14, .32)],
     "nursery":  [(-.05, .22, .24, .34), (.80, .16, .26, .40)],
+    "creative": [(.74, .26, .18, .40), (.88, .20, .14, .46), (-.06, .30, .18, .34)],
 }
 
 
@@ -178,6 +188,170 @@ def make_plate(category, variant, size=PLATE_PX):
     return img.convert("RGB").filter(ImageFilter.GaussianBlur(size / 190))
 
 
+# --------------------------------------------------------------------------- #
+# Preparing a photo (or a generated image) into a usable plate
+# --------------------------------------------------------------------------- #
+# Geometry the hero templates assume. A plate that ignores these still renders,
+# but the headline lands on clutter and the product appears to float.
+TEXT_ZONE = 0.42          # left fraction reserved for the headline column
+HORIZON_TARGET = 0.66     # where the surface should sit, as a fraction of height
+HORIZON_BAND = (0.50, 0.84)
+CALM_STDDEV = 34          # above this, the text zone is too busy to read on
+
+
+def _detect_horizon(img):
+    """Fraction down the image where the strongest horizontal edge sits.
+
+    Row-mean brightness changes fastest where a wall meets a floor, which is the
+    line a product needs to stand on. Returns None when nothing stands out.
+    """
+    grey = np.asarray(img.convert("L").resize((96, 96), Image.BILINEAR), float)
+    rows = grey.mean(axis=1)
+    lo, hi = int(96 * HORIZON_BAND[0]), int(96 * HORIZON_BAND[1])
+    steps = np.abs(np.diff(rows))[lo:hi]
+    if steps.size == 0 or steps.max() < 1.5:
+        return None
+    return (lo + int(steps.argmax())) / 96
+
+
+def _square_on_horizon(img):
+    """Crop to a square, sliding the crop so the horizon lands where we want."""
+    w, h = img.size
+    side = min(w, h)
+    left = (w - side) // 2
+    found = _detect_horizon(img)
+    if found is None:
+        top = (h - side) // 2
+    else:
+        # place the detected line at HORIZON_TARGET within the crop
+        top = int(found * h - HORIZON_TARGET * side)
+        top = max(0, min(h - side, top))
+    return img.crop((left, top, left + side, top + side))
+
+
+def _calm_text_zone(img, size):
+    """Blur and lift the headline column until type can sit on it."""
+    zone_w = int(size * TEXT_ZONE)
+    zone = img.crop((0, 0, zone_w, size))
+    busy = float(np.asarray(zone.convert("L"), float).std())
+    if busy > CALM_STDDEV:
+        zone = zone.filter(ImageFilter.GaussianBlur(size / 90))
+    veil = Image.new("RGBA", (zone_w, size), (255, 255, 255, 0))
+    grad = Image.new("L", (zone_w, 1))
+    for x in range(zone_w):                       # strongest at the left edge
+        grad.putpixel((x, 0), int(120 * (1 - x / zone_w) ** 1.4))
+    veil.putalpha(grad.resize((zone_w, size)))
+    zone = Image.alpha_composite(zone.convert("RGBA"), veil)
+    img.paste(zone.convert("RGB"), (0, 0))
+    return busy
+
+
+def prepare_plate(img, size=PLATE_PX):
+    """Turn any photo into a plate the templates can use. -> (image, report)."""
+    img = ImageOps.exif_transpose(img).convert("RGB")
+    before = _detect_horizon(img)
+    img = _square_on_horizon(img).resize((size, size), Image.LANCZOS)
+
+    # Every plate is background behind a product and a headline, so none of it
+    # should be sharp enough to compete.
+    img = img.filter(ImageFilter.GaussianBlur(size / 200))
+    busy = _calm_text_zone(img, size)
+
+    vig = Image.new("L", (size, size), 0)
+    ImageDraw.Draw(vig).ellipse(
+        [-size // 5, -size // 5, size + size // 5, size + size // 5], fill=255)
+    vig = vig.filter(ImageFilter.GaussianBlur(size // 12))
+    dark = Image.new("RGBA", (size, size), (26, 30, 40, 52))
+    img = Image.composite(img.convert("RGBA"),
+                          Image.alpha_composite(img.convert("RGBA"), dark), vig)
+
+    after = _detect_horizon(img)
+    return img.convert("RGB"), {
+        "horizon_before": round(before, 3) if before else None,
+        "horizon_after": round(after, 3) if after else None,
+        "text_zone_stddev": round(busy, 1),
+        "warnings": _plate_warnings(before, after, busy),
+    }
+
+
+def _plate_warnings(before, after, busy):
+    out = []
+    if before is None:
+        out.append("no clear surface line — the product may look like it is floating")
+    elif after is not None and abs(after - HORIZON_TARGET) > 0.09:
+        out.append(f"surface sits at {after:.2f}, wanted ~{HORIZON_TARGET} "
+                   f"(crop could not slide far enough)")
+    if busy > CALM_STDDEV * 1.6:
+        out.append(f"headline column is busy (stddev {busy:.0f}) — "
+                   f"blurred and lifted, but check the hero")
+    return out
+
+
+def prepare_folder(src_dir, out_dir=BG_DIR, size=PLATE_PX):
+    """Prep every image in a folder. Names are kept, so drop in
+    playroom_a.jpg / outdoor_b.png etc. and they land where the pipeline looks."""
+    exts = (".jpg", ".jpeg", ".png", ".webp")
+    files = sorted(f for f in os.listdir(src_dir) if f.lower().endswith(exts))
+    if not files:
+        print(f"No images in {src_dir}", file=sys.stderr)
+        return []
+    os.makedirs(out_dir, exist_ok=True)
+    done = []
+    for name in files:
+        with Image.open(os.path.join(src_dir, name)) as raw:
+            plate, report = prepare_plate(raw, size)
+        dest = os.path.join(out_dir, os.path.splitext(name)[0] + ".jpg")
+        plate.save(dest, quality=90)
+        done.append(dest)
+        note = "  ".join(report["warnings"]) or "ok"
+        print(f"  -> {dest}  horizon {report['horizon_after']}  {note}")
+    return done
+
+
+# --------------------------------------------------------------------------- #
+# Generating with mflux (local, Apple Silicon, FLUX.1 schnell is Apache 2.0)
+# --------------------------------------------------------------------------- #
+SCENE_PROMPTS = {
+    "playroom": "empty modern children's playroom, plain pale wall on the left, "
+                "wide unbroken wooden floor across the foreground",
+    "outdoor":  "empty sunlit garden path beside a lawn, plain fence on the left, "
+                "wide smooth paving across the foreground",
+    "garden":   "empty potting bench in a bright greenhouse, plain wall on the "
+                "left, wide clear wooden surface across the foreground",
+    "desk":     "empty light wooden study table by a window, plain wall on the "
+                "left, wide clear tabletop across the foreground",
+    "nursery":  "empty soft nursery corner, plain pastel wall on the left, "
+                "wide clear carpet across the foreground",
+    "creative": "empty craft table with paper and paint pots pushed to the far "
+                "right, plain wall on the left, wide clear tabletop in front",
+}
+PROMPT_SUFFIX = ("soft daylight from the {side}, shallow depth of field, "
+                 "product photography backdrop, no people, no toys, no text")
+NEGATIVE = "people, hands, children, toys, products, text, watermark, logo, clutter"
+
+
+def mflux_available():
+    return shutil.which("mflux-generate") or shutil.which("mf-txt2img")
+
+
+def generate_with_mflux(category, variant, out_path, size=1024, steps=4, seed=None):
+    """Run mflux for one plate. Raises RuntimeError with the fix if it is absent."""
+    exe = mflux_available()
+    if not exe:
+        raise RuntimeError(
+            "mflux is not installed. Install it (a one-time ~9.9 GB model "
+            "download on first run):\n    pip install mflux")
+    side = "left" if variant.upper() == "A" else "right"
+    prompt = f"{SCENE_PROMPTS[category]}, {PROMPT_SUFFIX.format(side=side)}"
+    cmd = [exe, "--model", "schnell", "-q", "4", "--low-ram",
+           "--steps", str(steps), "--width", str(size), "--height", str(size),
+           "--seed", str(seed if seed is not None else abs(hash((category, variant))) % 10**6),
+           "--prompt", prompt, "--output", out_path]
+    print(f"  [{category}_{variant.lower()}] {' '.join(cmd[:8])} ...")
+    subprocess.run(cmd, check=True)
+    return out_path
+
+
 def write_plates(out_dir=BG_DIR, overwrite=False):
     os.makedirs(out_dir, exist_ok=True)
     written = []
@@ -214,6 +388,14 @@ def main():
                     help="show the category each SKU resolves to, and stop")
     ap.add_argument("--out-dir", default="output", metavar="DIR",
                     help="where product.json files live (default output/)")
+    ap.add_argument("--prepare", metavar="DIR",
+                    help="prep every image in DIR into a template-ready plate "
+                         "(stock photos, mflux output, anything). Filenames are "
+                         "kept, so name them <category>_a.jpg")
+    ap.add_argument("--generate", action="store_true",
+                    help="generate plates locally with mflux, then prep them")
+    ap.add_argument("--category", metavar="NAME",
+                    help="with --generate, only this scene category")
     ap.add_argument("--overwrite", action="store_true",
                     help="replace plates that already exist (e.g. your real ones)")
     args = ap.parse_args()
@@ -221,9 +403,49 @@ def main():
     if args.list:
         _list_categories(args.out_dir)
         return 0
+
+    if args.prepare:
+        prepare_folder(args.prepare)
+        return 0
+
+    if args.generate:
+        cats = [args.category] if args.category else list(CATEGORIES)
+        bad = [c for c in cats if c not in SCENE_PROMPTS]
+        if bad:
+            print(f"Unknown category: {', '.join(bad)}. "
+                  f"Known: {', '.join(CATEGORIES)}", file=sys.stderr)
+            return 1
+        if not mflux_available():
+            print("mflux is not installed. One-time setup:\n"
+                  "    pip install mflux\n"
+                  "The first generation downloads FLUX.1 schnell 4-bit (~9.9 GB); "
+                  "it is Apache 2.0, so the images are yours to use commercially.",
+                  file=sys.stderr)
+            return 1
+        os.makedirs(BG_DIR, exist_ok=True)
+        raw_dir = os.path.join(BG_DIR, "_raw")
+        os.makedirs(raw_dir, exist_ok=True)
+        for cat in cats:
+            for variant in ("a", "b"):
+                raw = os.path.join(raw_dir, f"{cat}_{variant}.png")
+                try:
+                    generate_with_mflux(cat, variant, raw)
+                except (RuntimeError, subprocess.CalledProcessError) as exc:
+                    print(f"  ! {cat}_{variant}: {exc}", file=sys.stderr)
+                    continue
+                with Image.open(raw) as img:
+                    plate, report = prepare_plate(img)
+                dest = os.path.join(BG_DIR, f"{cat}_{variant}.jpg")
+                plate.save(dest, quality=90)
+                note = "  ".join(report["warnings"]) or "ok"
+                print(f"  -> {dest}  horizon {report['horizon_after']}  {note}")
+        print(f"\nRaw model output kept in {raw_dir}/ so you can re-prep "
+              f"without regenerating.")
+        return 0
     write_plates(overwrite=args.overwrite)
-    print("\nThese are placeholders. Replace them with Draw Things plates using "
-          "the same filenames — see DRAWTHINGS_SETUP.md.")
+    print("\nThese are drawn, not photographed. Replace them any time with\n"
+          "  python scenes.py --generate      (local mflux)\n"
+          "  python scenes.py --prepare DIR   (photos you supply)")
     return 0
 
 
