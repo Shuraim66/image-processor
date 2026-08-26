@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "toycat"
+version = "0.1.0"
+description = "Turn raw toy product photos into a Shopify-ready listing gallery, locally."
+requires-python = ">=3.12"
+dependencies = [
+    "pillow>=10.0",
+    "rembg>=2.0.50",
+    "onnxruntime>=1.17",
+    "pydantic>=2.0",
+    "ollama>=0.3",
+    "numpy>=1.26",
+    "scipy>=1.11",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[project.scripts]
+toycat = "toycat:main"
+
+[tool.setuptools]
+py-modules = [
+    "toycat", "slots", "analyzer", "gallery", "gallery_pipeline", "make_hero",
+    "palette", "process_products", "providers", "quality", "scenes",
+    "shopify_export", "specs", "typeset", "copyguard",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "ollama: needs a local Ollama with the VLM pulled (deselected by default)",
+    "slow: full render or segmentation pass",
+]
+addopts = "-m 'not ollama' --strict-markers"

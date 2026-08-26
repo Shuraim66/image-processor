@@ -26,6 +26,7 @@ import sys
 
 import analyzer
 import copyguard
+import slots
 
 PRODUCTS_DIR = "input"
 GALLERY_DIR = "output"
@@ -84,9 +85,8 @@ def images_for(sku, base_url, out_dir=GALLERY_DIR):
     d = os.path.join(out_dir, sku)
     if not os.path.isdir(d):
         return []
-    import gallery_pipeline
     files = [f for f in os.listdir(d) if f.lower().endswith(IMG_EXTS)]
-    files.sort(key=gallery_pipeline.slot_sort_key)   # listing order, not A-Z
+    files.sort(key=slots.slot_sort_key)              # listing order, not A-Z
     return [f"{base_url}{sku}/{f}" if base_url else os.path.join(d, f) for f in files]
 
 

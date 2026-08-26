@@ -446,9 +446,22 @@ def _centred(base, layer, y):
     base.alpha_composite(layer, ((W - layer.size[0]) // 2, y))
 
 
+class BrandAssetError(RuntimeError):
+    """The brand logo is missing, so a branded image cannot be built."""
+
+
 def _logo_at(bg, x_frac, y_frac, w_frac=0.13):
+    """Composite the brand mark at a fractional position; return its height.
+
+    A missing asset raises rather than skipping. An unbranded slot still looks
+    finished and passes every other check, so a silent skip ships unbranded
+    images and nothing notices. The one slot that must NOT carry the logo —
+    white-background, which marketplaces reject with a watermark — never calls
+    this in the first place.
+    """
     if not os.path.exists(LOGO_PATH):
-        return 0
+        raise BrandAssetError(
+            f"brand logo not found at '{LOGO_PATH}'; every branded slot needs it")
     logo = Image.open(LOGO_PATH).convert("RGBA")
     lw = int(W * w_frac)
     logo = logo.resize((lw, int(logo.height * lw / logo.width)), Image.LANCZOS)
@@ -596,11 +609,7 @@ def overlay_hero_text(bg, content, theme):
                theme["primary"], radius=22, angle=-8, anchor="right")
 
     # --- brand logo (top-right) ---
-    if os.path.exists(LOGO_PATH):
-        logo = Image.open(LOGO_PATH).convert("RGBA")
-        lw = int(W * 0.13)
-        logo = logo.resize((lw, int(logo.height * lw / logo.width)), Image.LANCZOS)
-        bg.alpha_composite(logo, (int(W * 0.85), int(W * 0.04)))
+    _logo_at(bg, 0.85, 0.04, 0.13)
     return bg
 
 

@@ -13,10 +13,8 @@ Slots (hero-heavy recipe):
 
 Background provider for slots 3-4 is pluggable:
     --bg-provider procedural   (default, free, offline)
-    --bg-provider drawthings   (local Draw Things gRPC on your Mac)
 
     python gallery_pipeline.py                       # all SKUs, procedural
-    python gallery_pipeline.py --sku SCOOTER-LED-PINK --bg-provider drawthings
     python gallery_pipeline.py --no-ollama          # deterministic copy, no model
 """
 
@@ -39,6 +37,7 @@ import providers
 import scenes
 import specs as specs_mod
 import quality
+import slots
 
 # input/ holds only the raw photos you supply. Everything generated — images,
 # product.json, cutout cache, manifest — lives under OUTPUT_ROOT, so the input
@@ -62,11 +61,12 @@ def cutout_dir(root=None):
 def manifest_path(root=None):
     return os.path.join(out_root(root), "_manifest.json")
 
-# A worker holding a rembg session peaks around this much. Measured with
-# bria-rmbg; a lighter REMBG_MODEL needs far less. It is the binding constraint
-# on --jobs: four workers want ~13 GB, which is why parallel rendering runs
-# SLOWER than serial on an 18 GB machine once it starts swapping.
-WORKER_PEAK_GB = 3.5
+# A worker holding a rembg session peaks around this much — measured at 5.9-7.0 GB
+# with birefnet-general-lite on 3120x4160 photos. The old 3.5 figure was optimistic
+# and is why parallel rendering ran SLOWER than serial: two workers already exceed
+# an 18 GB machine once the OS takes its share. Most of the peak is the full-res
+# RGBA image, not the weights, so the full birefnet-general costs no more here.
+WORKER_PEAK_GB = 7.0
 
 
 def load_specs():
@@ -99,25 +99,10 @@ def get_profile(sku, folder, out_dir, use_ollama, reanalyze, allow_fallback=Fals
 # what a very thorough shoot will spend.
 MAX_ANGLES = int(os.environ.get("MAX_ANGLES", "4"))
 
-# Filenames say what each image is; the listing order lives here rather than in a
-# numeric prefix, so Shopify positions stay right without "01_" in front of every
-# name. Slots that do not apply to a product are simply absent.
-SLOT_ORDER = (
-    "catalog-hero",           # product on a scene, no text on it at all
-    "white-background",       # marketplace main image
-    "with-packaging",         # product shown with its retail box
-    "every-angle",            # the other shots you took
-    "lifestyle-scene",        # in a room, from a second angle
-    "features-and-benefits",  # the branded feature card
-    "size-and-specs",         # only when real measurements exist
-    "close-up-detail",
-)
-
-
-def slot_sort_key(filename):
-    """Position in SLOT_ORDER, unknown names last, for a stable gallery order."""
-    stem = os.path.splitext(os.path.basename(filename))[0]
-    return (SLOT_ORDER.index(stem) if stem in SLOT_ORDER else len(SLOT_ORDER), stem)
+# The slot vocabulary and listing order live in slots.py so the exporter and the
+# quality checks can read them without importing this module.
+SLOT_ORDER = slots.SLOT_ORDER
+slot_sort_key = slots.slot_sort_key
 
 
 def make_cutout(raw_path, sku, root=None, suffix=""):
@@ -163,10 +148,14 @@ def build_for_sku(sku, specs, provider, use_ollama, reanalyze, ext="webp",
     def op(name):
         return os.path.join(out_dir, f"{name}.{ext}")
 
-    # Old numbered filenames from a previous run would otherwise linger alongside
-    # the new descriptive ones and be exported twice.
+    # A rename leaves the previous run's images behind and the exporter picks them
+    # up as extra gallery slots. SLOT_ORDER is the allow-list rather than a list of
+    # retired names: a deny-list has to be updated by hand at every rename, which
+    # is how "01_main" survived one. Only images are touched, so product.json and
+    # quality-report.json are safe.
     for stale in os.listdir(out_dir):
-        if stale[:2].isdigit() and stale.endswith(f".{ext}"):
+        stem, dot_ext = os.path.splitext(stale)
+        if dot_ext == f".{ext}" and stem not in SLOT_ORDER:
             os.remove(os.path.join(out_dir, stale))
 
     prompts = cont.get("scene_prompts", []) + ["bright playroom", "sunny living room"]
@@ -245,9 +234,11 @@ def build_for_sku(sku, specs, provider, use_ollama, reanalyze, ext="webp",
     if skipped:
         report["skipped_slots"] = skipped
     if vlm:   # step 6: does the lifestyle image faithfully show the real product?
-        v = quality.vlm_check(primary_raw, op("03_lifestyle_a"))
+        v = quality.vlm_check(primary_raw, op("lifestyle-scene"))
         report["vlm_check"] = v
-        if v["status"] == "review":
+        # 'fail' means the check itself could not run. Asked for and not answered
+        # is not a pass, so it holds the product back just as a mismatch does.
+        if v["status"] in ("review", "fail"):
             report["status"] = "review"
     with open(os.path.join(out_dir, "quality-report.json"), "w", encoding="utf-8") as f:
         json.dump(report, f, indent=2)
@@ -303,7 +294,8 @@ def safe_jobs(requested):
     if requested > budget:
         print(f"  ! --jobs {requested} needs ~{requested * WORKER_PEAK_GB:.0f} GB; "
               f"this machine has {ram:.0f} GB. Using {budget} to stay out of swap "
-              f"(a lighter REMBG_MODEL raises this).", file=sys.stderr)
+              f"(most of a worker's peak is the full-res photo, not the model, "
+              f"so a lighter REMBG_MODEL barely moves this).", file=sys.stderr)
         return budget
     return requested
 
@@ -336,7 +328,7 @@ def _build_one(sku):
 def main():
     ap = argparse.ArgumentParser(description="Generate the 7-image listing gallery per product.")
     ap.add_argument("--sku", help="only this SKU (default: all under input/)")
-    ap.add_argument("--bg-provider", choices=["procedural", "folder", "drawthings"],
+    ap.add_argument("--bg-provider", choices=["procedural", "folder"],
                     default="folder",
                     help="background engine for slots 3-4 (default folder: "
                          "reads category plates from backgrounds/)")

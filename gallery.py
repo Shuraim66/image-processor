@@ -28,11 +28,9 @@ def _light_bg(theme):
 
 
 def _logo(bg, x_frac=0.85, y_frac=0.04, w_frac=0.12):
-    if os.path.exists(mh.LOGO_PATH):
-        logo = Image.open(mh.LOGO_PATH).convert("RGBA")
-        lw = int(W * w_frac)
-        logo = logo.resize((lw, int(logo.height * lw / logo.width)), Image.LANCZOS)
-        bg.alpha_composite(logo, (int(W * x_frac), int(W * y_frac)))
+    """Brand mark on a card slot. Shares make_hero's helper so the missing-asset
+    rule is enforced in exactly one place."""
+    mh._logo_at(bg, x_frac, y_frac, w_frac)
 
 
 def _dotted_line(d, p0, p1, color, r=4 * SS, gap=22 * SS):
