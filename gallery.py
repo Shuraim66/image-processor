@@ -119,6 +119,61 @@ def render_infographic(cutout_path, content, out_path):
 
 
 # --------------------------------------------------------------------------- #
+# Slot 3 — every angle
+# --------------------------------------------------------------------------- #
+def render_angles(cutout_paths, content, out_path, title="EVERY ANGLE"):
+    """A grid of the product's other shots, cut out and set on cards.
+
+    The one slot that answers "what does it actually look like from the side" —
+    and the reason to shoot more than one photo. Two shots go side by side, three
+    or four into a 2x2; each card is sized to its own cutout so a tall product
+    and a wide one both sit properly in their cell.
+    """
+    theme = {**mh.THEME, **content.get("theme", {})}
+    bg = _light_bg(theme)
+
+    f_title = mh.display_font(content, title, int(W * 0.52), int(W * 0.05))
+    mh.banner(bg, (int(W * 0.5), int(W * 0.05)), title, f_title, theme["ink"],
+              anchor="center")
+
+    paths = cutout_paths[:4]
+    if not paths:
+        raise ValueError("render_angles needs at least one cutout")
+    cols = 1 if len(paths) == 1 else 2
+    rows = 1 if len(paths) <= 2 else 2
+
+    top, span = int(W * 0.17), int(W * 0.74)
+    cell_w, cell_h = span // cols, span // rows
+    pad = int(W * 0.018)
+    d = ImageDraw.Draw(bg)
+
+    for i, path in enumerate(paths):
+        cx = (W - cols * cell_w) // 2 + (i % cols) * cell_w
+        cy = top + (i // cols) * cell_h
+        card = [cx + pad, cy + pad, cx + cell_w - pad, cy + cell_h - pad]
+
+        shadow = Image.new("RGBA", (W, W), (0, 0, 0, 0))
+        ImageDraw.Draw(shadow).rounded_rectangle(card, radius=int(W * 0.02),
+                                                 fill=(30, 45, 80, 60))
+        bg.alpha_composite(shadow.filter(ImageFilter.GaussianBlur(int(W * 0.008))))
+        d.rounded_rectangle(card, radius=int(W * 0.02), fill=(255, 255, 255, 235))
+
+        inner_w = int((card[2] - card[0]) * 0.80)
+        inner_h = int((card[3] - card[1]) * 0.80)
+        with Image.open(path) as raw:
+            shot = raw.convert("RGBA")
+        scale = min(inner_w / shot.width, inner_h / shot.height)
+        shot = shot.resize((max(1, int(shot.width * scale)),
+                            max(1, int(shot.height * scale))), Image.LANCZOS)
+        bg.alpha_composite(shot, (int((card[0] + card[2]) / 2 - shot.width / 2),
+                                  int((card[1] + card[3]) / 2 - shot.height / 2)))
+
+    _logo(bg, x_frac=0.86, y_frac=0.035)
+    bg.convert("RGB").resize((SIZE, SIZE), Image.LANCZOS).save(out_path, quality=94)
+    return out_path
+
+
+# --------------------------------------------------------------------------- #
 # Slot 6 — size & age card
 # --------------------------------------------------------------------------- #
 def render_size_card(cutout_path, specs, out_path):
@@ -185,6 +240,40 @@ def render_size_card(cutout_path, specs, out_path):
 # --------------------------------------------------------------------------- #
 # Slot 7 — detail close-up
 # --------------------------------------------------------------------------- #
+def auto_detail_crop(original_path, product_box, window=0.42):
+    """Pick the most detailed square inside the product. -> crop fractions.
+
+    The alternative was a per-SKU constant, which meant a crop tuned for a
+    scooter's wheels pointed at bare table on everything else. Scoring by
+    gradient energy inside the product's own bounding box lands on whatever
+    actually has texture — a face, a lit panel, a printed logo.
+    """
+    import numpy as np
+
+    with Image.open(original_path) as img:
+        w, h = img.size
+        grey = np.asarray(img.convert("L").resize((160, 160), Image.BILINEAR), float)
+
+    gy, gx = np.gradient(grey)
+    energy = np.hypot(gx, gy)
+
+    l, t, r, b = product_box if product_box else (0, 0, w, h)
+    # product box in the 160x160 scoring space, clamped to something usable
+    sl, st = int(l / w * 160), int(t / h * 160)
+    sr, sb = max(sl + 8, int(r / w * 160)), max(st + 8, int(b / h * 160))
+
+    side = max(8, int(min(sr - sl, sb - st) * window))
+    best, best_at = -1.0, (sl, st)
+    for yy in range(st, max(st + 1, sb - side), max(2, side // 4)):
+        for xx in range(sl, max(sl + 1, sr - side), max(2, side // 4)):
+            score = energy[yy:yy + side, xx:xx + side].mean()
+            if score > best:
+                best, best_at = score, (xx, yy)
+
+    x0, y0 = best_at
+    return (x0 / 160, y0 / 160, (x0 + side) / 160, (y0 + side) / 160)
+
+
 def render_detail(original_path, crop_frac, label, content, out_path):
     """crop_frac = (left, top, right, bottom) as fractions of the original photo."""
     theme = {**mh.THEME, **content.get("theme", {})}

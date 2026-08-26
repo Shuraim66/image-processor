@@ -111,7 +111,7 @@ def _solid_bbox_pil(alpha: Image.Image, floor: int):
     return alpha.point(lambda a: 255 if a > floor else 0).getbbox()
 
 
-def trim_to_content(image: Image.Image) -> Image.Image:
+def trim_to_content(image: Image.Image, return_box: bool = False):
     """Crop to the real object and drop stray blobs around it.
 
     rembg does not return a clean binary mask — it leaves a haze of alpha 1-20
@@ -128,15 +128,18 @@ def trim_to_content(image: Image.Image) -> Image.Image:
         image = image.convert("RGBA")
     alpha = image.getchannel("A")
 
+    def _out(img, box):
+        return (img, box) if return_box else img
+
     if _np is None or _ndimage is None:      # SciPy/NumPy missing — threshold only
         bbox = _solid_bbox_pil(alpha, ALPHA_FLOOR)
-        return image.crop(bbox) if bbox else image
+        return _out(image.crop(bbox) if bbox else image, bbox)
 
     a = _np.asarray(alpha)
     mask = a > ALPHA_FLOOR
     if not mask.any():
         bbox = image.getbbox()               # nothing solid — keep old behaviour
-        return image.crop(bbox) if bbox else image
+        return _out(image.crop(bbox) if bbox else image, bbox)
 
     labels, count = _ndimage.label(mask)
     sizes = _ndimage.sum_labels(mask, labels, index=range(1, count + 1))
@@ -152,7 +155,7 @@ def trim_to_content(image: Image.Image) -> Image.Image:
     trimmed = image.copy()
     trimmed.putalpha(Image.fromarray(_np.where(keep, a, 0).astype("uint8")))
     bbox = trimmed.getchannel("A").getbbox()
-    return trimmed.crop(bbox) if bbox else trimmed
+    return _out(trimmed.crop(bbox) if bbox else trimmed, bbox)
 
 
 def make_shadow(cutout: Image.Image, canvas_size: int) -> Image.Image:

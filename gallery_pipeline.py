@@ -95,13 +95,20 @@ def get_profile(sku, folder, out_dir, use_ollama, reanalyze, allow_fallback=Fals
                                    allow_fallback=allow_fallback).model_dump()
 
 
-def make_cutout(raw_path, sku, root=None):
+# Extra angles each cost a rembg pass, which is the slowest step, so this caps
+# what a very thorough shoot will spend.
+MAX_ANGLES = int(os.environ.get("MAX_ANGLES", "4"))
+
+
+def make_cutout(raw_path, sku, root=None, suffix=""):
     """Transparent, trimmed cutout via the full rembg model (cached across SKUs)."""
     os.makedirs(cutout_dir(root), exist_ok=True)
-    out = os.path.join(cutout_dir(root), f"{sku}.png")
+    out = os.path.join(cutout_dir(root), f"{sku}{suffix}.png")
     src = Image.open(raw_path).convert("RGBA")
-    cut = pp.trim_to_content(pp.remove_background(src))
+    cut, box = pp.trim_to_content(pp.remove_background(src), return_box=True)
     cut.save(out)
+    with open(out + ".box.json", "w", encoding="utf-8") as fh:
+        json.dump({"box": box, "size": src.size}, fh)      # for auto_detail_crop
     return out
 
 
@@ -117,6 +124,12 @@ def build_for_sku(sku, specs, provider, use_ollama, reanalyze, ext="webp",
 
     primary_raw = raws[0]
     cutout = make_cutout(primary_raw, sku, root)
+    # Every other angle you shot, cut out too — otherwise the whole gallery is
+    # one photograph seen seven times.
+    angle_cuts = [cutout] + [
+        make_cutout(p, sku, root, suffix=f"_a{i}")
+        for i, p in enumerate(raws[1:MAX_ANGLES], start=2)
+    ]
     cont = get_profile(sku, folder, out_dir, use_ollama, reanalyze, allow_fallback)
     # Colour the whole set from the product itself, so a pink scooter and a
     # green plant dome stop shipping in the same corporate blue and red. A theme
@@ -141,16 +154,26 @@ def build_for_sku(sku, specs, provider, use_ollama, reanalyze, ext="webp",
     # 02 — branded hero (procedural bg)
     made.append(mh.render_hero(cutout, cont, op("02_hero")))
 
-    # 03/04 — lifestyle scenes (pluggable provider), real product composited on top
+    # 03 — every angle, when there is more than one shot to show
     prompts = cont.get("scene_prompts", []) + ["bright playroom", "sunny living room"]
-    for slot, variant, prompt in [("03_lifestyle_a", "A", prompts[0]),
-                                  ("04_lifestyle_b", "B", prompts[1])]:
-        scene = provider.scene(sku, cutout, primary_raw, variant, prompt,
+    if len(angle_cuts) > 1:
+        made.append(gallery.render_angles(angle_cuts, cont, op("03_angles")))
+        stale = op("03_lifestyle_a")
+        if os.path.exists(stale):
+            os.remove(stale)
+    else:
+        scene = provider.scene(sku, cutout, primary_raw, "A", prompts[0],
                                cont["category"])
-        if cache_bg:   # step 7: save the scene so a later --bg-provider folder run reuses it
-            os.makedirs("backgrounds", exist_ok=True)
-            scene.convert("RGB").save(os.path.join("backgrounds", f"{sku}_{variant.lower()}.{ext}"))
-        made.append(mh.render_hero(cutout, cont, op(slot), background=scene))
+        made.append(mh.render_hero(cutout, cont, op("03_lifestyle_a"), background=scene))
+
+    # 04 — in a scene, shot from a DIFFERENT angle than the hero where possible,
+    # so the two do not read as the same picture twice.
+    scene = provider.scene(sku, cutout, primary_raw, "B", prompts[1], cont["category"])
+    if cache_bg:
+        os.makedirs("backgrounds", exist_ok=True)
+        scene.convert("RGB").save(os.path.join("backgrounds", f"{sku}_b.{ext}"))
+    lifestyle_cut = angle_cuts[1] if len(angle_cuts) > 1 else cutout
+    made.append(mh.render_hero(lifestyle_cut, cont, op("04_lifestyle_b"), background=scene))
 
     # 05 — feature infographic
     made.append(gallery.render_infographic(cutout, cont, op("05_infographic")))
@@ -172,8 +195,16 @@ def build_for_sku(sku, specs, provider, use_ollama, reanalyze, ext="webp",
         if os.path.exists(stale):        # drop a card built before the data went away
             os.remove(stale)
 
-    # 07 — detail close-up
-    made.append(gallery.render_detail(primary_raw, tuple(sp["detail_crop"]),
+    # 07 — detail close-up, aimed at the product rather than a fixed rectangle
+    crop = tuple(sp["detail_crop"]) if sp.get("detail_crop_manual") else None
+    if crop is None:
+        side_path = cutout + ".box.json"
+        box = None
+        if os.path.exists(side_path):
+            with open(side_path, encoding="utf-8") as fh:
+                box = json.load(fh).get("box")
+        crop = gallery.auto_detail_crop(primary_raw, box)
+    made.append(gallery.render_detail(primary_raw, crop,
                 sp.get("detail_label", "CLOSER LOOK"), cont, op("07_detail")))
 
     # quality report (deterministic checks + optional VLM semantic check)
