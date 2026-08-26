@@ -71,7 +71,7 @@ def check_source(cutout_path, render_size):
 
 
 def check_gallery(sku, out_dir, cutout_path=None, copy_source="", copy_flags=(),
-                  render_size=1600):
+                  render_size=1600, order_key=None):
     report = {"sku": sku, "status": "pass", "copy_source": copy_source,
               "copy_flags": list(copy_flags), "images": []}
     if copy_flags:
@@ -79,10 +79,10 @@ def check_gallery(sku, out_dir, cutout_path=None, copy_source="", copy_flags=(),
     if copy_source.startswith("fallback"):
         report["status"] = "review"
         report["note"] = f"copy is placeholder text ({copy_source}) — not written by the model"
-    files = sorted(f for f in os.listdir(out_dir)
-                   if f.lower().endswith(IMG_EXTS))
+    files = [f for f in os.listdir(out_dir) if f.lower().endswith(IMG_EXTS)]
+    files.sort(key=order_key or (lambda n: n))
     for f in files:
-        is_main = f.startswith("01")
+        is_main = f.startswith("white-background")
         try:
             checks = check_image(os.path.join(out_dir, f), is_main)
         except Exception as exc:  # noqa: BLE001

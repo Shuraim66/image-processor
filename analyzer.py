@@ -70,6 +70,7 @@ class ProductProfile(BaseModel):
     theme: Dict[str, Any] = Field(default_factory=dict)   # pin colours here to
     # override the palette derived from the product's own pixels (see palette.py)
     review_flags: List[str] = Field(default_factory=list)  # copyguard findings
+    packaging_photos: List[str] = Field(default_factory=list)  # filenames showing the box
 
 
 PROMPT = (
@@ -137,6 +138,43 @@ def encode_images(paths, max_px=None, limit=None):
 def _is_context_error(exc):
     text = str(exc).lower()
     return "context" in text and ("exceed" in text or "size" in text)
+
+
+PACKAGING_PROMPT = (
+    "These images are numbered from 1 in the order given. Reply ONLY with the "
+    "numbers of images showing the product's retail BOX, carton, blister or "
+    "header card, CLEAREST VIEW FIRST. A product sitting on a shelf or table is "
+    "not packaging. Empty list if none show packaging.")
+PACKAGING_SCHEMA = {
+    "type": "object",
+    "properties": {"packaging_indexes": {"type": "array", "items": {"type": "integer"}}},
+    "required": ["packaging_indexes"],
+}
+
+
+def find_packaging(image_paths, model=None):
+    """Filenames among `image_paths` that show the retail packaging.
+
+    Kept as its own small call rather than a field on the main prompt: asking for
+    it alongside twenty other fields made the model pad its answer until the
+    JSON truncated. Failure returns nothing, which just means no packshot slot.
+    """
+    try:
+        import ollama
+        resp = ollama.chat(
+            model=model or resolve_model(),
+            messages=[{"role": "user", "content": PACKAGING_PROMPT,
+                       "images": encode_images(image_paths, limit=8)}],
+            format=PACKAGING_SCHEMA,
+            options={"temperature": 0.0,
+                     "num_ctx": int(os.environ.get("OLLAMA_NUM_CTX", "8192"))},
+        )
+        idx = json.loads(resp["message"]["content"])["packaging_indexes"]
+        return [os.path.basename(image_paths[i - 1])
+                for i in idx if 1 <= i <= len(image_paths)]
+    except Exception as exc:  # noqa: BLE001 — optional enrichment, never fatal
+        print(f"  [analyzer] packaging detection skipped ({exc})", file=sys.stderr)
+        return []
 
 
 class AnalyzerError(RuntimeError):
@@ -226,7 +264,7 @@ def _request_schema() -> dict:
     """The schema the model is asked to fill — bookkeeping fields removed so it
     does not waste tokens inventing an sku or a source it cannot know."""
     schema = ProductProfile.model_json_schema()
-    for field in ("sku", "source", "theme", "review_flags"):
+    for field in ("sku", "source", "theme", "review_flags", "packaging_photos"):
         schema.get("properties", {}).pop(field, None)
         if field in schema.get("required", []):
             schema["required"].remove(field)
@@ -284,6 +322,7 @@ def analyze(sku: str, image_paths: List[str], use_ollama: bool = True,
             print(f"  [analyzer] {sku}: {note}", file=sys.stderr)
 
         data["source"] = model
+        data["packaging_photos"] = find_packaging(image_paths, model)
         data["review_flags"] = copyguard.find_issues(data, len(image_paths))
         for flag in data["review_flags"]:
             print(f"  [analyzer] {sku}: {flag}", file=sys.stderr)

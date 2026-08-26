@@ -99,6 +99,26 @@ def get_profile(sku, folder, out_dir, use_ollama, reanalyze, allow_fallback=Fals
 # what a very thorough shoot will spend.
 MAX_ANGLES = int(os.environ.get("MAX_ANGLES", "4"))
 
+# Filenames say what each image is; the listing order lives here rather than in a
+# numeric prefix, so Shopify positions stay right without "01_" in front of every
+# name. Slots that do not apply to a product are simply absent.
+SLOT_ORDER = (
+    "catalog-hero",           # product on a scene, no text on it at all
+    "white-background",       # marketplace main image
+    "with-packaging",         # product shown with its retail box
+    "every-angle",            # the other shots you took
+    "lifestyle-scene",        # in a room, from a second angle
+    "features-and-benefits",  # the branded feature card
+    "size-and-specs",         # only when real measurements exist
+    "close-up-detail",
+)
+
+
+def slot_sort_key(filename):
+    """Position in SLOT_ORDER, unknown names last, for a stable gallery order."""
+    stem = os.path.splitext(os.path.basename(filename))[0]
+    return (SLOT_ORDER.index(stem) if stem in SLOT_ORDER else len(SLOT_ORDER), stem)
+
 
 def make_cutout(raw_path, sku, root=None, suffix=""):
     """Transparent, trimmed cutout via the full rembg model (cached across SKUs)."""
@@ -143,44 +163,56 @@ def build_for_sku(sku, specs, provider, use_ollama, reanalyze, ext="webp",
     def op(name):
         return os.path.join(out_dir, f"{name}.{ext}")
 
-    # 01 — pure white main (no watermark; marketplace-safe), matched to gallery size.
-    # Built from the cached cutout: process_image() would re-run rembg on a photo
-    # we have already segmented, doubling the slowest step in the pipeline.
-    p = op("01_main")
+    # Old numbered filenames from a previous run would otherwise linger alongside
+    # the new descriptive ones and be exported twice.
+    for stale in os.listdir(out_dir):
+        if stale[:2].isdigit() and stale.endswith(f".{ext}"):
+            os.remove(os.path.join(out_dir, stale))
+
+    prompts = cont.get("scene_prompts", []) + ["bright playroom", "sunny living room"]
+    plate_a = provider.scene(sku, cutout, primary_raw, "A", prompts[0], cont["category"])
+
+    # catalog hero — the product on a scene with NOTHING written on it. Copy
+    # belongs on the feature card; on every image it made the set look stamped.
+    made.append(mh.render_hero(cutout, cont, op("catalog-hero"),
+                               background=plate_a, layout="clean"))
+
+    # white background — the marketplace-safe main image, no watermark
+    p = op("white-background")
     (pp.standardize(Image.open(cutout).convert("RGBA")).convert("RGB")
        .resize((mh.SIZE, mh.SIZE), Image.LANCZOS)
        .save(p, quality=92)); made.append(p)
 
-    # 02 — branded hero (procedural bg)
-    made.append(mh.render_hero(cutout, cont, op("02_hero")))
+    # with packaging — the clearest box shot, but never the primary photo: on a
+    # single-photo product the detector points at the main image, and a packshot
+    # identical to the white-background slot is just a duplicate.
+    primary_name = os.path.basename(primary_raw)
+    packaging = [os.path.join(folder, n) for n in cont.get("packaging_photos", [])
+                 if n != primary_name and os.path.exists(os.path.join(folder, n))]
+    if packaging:
+        pack_cut = make_cutout(packaging[0], sku, root, suffix="_pack")
+        p = op("with-packaging")
+        (pp.standardize(Image.open(pack_cut).convert("RGBA")).convert("RGB")
+           .resize((mh.SIZE, mh.SIZE), Image.LANCZOS)
+           .save(p, quality=92)); made.append(p)
 
-    # 03 — every angle, when there is more than one shot to show
-    prompts = cont.get("scene_prompts", []) + ["bright playroom", "sunny living room"]
+    # every angle — the other shots you took, on cards
     if len(angle_cuts) > 1:
-        made.append(gallery.render_angles(angle_cuts, cont, op("03_angles")))
-        stale = op("03_lifestyle_a")
-        if os.path.exists(stale):
-            os.remove(stale)
-    else:
-        scene = provider.scene(sku, cutout, primary_raw, "A", prompts[0],
-                               cont["category"])
-        made.append(mh.render_hero(cutout, cont, op("03_lifestyle_a"), background=scene))
+        made.append(gallery.render_angles(angle_cuts, cont, op("every-angle")))
 
-    # 04 — in a scene, shot from a DIFFERENT angle than the hero where possible,
-    # so the two do not read as the same picture twice.
-    scene = provider.scene(sku, cutout, primary_raw, "B", prompts[1], cont["category"])
+    # lifestyle — a scene, from a different angle than the hero
+    plate_b = provider.scene(sku, cutout, primary_raw, "B", prompts[1], cont["category"])
     if cache_bg:
         os.makedirs("backgrounds", exist_ok=True)
-        scene.convert("RGB").save(os.path.join("backgrounds", f"{sku}_b.{ext}"))
+        plate_b.convert("RGB").save(os.path.join("backgrounds", f"{sku}_b.{ext}"))
     lifestyle_cut = angle_cuts[1] if len(angle_cuts) > 1 else cutout
-    made.append(mh.render_hero(lifestyle_cut, cont, op("04_lifestyle_b"), background=scene))
+    made.append(mh.render_hero(lifestyle_cut, cont, op("lifestyle-scene"),
+                               background=plate_b))
 
-    # 05 — feature infographic
-    made.append(gallery.render_infographic(cutout, cont, op("05_infographic")))
+    # features & benefits
+    made.append(gallery.render_infographic(cutout, cont, op("features-and-benefits")))
 
-    # 06 — size & age card. Skipped without real measurements: a card reading
-    # "≈ — cm" with arrows spanning nothing looks like a specification and is
-    # worse than a six-image gallery. `python specs.py` lists what is missing.
+    # size & specs, skipped without real measurements
     skipped = []
     if specs_mod.has_dimensions(sp):
         made.append(gallery.render_size_card(cutout, {
@@ -188,14 +220,11 @@ def build_for_sku(sku, specs, provider, use_ollama, reanalyze, ext="webp",
             "height": sp["height"], "length": sp["length"], "badges": sp["badges"],
             "theme": cont.get("theme", {}),
             "category": cont.get("category"),
-        }, op("06_size")))
+        }, op("size-and-specs")))
     else:
-        skipped.append("06_size (no dimensions in specs.json/specs.csv)")
-        stale = op("06_size")
-        if os.path.exists(stale):        # drop a card built before the data went away
-            os.remove(stale)
+        skipped.append("size-and-specs (no dimensions in specs.json/specs.csv)")
 
-    # 07 — detail close-up, aimed at the product rather than a fixed rectangle
+    # close-up, aimed at the product rather than a fixed rectangle
     crop = tuple(sp["detail_crop"]) if sp.get("detail_crop_manual") else None
     if crop is None:
         side_path = cutout + ".box.json"
@@ -205,13 +234,14 @@ def build_for_sku(sku, specs, provider, use_ollama, reanalyze, ext="webp",
                 box = json.load(fh).get("box")
         crop = gallery.auto_detail_crop(primary_raw, box)
     made.append(gallery.render_detail(primary_raw, crop,
-                sp.get("detail_label", "CLOSER LOOK"), cont, op("07_detail")))
+                sp.get("detail_label", "CLOSER LOOK"), cont, op("close-up-detail")))
 
     # quality report (deterministic checks + optional VLM semantic check)
     report = quality.check_gallery(sku, out_dir, cutout_path=cutout,
                                    copy_source=cont.get("source", ""),
                                    copy_flags=cont.get("review_flags", []),
-                                   render_size=mh.SIZE)
+                                   render_size=mh.SIZE,
+                                   order_key=slot_sort_key)
     if skipped:
         report["skipped_slots"] = skipped
     if vlm:   # step 6: does the lifestyle image faithfully show the real product?

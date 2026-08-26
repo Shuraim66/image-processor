@@ -76,16 +76,21 @@ python shopify_export.py --price 29.99 --status draft
 Image Src holds local `output/` paths, which is fine for reviewing the CSV.
 Shopify's own importer fetches images over HTTP, so add
 `--image-base-url https://your-cdn.example.com/toys/` once they are hosted.
-Writes `gallery_out/<SKU>/01_main … 07_detail`:
+Writes `output/<SKU>/`, one file per slot, named for what it is:
 
-| # | slot | source |
-|---|------|--------|
-| 01 | pure-white main | catalog |
-| 02 | branded hero | template |
-| 03/04 | lifestyle scenes | **background provider** |
-| 05 | feature infographic | template (14-icon set, chosen per product) |
-| 06 | size & age card | `specs.json` / `specs.csv` — skipped if unmeasured |
-| 07 | detail close-up | template |
+| file | what it is |
+|------|------------|
+| `catalog-hero` | product on a scene, **no text on the image** |
+| `white-background` | clean packshot, marketplace-safe |
+| `with-packaging` | product with its retail box, when a box shot exists |
+| `every-angle` | the other shots you took, on cards |
+| `lifestyle-scene` | in a room, from a second angle |
+| `features-and-benefits` | the branded feature card |
+| `size-and-specs` | only when real measurements exist |
+| `close-up-detail` | auto-aimed at the product's densest detail |
+
+Listing order lives in `gallery_pipeline.SLOT_ORDER`, not in a numeric filename
+prefix, so Shopify positions stay correct while the names stay readable.
 
 ## Background providers (slots 3 & 4)
 

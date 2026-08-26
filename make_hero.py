@@ -530,6 +530,18 @@ def overlay_poster_text(bg, content, theme):
     return bg
 
 
+def overlay_clean(bg, content, theme):
+    """No copy at all — just the brand mark, small, in the corner.
+
+    A catalog hero sells by showing the product well, not by shouting over it.
+    Banners, a wordmark and four bullets belong on the feature card, which is a
+    different slot; putting them on every image is what made the whole set read
+    as one template.
+    """
+    _logo_at(bg, 0.855, 0.038, 0.105)
+    return bg
+
+
 def overlay_hero_text(bg, content, theme):
     """Draw the headline banners, sticker wordmark, feature bullets, corner
     ribbon, side callout and brand logo. All text auto-shrinks to its zone so it
@@ -613,6 +625,8 @@ LAYOUTS = {
     #            cx     base_y  target_h  max_w   text renderer
     "side":   (0.71,   0.86,   0.66,     0.48,   overlay_hero_text),
     "poster": (0.50,   1.02,   0.58,     0.92,   overlay_poster_text),
+    # No text, so the product gets the whole frame.
+    "clean":  (0.50,   0.88,   0.64,     0.78,   overlay_clean),
 }
 
 
@@ -626,6 +640,8 @@ def render_hero(cutout_path, content, out_path, background=None, layout=None):
     """
     theme = {**THEME, **content.get("theme", {})}
     layout = layout or choose_layout(cutout_path)
+    if layout not in LAYOUTS:
+        raise ValueError(f"unknown layout {layout!r}; have {sorted(LAYOUTS)}")
     cx_f, base_f, targ_f, maxw_f, draw_text = LAYOUTS[layout]
     cx, base_y = int(W * cx_f), int(W * base_f)
 
