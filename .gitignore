@@ -1,4 +1,6 @@
 .venv/
+.DS_Store
+.pytest_cache/
 __pycache__/
 *.pyc
 # generated outputs (regenerate anytime)
@@ -7,12 +9,10 @@ hero/
 
 # large / machine-specific model files
 *.onnx
-# Draw Things: fetched by setup_drawthings.sh (third-party, not vendored)
-generated/
-dt_certs/
-# scenes you export from Draw Things (per machine)
+# scene plates (per machine; regenerate with scenes.py)
 backgrounds/
-woocommerce_import.csv
 
 shopify_import.csv
 specs.csv
+# raw photos awaiting triage into input/<SKU>/
+raw_footages/
