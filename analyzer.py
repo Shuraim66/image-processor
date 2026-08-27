@@ -344,10 +344,43 @@ def profile_path(sku_folder: str, out_dir: str = None) -> str:
     return os.path.join(out_dir or sku_folder, "product.json")
 
 
+def check_one_product(sku_folder, imgs):
+    """Refuse a folder that looks like several products, and say when photos are dropped.
+
+    Analysis sends every photo as views of ONE item, so a folder holding a whole
+    shoot does not fail — it returns confident, well-formed copy for whichever
+    product comes first and silently discards the rest. Nothing downstream can
+    tell that apart from a real product, which makes it worth catching here.
+
+    The test is deliberately conservative. A single product photographed over a
+    few minutes does split on capture time (LIGHT-MOON-PINK spans 190 s with the
+    box shots two minutes from the product), so a gap alone would cry wolf. Only
+    a folder holding more photos than can even be sent AND splitting in two is
+    treated as unsorted.
+    """
+    if len(imgs) <= VLM_MAX_IMAGES:
+        return
+    groups = 1
+    try:
+        import intake
+        groups = len(intake.cluster(intake.discover(sku_folder)))
+    except Exception:                          # noqa: BLE001 — the guard is a courtesy
+        pass
+    if groups > 1:
+        raise AnalyzerError(
+            f"'{sku_folder}' holds {len(imgs)} photos that look like {groups} different "
+            f"products. Analysis treats a folder as one product, so this would write "
+            f"confident copy for just one of them. Sort it first: "
+            f"toycat sort {sku_folder}")
+    print(f"  ! {len(imgs)} photos, but only the first {VLM_MAX_IMAGES} are sent "
+          f"(raise OLLAMA_VLM_MAX_IMAGES to use more)", file=sys.stderr)
+
+
 def analyze_folder(sku_folder: str, out_dir: str = None, use_ollama: bool = True,
                    allow_fallback: bool = False) -> ProductProfile:
     sku = os.path.basename(os.path.normpath(sku_folder))
     imgs = images_in(sku_folder)
+    check_one_product(sku_folder, imgs)
     print(f"[{sku}] {len(imgs)} photo(s) -> {OLLAMA_MODEL if use_ollama else 'fallback'}")
     profile = analyze(sku, imgs, use_ollama=use_ollama, allow_fallback=allow_fallback)
     out = profile_path(sku_folder, out_dir)

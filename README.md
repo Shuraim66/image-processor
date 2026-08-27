@@ -87,7 +87,12 @@ Sends every photo of a product to Qwen3-VL **together**, as different views of
 one object, and writes `output/<SKU>/product.json`: title, description, bullets,
 features, SEO fields, tags, alt text, scene prompts.
 
-Analysis **fails loudly** rather than writing filler. If the model is unreachable
+Analysis refuses a folder that holds more than one product. It would not fail on
+its own — it treats every photo as views of one item, so a whole shoot in one
+folder yields confident, unflagged copy for whichever product comes first and
+silently discards the rest. Run `toycat sort` first; the guard says so.
+
+Analysis also **fails loudly** rather than writing filler. If the model is unreachable
 the SKU is skipped and named at the end. `--allow-fallback` opts into placeholder
 copy, and anything written that way is flagged for review so it can't ship
 silently.

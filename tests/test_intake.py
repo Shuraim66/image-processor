@@ -112,3 +112,55 @@ def test_the_real_shoot_groups_as_it_was_sorted_by_hand():
     groups = intake.cluster(shots)
     assert len(groups) == 7, "the reference shoot over-splits into exactly 7"
     assert [len(g) for g in intake.merge(groups, [(4, 5)])] == [4, 3, 4, 6, 5, 6]
+
+
+# --- the guard that stops analyze running on an unsorted folder ---------------
+
+def _shoot(tmp_path, name, stamps):
+    d = tmp_path / name
+    d.mkdir()
+    for s in stamps:
+        Image.new("RGB", (8, 8), "white").save(d / f"IMG_20260825_{s}.jpg")
+    return str(d)
+
+
+def test_analyze_refuses_a_folder_holding_several_products(tmp_path):
+    """A mixed folder does not fail on its own — it returns confident copy for
+    whichever product comes first and drops the rest. This is the only thing
+    standing between an unsorted drop and a listing for a product nobody sells."""
+    import analyzer
+    folder = _shoot(tmp_path, "shoot",
+                    ["220000", "220005", "220010", "220015",   # product one
+                     "220400", "220405", "220410", "220415"])  # product two
+    imgs = analyzer.images_in(folder)
+    with pytest.raises(analyzer.AnalyzerError, match="toycat sort"):
+        analyzer.check_one_product(folder, imgs)
+
+
+def test_guard_allows_one_product_shot_over_several_minutes(tmp_path):
+    """LIGHT-MOON-PINK spans 190 s because its box shots sit two minutes from the
+    product. A capture-time gap alone would reject it, so the guard also requires
+    more photos than can even be sent."""
+    import analyzer
+    folder = _shoot(tmp_path, "one",
+                    ["224534", "224614", "224827", "224833", "224841", "224844"])
+    analyzer.check_one_product(folder, analyzer.images_in(folder))   # must not raise
+
+
+def test_guard_ignores_small_folders(tmp_path):
+    import analyzer
+    folder = _shoot(tmp_path, "small", ["220000", "220900"])
+    analyzer.check_one_product(folder, analyzer.images_in(folder))   # must not raise
+
+
+@pytest.mark.slow
+def test_guard_passes_every_real_product_folder():
+    """The guard is worthless if it cries wolf on the catalogue it ships with."""
+    import analyzer
+    if not os.path.isdir("input"):
+        pytest.skip("no input/")
+    for sku in sorted(os.listdir("input")):
+        folder = os.path.join("input", sku)
+        if not os.path.isdir(folder):
+            continue
+        analyzer.check_one_product(folder, analyzer.images_in(folder))
