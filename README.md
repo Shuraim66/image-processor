@@ -30,6 +30,35 @@ same flags; use whichever reads better.
 
 ---
 
+## After a restart
+
+Ollama is installed via Homebrew here, with no menu-bar app and no LaunchAgent,
+so **it does not come back on its own**. Register it once and stop thinking about it:
+
+```bash
+brew services start ollama
+```
+
+Then, at the start of any session:
+
+```bash
+cd ~/Desktop/image-processor
+source .venv/bin/activate
+```
+
+Thirty seconds of checks that save an hour of confusion:
+
+```bash
+ollama list          # the VLM tag should be there; if this hangs, Ollama is down
+toycat --help        # if "command not found", re-run: pip install -e '.[dev]'
+pytest               # 50 tests, no model needed
+```
+
+The model caches survive a restart — BiRefNet in `~/.rembg/models/` and the VLM in
+Ollama's own store — so nothing re-downloads.
+
+---
+
 ## The workflow
 
 ### 0. Drop the photos in
