@@ -25,7 +25,7 @@ toycat = "toycat:main"
 
 [tool.setuptools]
 py-modules = [
-    "toycat", "slots", "analyzer", "gallery", "gallery_pipeline", "make_hero",
+    "toycat", "slots", "intake", "analyzer", "gallery", "gallery_pipeline", "make_hero",
     "palette", "process_products", "providers", "quality", "scenes",
     "shopify_export", "specs", "typeset", "copyguard",
 ]

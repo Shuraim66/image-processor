@@ -34,9 +34,31 @@ same flags; use whichever reads better.
 
 ### 0. Drop the photos in
 
+Either sort them yourself:
+
 ```
 input/<SKU>/front.jpg, angle2.jpg, angle3.jpg …
 ```
+
+…or drop the whole shoot into one folder and let `toycat sort` group it:
+
+```bash
+toycat sort raw_footages/                     # propose; writes nothing
+toycat sort raw_footages/ --apply --merge 4,5 \
+    --name 1=TUMBLER-GRADIENT-MOCHA --name 2=TUMBLER-HEART-BLACK
+```
+
+Grouping is by capture time — a pause longer than `--gap` (60 s) reads as the
+next product. It writes a contact sheet, one row per proposed product, so an
+over-split is obvious; `--merge 4,5` folds two rows together. It only ever
+over-splits, never merges two different products, so the worst case is one extra
+flag. On the 28-photo reference shoot it recovers the hand-sorted grouping
+exactly with a single `--merge`.
+
+Photos are **copied**, so the shoot folder survives a wrong guess, and it refuses
+to write into a product folder that already has photos unless you pass
+`--overwrite`. `front.jpg` is the earliest shot in the group — check the contact
+sheet, because a row that opens on a packaging shot wants renaming.
 
 One folder per product, named as the SKU. `front.jpg` should be the **clearest
 whole-product shot** — it drives the white-background image and the close-up

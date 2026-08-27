@@ -11,6 +11,7 @@ import sys
 
 # stage -> (module, one-line help). Order is the order you run them in.
 STAGES = {
+    "sort": ("intake", "group an unsorted shoot into input/<SKU>/ folders"),
     "analyze": ("analyzer", "photos -> product.json (local VLM)"),
     "scenes": ("scenes", "generate the background plates"),
     "specs": ("specs", "size data and the missing-measurement report"),
