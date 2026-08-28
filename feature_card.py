@@ -83,11 +83,15 @@ def render_v2(hero_photo, thumbs, content, out_path, theme=None):
     bg = Image.composite(tint, bg, grad.resize((W, W))).convert("RGBA")
     d = ImageDraw.Draw(bg)
 
-    # hero product (real cutout), upper-right
+    # hero product (real cutout) — fit inside a box on the RIGHT so wide products
+    # never intrude on the headline/features column on the left.
     cut = pp.trim_to_content(pp.remove_background(Image.open(hero_photo).convert("RGBA")))
-    hh = int(W * 0.42); scale = hh / cut.height
-    cut = cut.resize((int(cut.width * scale), hh), Image.LANCZOS)
-    hx = int(W * 0.72) - cut.width // 2; hy = int(W * 0.07)
+    box_w, box_h = int(W * 0.44), int(W * 0.46)
+    scale = min(box_w / cut.width, box_h / cut.height)
+    cut = cut.resize((max(1, int(cut.width * scale)), max(1, int(cut.height * scale))), Image.LANCZOS)
+    zone_cx, zone_top = int(W * 0.74), int(W * 0.06)
+    hx = zone_cx - cut.width // 2
+    hy = zone_top + (box_h - cut.height) // 2
     sh = Image.new("RGBA", (W, W), (0, 0, 0, 0))
     sil = Image.new("RGBA", cut.size, ink + (0,)); sil.putalpha(cut.getchannel("A").point(lambda a: 90 if a else 0))
     sh.paste(sil, (hx + 10*SS, hy + 16*SS), sil); bg.alpha_composite(sh.filter(ImageFilter.GaussianBlur(18*SS)))
