@@ -365,3 +365,27 @@ if __name__ == "__main__":
     out = render_hero("hero/SCOOTER-LED-PINK_cutout.png", demo_content(),
                       "hero/SCOOTER-LED-PINK_hero.jpg")
     print("wrote", out)
+
+
+def derive_theme(image_path):
+    """Derive a palette (primary, accent, ink) from the product's own colors so
+    overlaid text matches the product, like a designer would. Falls back to the
+    brand THEME if no vivid colors are found."""
+    import colorsys
+    im = Image.open(image_path).convert("RGB").resize((140, 140))
+    q = im.quantize(colors=16).convert("RGB")
+    colors = sorted(q.getcolors(140 * 140) or [], reverse=True)
+    cand = []
+    for cnt, rgb in colors:
+        h, s, v = colorsys.rgb_to_hsv(*[c / 255 for c in rgb])
+        if s > 0.28 and 0.25 < v < 0.97:          # skip white / gray / black bg
+            cand.append((cnt, rgb, (h, s, v)))
+    if not cand:
+        return dict(THEME)
+    primary = cand[0][1]
+    ph = cand[0][2][0]
+    accent = next((rgb for _, rgb, (h, s, v) in cand[1:]
+                   if min(abs(h - ph), 1 - abs(h - ph)) > 0.08), primary)
+    ir, ig, ib = colorsys.hsv_to_rgb(ph, min(0.55, cand[0][2][1]), 0.24)  # dark tint for text
+    ink = (int(ir * 255), int(ig * 255), int(ib * 255))
+    return {**THEME, "primary": primary, "accent": accent, "ink": ink}
