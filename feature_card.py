@@ -70,17 +70,24 @@ def _rounded_thumb(img, size, rad):
 
 
 # ---------- main -------------------------------------------------------------
-def render_v2(hero_photo, thumbs, content, out_path, theme=None):
+def render_v2(hero_photo, thumbs, content, out_path, theme=None, scene=None):
     theme = theme or mh.derive_theme(hero_photo)
     prim, acc, ink = theme["primary"], theme["accent"], theme["ink"]
 
-    # themed soft background
-    bg = Image.new("RGB", (W, W), (250, 249, 252))
-    grad = Image.new("L", (1, W))
-    for y in range(W):
-        grad.putpixel((0, y), int(70 * (1 - y / W)))
-    tint = Image.new("RGB", (W, W), tuple(min(255, c + 40) for c in prim))
-    bg = Image.composite(tint, bg, grad.resize((W, W))).convert("RGBA")
+    if scene:
+        # "classic" backdrop: heavily blur a scene render into an abstract warm
+        # wash (its product dissolves) so text stays readable on top.
+        sc = Image.open(scene).convert("RGB").resize((W, W)).filter(ImageFilter.GaussianBlur(70 * SS))
+        wash = Image.new("RGB", (W, W), (250, 248, 245))
+        bg = Image.blend(sc, wash, 0.58).convert("RGBA")
+    else:
+        # themed soft gradient
+        bg = Image.new("RGB", (W, W), (250, 249, 252))
+        grad = Image.new("L", (1, W))
+        for y in range(W):
+            grad.putpixel((0, y), int(70 * (1 - y / W)))
+        tint = Image.new("RGB", (W, W), tuple(min(255, c + 40) for c in prim))
+        bg = Image.composite(tint, bg, grad.resize((W, W))).convert("RGBA")
     d = ImageDraw.Draw(bg)
 
     # hero product (real cutout) — fit inside a box on the RIGHT so wide products
@@ -99,19 +106,19 @@ def render_v2(hero_photo, thumbs, content, out_path, theme=None):
 
     x0 = int(W * 0.05); LEFT = int(W * 0.40)   # text column, kept clear of the product
     y = int(W * 0.05)
-    # product name eyebrow
+    # product name eyebrow (Montserrat)
     if content.get("name"):
         f_n = mh._fit_font("Montserrat-ExtraBold.otf", content["name"].upper(), LEFT, 32, 18)
         d.text((x0, y), content["name"].upper(), font=f_n, fill=acc); y += int(48*SS)
-    # headline (2 lines)
-    f_h = mh._fit_font("Montserrat-Black.otf", [content["headline_top"], content["headline_accent"]],
-                       LEFT, 82, 38)
-    lh = sum(f_h.getmetrics())
+    # headline (2 lines) — rounded Baloo display for a friendlier, distinct look
+    f_h = mh._fit_font("Baloo2-ExtraBold.ttf", [content["headline_top"], content["headline_accent"]],
+                       LEFT, 88, 40)
+    lh = int(sum(f_h.getmetrics()) * 0.92)
     d.text((x0, y), content["headline_top"], font=f_h, fill=ink)
     d.text((x0, y + lh), content["headline_accent"], font=f_h, fill=acc)
-    y += 2*lh + int(16*SS)
-    # subhead
-    f_s = mh._font("Montserrat-SemiBold.otf", 30)
+    y += 2*lh + int(20*SS)
+    # subhead (Poppins — a second family for contrast)
+    f_s = mh._font("Poppins-SemiBold.ttf", 30)
     for ln in _wrap(d, content["subhead"], f_s, LEFT):
         d.text((x0, y), ln, font=f_s, fill=ink); y += int(40*SS)
 
