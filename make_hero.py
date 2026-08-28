@@ -369,23 +369,34 @@ if __name__ == "__main__":
 
 def derive_theme(image_path):
     """Derive a palette (primary, accent, ink) from the product's own colors so
-    overlaid text matches the product, like a designer would. Falls back to the
-    brand THEME if no vivid colors are found."""
+    overlaid text matches the product. Two-tier: prefer vivid colors, but fall
+    back to muted/warm tones (e.g. a brown/black tumbler) before the brand THEME,
+    so neutral products still get a matching warm palette instead of blue/red."""
     import colorsys
     im = Image.open(image_path).convert("RGB").resize((140, 140))
     q = im.quantize(colors=16).convert("RGB")
     colors = sorted(q.getcolors(140 * 140) or [], reverse=True)
-    cand = []
-    for cnt, rgb in colors:
-        h, s, v = colorsys.rgb_to_hsv(*[c / 255 for c in rgb])
-        if s > 0.28 and 0.25 < v < 0.97:          # skip white / gray / black bg
-            cand.append((cnt, rgb, (h, s, v)))
+    hsv = [(cnt, rgb, colorsys.rgb_to_hsv(*[c / 255 for c in rgb])) for cnt, rgb in colors]
+
+    def pick(min_s):   # chromatic pixels, excluding near-white and near-black
+        return [x for x in hsv if x[2][1] > min_s and 0.16 < x[2][2] < 0.95]
+
+    cand = pick(0.28) or pick(0.10)     # vivid first, then muted
     if not cand:
         return dict(THEME)
-    primary = cand[0][1]
-    ph = cand[0][2][0]
-    accent = next((rgb for _, rgb, (h, s, v) in cand[1:]
-                   if min(abs(h - ph), 1 - abs(h - ph)) > 0.08), primary)
-    ir, ig, ib = colorsys.hsv_to_rgb(ph, min(0.55, cand[0][2][1]), 0.24)  # dark tint for text
-    ink = (int(ir * 255), int(ig * 255), int(ib * 255))
+
+    ph, ps, pv = cand[0][2]
+    # deepen a light/washed primary so banners stay readable with white text
+    ts, tv = max(ps, 0.38), min(pv, 0.62)
+    primary = tuple(int(c * 255) for c in colorsys.hsv_to_rgb(ph, ts, tv))
+    # accent: a distinct hue if the product has one, else a warmer deeper shade
+    accent = None
+    for _, _, (h, s, v) in cand[1:]:
+        if min(abs(h - ph), 1 - abs(h - ph)) > 0.08:
+            accent = tuple(int(c * 255) for c in colorsys.hsv_to_rgb(h, max(s, 0.4), min(v, 0.6)))
+            break
+    if accent is None:
+        accent = tuple(int(c * 255) for c in
+                       colorsys.hsv_to_rgb((ph + 0.05) % 1.0, min(1, ts + 0.12), max(0.32, tv - 0.14)))
+    ink = tuple(int(c * 255) for c in colorsys.hsv_to_rgb(ph, min(0.6, ts), 0.22))
     return {**THEME, "primary": primary, "accent": accent, "ink": ink}
