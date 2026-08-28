@@ -120,7 +120,7 @@ def render_v2(hero_photo, thumbs, content, out_path, theme=None):
 
     # thumbnail row (real crops)
     n = len(thumbs); pad = int(W*0.02); tw = int((W - 2*x0 - (n-1)*pad) / n)
-    ty = int(W * 0.63); f_c = mh._font("Montserrat-Bold.otf", 24)
+    ty = int(W * 0.67); f_c = mh._font("Montserrat-Bold.otf", 24)
     for i, t in enumerate(thumbs):
         src = Image.open(t["photo"]).convert("RGB")
         l, tp, rr, b = t["crop"]; iw, ih = src.size
@@ -133,13 +133,14 @@ def render_v2(hero_photo, thumbs, content, out_path, theme=None):
         cw = d.textlength(t["caption"], font=f_c)
         d.text((tx + (tw-cw)//2, ty + tw + int(8*SS)), t["caption"], font=f_c, fill=ink)
 
-    # trust bar
-    by0 = int(W * 0.90); d.rectangle([0, by0, W, W], fill=prim)
-    f_b = mh._font("Montserrat-ExtraBold.otf", 28)
-    m = len(content["trust"]); seg = W / m
-    for i, tb in enumerate(content["trust"]):
-        bw = d.textlength(tb, font=f_b)
-        d.text((seg*i + (seg-bw)//2, by0 + int(0.03*W)), tb, font=f_b, fill=(255, 255, 255))
+    # trust bar (optional)
+    if content.get("trust"):
+        by0 = int(W * 0.90); d.rectangle([0, by0, W, W], fill=prim)
+        f_b = mh._font("Montserrat-ExtraBold.otf", 28)
+        m = len(content["trust"]); seg = W / m
+        for i, tb in enumerate(content["trust"]):
+            bw = d.textlength(tb, font=f_b)
+            d.text((seg*i + (seg-bw)//2, by0 + int(0.03*W)), tb, font=f_b, fill=(255, 255, 255))
 
     # logo watermark
     if os.path.exists(mh.LOGO_PATH):
