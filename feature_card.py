@@ -73,6 +73,7 @@ def _rounded_thumb(img, size, rad):
 def render_v2(hero_photo, thumbs, content, out_path, theme=None, scene=None):
     theme = theme or mh.derive_theme(hero_photo)
     prim, acc, ink = theme["primary"], theme["accent"], theme["ink"]
+    style = content.get("style") or mh.product_style(hero_photo)   # playful | clean
 
     if scene:
         # "classic" backdrop: heavily blur a scene render into an abstract warm
@@ -110,8 +111,9 @@ def render_v2(hero_photo, thumbs, content, out_path, theme=None, scene=None):
     if content.get("name"):
         f_n = mh._fit_font("Montserrat-ExtraBold.otf", content["name"].upper(), LEFT, 32, 18)
         d.text((x0, y), content["name"].upper(), font=f_n, fill=acc); y += int(48*SS)
-    # headline (2 lines) — Poppins ExtraBold: strong, clean, friendly, versatile
-    f_h = mh._fit_font("Poppins-ExtraBold.ttf", [content["headline_top"], content["headline_accent"]],
+    # headline (2 lines) — funky Baloo for playful toys, clean Poppins for utility
+    hfont = "Baloo2-ExtraBold.ttf" if style == "playful" else "Poppins-ExtraBold.ttf"
+    f_h = mh._fit_font(hfont, [content["headline_top"], content["headline_accent"]],
                        LEFT, 84, 40)
     lh = int(sum(f_h.getmetrics()) * 0.98)
     d.text((x0, y), content["headline_top"], font=f_h, fill=ink)
@@ -208,9 +210,12 @@ def render_hero_title(product_photo, content, out_path, theme=None, scene=None):
         y += bh + int(22 * SS)
     # big outlined sticker title (centred, rounded Baloo)
     title = content["title"].upper()
-    f_t = mh._fit_font("Baloo2-ExtraBold.ttf", title, int(W * 0.86), 100, 44)
+    style = content.get("style") or mh.product_style(product_photo)
+    tfont = "Baloo2-ExtraBold.ttf" if style == "playful" else "Poppins-ExtraBold.ttf"
+    ow = 14 if style == "playful" else 5          # chunky sticker vs clean bold
+    f_t = mh._fit_font(tfont, title, int(W * 0.86), 100, 44)
     tw, th, ox, oy = mh._text_size(f_t, title)
-    mh.sticker_text(bg, ((W - tw) // 2, y), title, f_t, fill=prim, outline=(255, 255, 255), outline_w=14)
+    mh.sticker_text(bg, ((W - tw) // 2, y), title, f_t, fill=prim, outline=(255, 255, 255), outline_w=ow)
     y += th + int(46 * SS)
     # subhead (centred)
     if content.get("subhead2"):

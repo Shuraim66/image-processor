@@ -400,3 +400,18 @@ def derive_theme(image_path):
                        colorsys.hsv_to_rgb((ph + 0.05) % 1.0, min(1, ts + 0.12), max(0.32, tv - 0.14)))
     ink = tuple(int(c * 255) for c in colorsys.hsv_to_rgb(ph, min(0.6, ts), 0.22))
     return {**THEME, "primary": primary, "accent": accent, "ink": ink}
+
+
+def product_style(image_path):
+    """Classify a product as 'playful' (vivid, colorful toy -> funky fonts) or
+    'clean' (muted/neutral, grown-up item like a tumbler -> simple fonts),
+    from the saturation of its dominant colour."""
+    import colorsys
+    im = Image.open(image_path).convert("RGB").resize((140, 140))
+    q = im.quantize(colors=16).convert("RGB")
+    best = 0.0
+    for cnt, rgb in (q.getcolors(140 * 140) or []):
+        h, s, v = colorsys.rgb_to_hsv(*[c / 255 for c in rgb])
+        if 0.2 < v < 0.95:
+            best = max(best, s)
+    return "playful" if best > 0.45 else "clean"
