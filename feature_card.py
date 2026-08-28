@@ -86,45 +86,50 @@ def render_v2(hero_photo, thumbs, content, out_path, theme=None):
     # hero product (real cutout) — fit inside a box on the RIGHT so wide products
     # never intrude on the headline/features column on the left.
     cut = pp.trim_to_content(pp.remove_background(Image.open(hero_photo).convert("RGBA")))
-    box_w, box_h = int(W * 0.44), int(W * 0.46)
+    zone_l, zone_t = int(W * 0.47), int(W * 0.14)
+    box_w, box_h = int(W * 0.51), int(W * 0.50)   # large right zone the product fills
     scale = min(box_w / cut.width, box_h / cut.height)
     cut = cut.resize((max(1, int(cut.width * scale)), max(1, int(cut.height * scale))), Image.LANCZOS)
-    zone_cx, zone_top = int(W * 0.74), int(W * 0.06)
-    hx = zone_cx - cut.width // 2
-    hy = zone_top + (box_h - cut.height) // 2
+    hx = zone_l + (box_w - cut.width) // 2
+    hy = zone_t + (box_h - cut.height) // 2
     sh = Image.new("RGBA", (W, W), (0, 0, 0, 0))
     sil = Image.new("RGBA", cut.size, ink + (0,)); sil.putalpha(cut.getchannel("A").point(lambda a: 90 if a else 0))
     sh.paste(sil, (hx + 10*SS, hy + 16*SS), sil); bg.alpha_composite(sh.filter(ImageFilter.GaussianBlur(18*SS)))
     bg.alpha_composite(cut, (hx, hy))
 
-    x0 = int(W * 0.05)
-    # headline
+    x0 = int(W * 0.05); LEFT = int(W * 0.40)   # text column, kept clear of the product
+    y = int(W * 0.05)
+    # product name eyebrow
+    if content.get("name"):
+        f_n = mh._fit_font("Montserrat-ExtraBold.otf", content["name"].upper(), LEFT, 32, 18)
+        d.text((x0, y), content["name"].upper(), font=f_n, fill=acc); y += int(48*SS)
+    # headline (2 lines)
     f_h = mh._fit_font("Montserrat-Black.otf", [content["headline_top"], content["headline_accent"]],
-                       int(W * 0.42), 84, 40)
-    d.text((x0, int(W*0.05)), content["headline_top"], font=f_h, fill=ink)
-    asc = f_h.getmetrics(); d.text((x0, int(W*0.05) + asc[0] + asc[1]), content["headline_accent"],
-                                   font=f_h, fill=acc)
+                       LEFT, 82, 38)
+    lh = sum(f_h.getmetrics())
+    d.text((x0, y), content["headline_top"], font=f_h, fill=ink)
+    d.text((x0, y + lh), content["headline_accent"], font=f_h, fill=acc)
+    y += 2*lh + int(16*SS)
     # subhead
     f_s = mh._font("Montserrat-SemiBold.otf", 30)
-    sy = int(W * 0.05) + 2*(asc[0]+asc[1]) + 14*SS
-    for ln in _wrap(d, content["subhead"], f_s, int(W*0.42)):
-        d.text((x0, sy), ln, font=f_s, fill=ink); sy += int(38*SS)
+    for ln in _wrap(d, content["subhead"], f_s, LEFT):
+        d.text((x0, y), ln, font=f_s, fill=ink); y += int(40*SS)
 
-    # 4 features (left)
+    # 4 features (left), evenly spaced with breathing room
     f_ft = mh._font("Montserrat-ExtraBold.otf", 30)
     f_fd = mh._font("Montserrat-SemiBold.otf", 24)
-    r = int(W * 0.028); fy = int(W * 0.34); step = int(W * 0.075)
+    r = int(W * 0.028); fy = int(W * 0.37); step = int(W * 0.088)
+    tx = x0 + 2*r + 22*SS
     for i, ft in enumerate(content["features"][:4]):
         cy = fy + i * step; col = prim if i % 2 == 0 else acc
         _icon(d, x0 + r, cy, r, ft["icon"], col)
-        tx = x0 + 2*r + 20*SS
-        d.text((tx, cy - int(30*SS)), ft["title"], font=f_ft, fill=col)
-        for j, ln in enumerate(_wrap(d, ft["desc"], f_fd, int(W*0.30))):
-            d.text((tx, cy + int((-2 + j*26)*SS)), ln, font=f_fd, fill=ink)
+        d.text((tx, cy - int(36*SS)), ft["title"], font=f_ft, fill=col)
+        for j, ln in enumerate(_wrap(d, ft["desc"], f_fd, LEFT - (2*r + 22*SS))):
+            d.text((tx, cy + int((4 + j*30)*SS)), ln, font=f_fd, fill=ink)
 
     # thumbnail row (real crops)
     n = len(thumbs); pad = int(W*0.02); tw = int((W - 2*x0 - (n-1)*pad) / n)
-    ty = int(W * 0.67); f_c = mh._font("Montserrat-Bold.otf", 24)
+    ty = int(W * 0.69); f_c = mh._font("Montserrat-Bold.otf", 24)
     for i, t in enumerate(thumbs):
         src = Image.open(t["photo"]).convert("RGB")
         l, tp, rr, b = t["crop"]; iw, ih = src.size
