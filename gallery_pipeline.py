@@ -34,6 +34,7 @@ import gallery
 import analyzer
 import providers
 import quality
+import fal_listing
 
 OUTPUT_ROOT = "gallery_out"
 CUTOUT_DIR = "gallery_out/_cutouts"
@@ -143,8 +144,11 @@ def build_for_sku(sku, specs, provider, use_ollama, reanalyze, ext="webp",
 def main():
     ap = argparse.ArgumentParser(description="Generate the 7-image listing gallery per product.")
     ap.add_argument("--sku", help="only this SKU (default: all under input/)")
-    ap.add_argument("--bg-provider", choices=["procedural", "folder", "drawthings"],
-                    default="procedural", help="background engine for slots 3-4")
+    ap.add_argument("--bg-provider", choices=["procedural", "folder", "drawthings", "fal"],
+                    default="procedural",
+                    help="scene engine. procedural/folder/drawthings = bare-bg + composite; "
+                         "fal = product-in-scene listing set (CatalogHero/WhiteBG/Packshot/"
+                         "Detail/Lifestyle + FeatureCard). fal needs FAL_KEY.")
     ap.add_argument("--no-ollama", action="store_true",
                     help="skip the Qwen3-VL analyzer; use deterministic fallback copy")
     ap.add_argument("--reanalyze", action="store_true",
@@ -160,20 +164,28 @@ def main():
     args = ap.parse_args()
 
     specs = load_specs()
-    provider = providers.get_provider(args.bg_provider)
-    print(f"Background provider: {provider.name}")
+    is_fal = args.bg_provider == "fal"
+    provider = None if is_fal else providers.get_provider(args.bg_provider)
+    print(f"Scene engine: {args.bg_provider}")
 
     skus = [args.sku] if args.sku else pp.find_sku_folders(pp.INPUT_DIR)
     for i, sku in enumerate(skus, 1):
         print(f"[{i}/{len(skus)}] {sku}")
         try:
-            for p in build_for_sku(sku, specs, provider,
-                                   use_ollama=not args.no_ollama,
-                                   reanalyze=args.reanalyze, ext=args.format,
-                                   per_product=args.per_product,
-                                   cache_bg=args.cache_backgrounds,
-                                   vlm=args.vlm_check):
-                print(f"  -> {p}")
+            if is_fal:   # fal renders the product into each scene (product-in-scene set)
+                folder = os.path.join(pp.INPUT_DIR, sku)
+                cont = get_profile(sku, folder, not args.no_ollama, args.reanalyze)
+                out_dir = (os.path.join(folder, "output") if args.per_product
+                           else os.path.join(OUTPUT_ROOT, sku))
+                fal_listing.build(sku, pp.raw_images_in(folder), cont, out_dir, ext=args.format)
+            else:
+                for p in build_for_sku(sku, specs, provider,
+                                       use_ollama=not args.no_ollama,
+                                       reanalyze=args.reanalyze, ext=args.format,
+                                       per_product=args.per_product,
+                                       cache_bg=args.cache_backgrounds,
+                                       vlm=args.vlm_check):
+                    print(f"  -> {p}")
         except Exception as exc:  # keep the batch alive
             print(f"  ! {sku} failed: {exc}", file=sys.stderr)
             traceback.print_exc()

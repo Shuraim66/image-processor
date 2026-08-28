@@ -110,10 +110,10 @@ def render_v2(hero_photo, thumbs, content, out_path, theme=None, scene=None):
     if content.get("name"):
         f_n = mh._fit_font("Montserrat-ExtraBold.otf", content["name"].upper(), LEFT, 32, 18)
         d.text((x0, y), content["name"].upper(), font=f_n, fill=acc); y += int(48*SS)
-    # headline (2 lines) — rounded Baloo display for a friendlier, distinct look
-    f_h = mh._fit_font("Baloo2-ExtraBold.ttf", [content["headline_top"], content["headline_accent"]],
-                       LEFT, 88, 40)
-    lh = int(sum(f_h.getmetrics()) * 0.92)
+    # headline (2 lines) — Poppins ExtraBold: strong, clean, friendly, versatile
+    f_h = mh._fit_font("Poppins-ExtraBold.ttf", [content["headline_top"], content["headline_accent"]],
+                       LEFT, 84, 40)
+    lh = int(sum(f_h.getmetrics()) * 0.98)
     d.text((x0, y), content["headline_top"], font=f_h, fill=ink)
     d.text((x0, y + lh), content["headline_accent"], font=f_h, fill=acc)
     y += 2*lh + int(20*SS)
