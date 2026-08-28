@@ -166,3 +166,70 @@ def render_v2(hero_photo, thumbs, content, out_path, theme=None, scene=None):
 
     bg.convert("RGB").resize((SIZE, SIZE), Image.LANCZOS).save(out_path, quality=94)
     return out_path
+
+
+def render_hero_title(product_photo, content, out_path, theme=None, scene=None):
+    """Store-style titled hero: eyebrow pill + big outlined 'sticker' title +
+    subhead centered on top, product below, logo top-left + round badge top-right.
+    Colors auto-match the product."""
+    theme = theme or mh.derive_theme(product_photo)
+    prim, acc, ink = theme["primary"], theme["accent"], theme["ink"]
+
+    if scene and os.path.exists(scene):
+        sc = Image.open(scene).convert("RGB").resize((W, W)).filter(ImageFilter.GaussianBlur(70 * SS))
+        bg = Image.blend(sc, Image.new("RGB", (W, W), (250, 249, 246)), 0.5).convert("RGBA")
+    else:
+        bg = Image.new("RGB", (W, W), (250, 249, 246))
+        grad = Image.new("L", (1, W))
+        for yy in range(W):
+            grad.putpixel((0, yy), int(60 * (1 - yy / W)))
+        tint = Image.new("RGB", (W, W), tuple(min(255, c + 65) for c in prim))
+        bg = Image.composite(tint, bg, grad.resize((W, W))).convert("RGBA")
+    d = ImageDraw.Draw(bg)
+
+    # product cutout, bottom-centre
+    cut = pp.trim_to_content(pp.remove_background(Image.open(product_photo).convert("RGBA")))
+    s = min(int(W * 0.80) / cut.width, int(W * 0.50) / cut.height)
+    cut = cut.resize((max(1, int(cut.width * s)), max(1, int(cut.height * s))), Image.LANCZOS)
+    px, py = (W - cut.width) // 2, int(W * 0.97) - cut.height
+    sh = Image.new("RGBA", (W, W), (0, 0, 0, 0))
+    sil = Image.new("RGBA", cut.size, ink + (0,)); sil.putalpha(cut.getchannel("A").point(lambda a: 80 if a else 0))
+    sh.paste(sil, (px + 8 * SS, py + 14 * SS), sil); bg.alpha_composite(sh.filter(ImageFilter.GaussianBlur(20 * SS)))
+    bg.alpha_composite(cut, (px, py))
+
+    y = int(W * 0.20)   # title block sits BELOW the logo/badge row (no overlap)
+    # eyebrow pill (centred)
+    if content.get("eyebrow"):
+        f_e = mh._font("Montserrat-ExtraBold.otf", 30)
+        tw = d.textlength(content["eyebrow"], font=f_e); bw, bh = int(tw + 56 * SS), int(66 * SS)
+        bx = (W - bw) // 2
+        d.rounded_rectangle([bx, y, bx + bw, y + bh], radius=bh // 2, fill=acc)
+        d.text((bx + (bw - tw) // 2, y + int(15 * SS)), content["eyebrow"], font=f_e, fill=(255, 255, 255))
+        y += bh + int(22 * SS)
+    # big outlined sticker title (centred, rounded Baloo)
+    title = content["title"].upper()
+    f_t = mh._fit_font("Baloo2-ExtraBold.ttf", title, int(W * 0.86), 100, 44)
+    tw, th, ox, oy = mh._text_size(f_t, title)
+    mh.sticker_text(bg, ((W - tw) // 2, y), title, f_t, fill=prim, outline=(255, 255, 255), outline_w=14)
+    y += th + int(46 * SS)
+    # subhead (centred)
+    if content.get("subhead2"):
+        f_s = mh._font("Poppins-ExtraBold.ttf", 34); sw = d.textlength(content["subhead2"], font=f_s)
+        d.text(((W - sw) // 2, y), content["subhead2"], font=f_s, fill=ink)
+
+    # logo top-left
+    if os.path.exists(mh.LOGO_PATH):
+        logo = Image.open(mh.LOGO_PATH).convert("RGBA"); lw = int(W * 0.13)
+        logo = logo.resize((lw, int(logo.height * lw / logo.width)), Image.LANCZOS)
+        bg.alpha_composite(logo, (int(W * 0.045), int(W * 0.04)))
+    # round badge top-right
+    if content.get("badge"):
+        bd = int(W * 0.145); bx, by = int(W * 0.81), int(W * 0.035)
+        d.ellipse([bx, by, bx + bd, by + bd], fill=prim)
+        f_b = mh._font("Montserrat-ExtraBold.otf", 27); lines = content["badge"].split()
+        ty = by + bd // 2 - len(lines) * int(19 * SS)
+        for ln in lines:
+            lw2 = d.textlength(ln, font=f_b); d.text((bx + (bd - lw2) // 2, ty), ln, font=f_b, fill=(255, 255, 255)); ty += int(38 * SS)
+
+    bg.convert("RGB").resize((SIZE, SIZE), Image.LANCZOS).save(out_path, quality=94)
+    return out_path
