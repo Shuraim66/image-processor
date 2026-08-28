@@ -102,6 +102,15 @@ def build(sku, raws, profile, out_dir, ext="png"):
                  scene=O + "CatalogHero.png")
     print("  -> FeatureCard")
 
+    # Titled hero (store-style: eyebrow + big title + subhead + badge)
+    fc.render_hero_title(O + "WhiteBG.png",
+                         {"eyebrow": profile.get("tagline_top", ""),
+                          "title": profile.get("name") or sku,
+                          "subhead2": profile.get("tagline_sub", ""),
+                          "badge": "TOY GIFT"},
+                         O + "Hero_titled.png", scene=O + "CatalogHero.png")
+    print("  -> Hero_titled")
+
     # watermark the marketing shots (WhiteBG stays clean for the marketplace main)
     SIZE = mh.SIZE
     for n in WATERMARK_SLOTS:
