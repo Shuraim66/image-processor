@@ -1,0 +1,17 @@
+{
+  "auto_group_threshold": 0.85,
+  "ambiguous_low": 0.60,
+  "ambiguous_high": 0.84,
+  "different_product_threshold": 0.60,
+  "duplicate_threshold": 0.985,
+  "near_duplicate_threshold": 0.95,
+  "ambiguity_margin": 0.05,
+  "timestamp_proximity_seconds": 900,
+  "timestamp_weight": 0.15,
+  "embedding_weight": 0.85,
+  "use_filename_hints": true,
+  "min_images_per_group": 1,
+  "max_images_per_group": 12,
+  "verify_groups_with_vision_model": true,
+  "verification_min_confidence": 0.80
+}

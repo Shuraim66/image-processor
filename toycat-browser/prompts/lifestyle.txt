@@ -1,0 +1,40 @@
+{{PRODUCT_LOCK}}
+
+TASK: Lifestyle (image 5 of 6)
+
+Place the exact product in a realistic, product-appropriate environment.
+The closest matching reference for this shot is: {{BEST_VIEW_LIFESTYLE}}
+
+Approved scene for this product: {{SCENE_NAME}}
+Scene description: {{SCENE_DESCRIPTION}}
+Environment: {{SCENE_ENVIRONMENT}}
+Surface: {{SCENE_SURFACE}}
+
+This scene has already been validated against the product's requirements.
+Do NOT substitute a different environment.
+
+Forbidden contexts for this product: {{FORBIDDEN_CONTEXTS}}
+
+Visual style:
+- soft
+- light
+- pastel
+- low contrast
+- clean
+- minimal
+- toy-store aesthetic
+- product-first
+- the background must never compete with the product
+
+Product placement constraints:
+- anchor: {{PLACEMENT_ANCHOR}}
+- product width should occupy about {{TARGET_WIDTH_RATIO}} of the frame width
+- keep at least {{MIN_MARGIN}} of the frame as clear margin on every side
+- uniform scaling only; never stretch, squash, warp or liquify the product
+- the product must sit on the surface with a realistic contact shadow and a
+  physically plausible size relative to the environment
+
+No generated logo or watermark.
+
+Output a single square image at {{CANVAS_W}} x {{CANVAS_H}} (1:1).
+Generate ONE image only.

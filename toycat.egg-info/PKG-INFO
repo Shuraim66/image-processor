@@ -1,0 +1,14 @@
+Metadata-Version: 2.4
+Name: toycat
+Version: 0.1.0
+Summary: Turn raw toy product photos into a Shopify-ready listing gallery, locally.
+Requires-Python: >=3.12
+Requires-Dist: pillow>=10.0
+Requires-Dist: rembg>=2.0.50
+Requires-Dist: onnxruntime>=1.17
+Requires-Dist: pydantic>=2.0
+Requires-Dist: ollama>=0.3
+Requires-Dist: numpy>=1.26
+Requires-Dist: scipy>=1.11
+Provides-Extra: dev
+Requires-Dist: pytest>=8.0; extra == "dev"

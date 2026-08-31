@@ -1,0 +1,70 @@
+{
+  "fixture_id": "dumpling",
+  "title": "Blue Dumpling / Squishy — mandatory product-fidelity regression case",
+  "why_this_exists": "Spec 64. A previous generation pipeline changed this product's size, proportions and appearance. Every implementation change must preserve this case.",
+  "source": "input/SQUISHY-BUN-MYSTERY/ on branch fix/cutout-framing-and-analyzer (legacy, unmodified)",
+  "reference_images": [
+    "front.jpg",
+    "angle2.jpg",
+    "angle3.jpg",
+    "angle4.jpg",
+    "angle5.jpg",
+    "angle6.jpg"
+  ],
+  "expected_grouping": {
+    "product_count": 1,
+    "images_in_group": 6,
+    "unassigned": 0,
+    "review_required": 0
+  },
+  "ground_truth": {
+    "note": "Only facts visible in the photographs. Anything not listed is UNKNOWN and must never be asserted as fact.",
+    "component_count": 2,
+    "components": [
+      {
+        "name": "squishy ball",
+        "provenance": "VERIFIED_FROM_PHOTOS",
+        "colors": ["blue"],
+        "surface": "translucent glossy shell with embedded blue beads and turquoise glitter",
+        "face": "printed kawaii face: two black oval eyes with white highlights, small curved smile, red blush strokes on both cheeks",
+        "shape": "dome / rounded ball"
+      },
+      {
+        "name": "steamer basket container",
+        "provenance": "VERIFIED_FROM_PHOTOS",
+        "colors": ["tan", "light brown"],
+        "parts": ["base", "removable lid"],
+        "lid_detail": "moulded woven basket-weave pattern with a central raised handle",
+        "shape": "shallow cylinder"
+      }
+    ],
+    "packaging_present": false,
+    "packaging_note": "The steamer basket is part of the product, not retail packaging. No retail packaging appears in the references, so packshot_status must be 'unavailable' rather than invented.",
+    "visible_text": [],
+    "visible_branding": [],
+    "unknown_facts": [
+      "brand",
+      "materials",
+      "dimensions",
+      "age_range",
+      "safety_certification",
+      "country_of_origin"
+    ]
+  },
+  "scene_requirements": {
+    "environment": ["indoor"],
+    "surface": ["table", "floor"],
+    "size_class": "small",
+    "water_related": false,
+    "forbidden_contexts": ["outdoor_ground", "poolside", "garden"]
+  },
+  "must_not_regress": [
+    "component_count stays 2 — the ball and the basket, never merged into one object",
+    "the ball stays blue with visible embedded beads and glitter",
+    "the basket stays tan with its woven lid pattern",
+    "the printed face keeps its two eyes, smile and cheek blush",
+    "the ball/basket proportions stay as photographed — the ball sits inside the base",
+    "no invented retail packaging, text, branding or accessories",
+    "uniform scaling only; the dome is never stretched into an oval"
+  ]
+}

@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "toycat-browser"
+version = "0.1.0"
+description = "THE TOY GIFT SHOP local product catalog automation (browser-driven image generation)."
+requires-python = ">=3.12"
+dependencies = [
+    "typer>=0.12",
+    "rich>=13.7",
+    "pydantic>=2.7",
+    "pillow>=10.3",
+    "ollama>=0.3",
+    "numpy>=1.26",
+]
+
+[project.optional-dependencies]
+heic = ["pillow-heif>=0.16"]
+grouping = ["imagehash>=4.3", "scikit-learn>=1.4"]
+dev = ["pytest>=8.0"]
+
+[project.scripts]
+toycat = "toycat_browser.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+toycat_browser = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+markers = [
+    "regression: real-product fidelity regression cases (spec 64)",
+    "requires_ollama: needs a running local Ollama with the vision model",
+    "requires_browser: needs Claude browser control + an authenticated ChatGPT session",
+]

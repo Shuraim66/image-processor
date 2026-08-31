@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+logs/*.log
+products-output/
+products-input/*
+!products-input/.gitkeep
+working/
+.DS_Store

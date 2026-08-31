@@ -1,0 +1,41 @@
+{{PRODUCT_LOCK}}
+
+TASK: Catalog Hero (image 1 of 6)
+
+Use the uploaded product references as the exact physical-product source.
+
+Create a polished commercial product photograph.
+
+Use the best available real product angle. The closest matching reference
+for this shot is: {{BEST_VIEW_HERO}}
+
+Preserve the exact product.
+
+Place it in a soft, light, premium THE TOY GIFT SHOP visual environment.
+
+The product should be the dominant subject.
+
+Use:
+- balanced framing
+- controlled scale
+- clean composition
+- realistic contact shadow
+- soft light
+- subtle depth
+- uncluttered environment
+
+Product placement constraints:
+- anchor: {{PLACEMENT_ANCHOR}}
+- product width should occupy about {{TARGET_WIDTH_RATIO}} of the frame width
+- keep at least {{MIN_MARGIN}} of the frame as clear margin on every side
+- uniform scaling only; never stretch, squash, warp or liquify the product
+
+Do not introduce unrelated props.
+
+Do not alter the product.
+
+No generated logo or watermark. The exact THE TOY GIFT SHOP logo will be
+applied locally afterward.
+
+Output a single square image at {{CANVAS_W}} x {{CANVAS_H}} (1:1).
+Generate ONE image only.

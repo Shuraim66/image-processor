@@ -1,0 +1,110 @@
+{
+  "preset": "toy_catalog",
+  "brand_name": "THE TOY GIFT SHOP",
+  "sku_prefix": "TTGS",
+  "input": {
+    "supported_extensions": [
+      ".jpg",
+      ".jpeg",
+      ".png",
+      ".webp",
+      ".heic",
+      ".heif"
+    ],
+    "recursive": true,
+    "follow_symlinks": false,
+    "ignore_filenames": [
+      ".DS_Store",
+      "Thumbs.db",
+      "desktop.ini"
+    ],
+    "ignore_hidden": true,
+    "min_edge_pixels": 640,
+    "min_megapixels": 0.4,
+    "max_file_size_bytes": 104857600,
+    "working_copy": {
+      "max_edge_pixels": 2048,
+      "format": "JPEG",
+      "jpeg_quality": 95,
+      "strip_metadata": true
+    }
+  },
+  "canvas": {
+    "width": 2048,
+    "height": 2048,
+    "aspect_ratio": "1:1",
+    "color_profile": "sRGB",
+    "output_format": "WEBP",
+    "webp_quality": 90
+  },
+  "images": [
+    {
+      "slot": "catalog_hero",
+      "index": 1,
+      "filename": "01-catalog-hero.webp",
+      "prompt": "catalog-hero.txt",
+      "required": true
+    },
+    {
+      "slot": "white_background",
+      "index": 2,
+      "filename": "02-white-background.webp",
+      "prompt": "white-background.txt",
+      "required": true
+    },
+    {
+      "slot": "packshot",
+      "index": 3,
+      "filename": "03-packshot.webp",
+      "prompt": "packshot.txt",
+      "required": false
+    },
+    {
+      "slot": "detail",
+      "index": 4,
+      "filename": "04-detail.webp",
+      "prompt": "detail.txt",
+      "required": true
+    },
+    {
+      "slot": "lifestyle",
+      "index": 5,
+      "filename": "05-lifestyle.webp",
+      "prompt": "lifestyle.txt",
+      "required": true
+    },
+    {
+      "slot": "feature_card",
+      "index": 6,
+      "filename": "06-feature-card.webp",
+      "prompt": "feature-card.txt",
+      "required": true
+    }
+  ],
+  "placement": {
+    "anchor": "bottom_center",
+    "target_width_ratio": 0.72,
+    "min_margin": 0.05,
+    "uniform_scale_only": true
+  },
+  "generation": {
+    "provider": "chatgpt_browser",
+    "one_image_per_request": true,
+    "one_conversation_per_product": true,
+    "max_attempts_per_image": 3,
+    "generation_timeout_seconds": 300,
+    "download_timeout_seconds": 120,
+    "backoff_seconds": [
+      5,
+      15,
+      45
+    ]
+  },
+  "analysis": {
+    "ollama_host": "http://127.0.0.1:11434",
+    "vision_model": "qwen3-vl:8b-instruct-q4_K_M",
+    "num_ctx": 8192,
+    "request_timeout_seconds": 300,
+    "release_model_between_stages": true
+  }
+}

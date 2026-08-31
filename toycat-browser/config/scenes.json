@@ -1,0 +1,26 @@
+{
+  "style": {
+    "description": "soft, light, pastel, low contrast, clean, minimal toy-store aesthetic, product-first",
+    "forbid_noisy_backgrounds": true
+  },
+  "asset_dirs": ["assets/backgrounds", "assets/scenes"],
+  "fallback_status": "NO_COMPATIBLE_BACKGROUND",
+  "size_classes": ["small", "small_medium", "medium", "large", "extra_large"],
+  "scenes": [],
+  "category_requirements": {
+    "plush":                 { "environment": ["indoor"],            "surface": ["floor", "table", "bed"], "size_class": "small_medium" },
+    "doll":                  { "environment": ["indoor"],            "surface": ["floor", "table", "shelf"], "size_class": "small" },
+    "action_figure":         { "environment": ["indoor"],            "surface": ["floor", "table", "shelf"], "size_class": "small" },
+    "squishy":               { "environment": ["indoor"],            "surface": ["table", "floor"], "size_class": "small" },
+    "small_educational_toy": { "environment": ["indoor"],            "surface": ["table", "floor"], "size_class": "small_medium" },
+    "rc_car":                { "environment": ["indoor", "outdoor"], "surface": ["floor", "ground"], "size_class": "medium" },
+    "ride_on_vehicle":       { "environment": ["indoor", "outdoor"], "surface": ["floor", "ground"], "size_class": "large" },
+    "scooter":               { "environment": ["indoor", "outdoor"], "surface": ["floor", "ground"], "size_class": "large" },
+    "swimming_pool":         { "environment": ["outdoor"],           "surface": ["ground"], "size_class": "extra_large", "water_related": true },
+    "large_outdoor_toy":     { "environment": ["outdoor"],           "surface": ["ground"], "size_class": "extra_large" }
+  },
+  "forbidden_contexts_by_size_class": {
+    "large":       ["tabletop", "bookshelf", "indoor_desk"],
+    "extra_large": ["bedroom", "tabletop", "bookshelf", "indoor_desk"]
+  }
+}

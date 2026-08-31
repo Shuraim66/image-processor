@@ -1,0 +1,26 @@
+{
+  "deterministic": {
+    "expected_width": 2048,
+    "expected_height": 2048,
+    "expected_aspect_ratio": 1.0,
+    "aspect_ratio_tolerance": 0.001,
+    "expected_format": "WEBP",
+    "expected_color_profile": "sRGB",
+    "max_file_size_bytes": 3145728,
+    "min_file_size_bytes": 20480,
+    "allow_transparency": false,
+    "require_watermark": true,
+    "min_product_bbox_ratio": 0.15,
+    "max_product_bbox_ratio": 0.95,
+    "safe_bounds_margin": 0.02
+  },
+  "fidelity": {
+    "critical_properties": ["product_identity", "shape", "colors", "proportions"],
+    "review_properties": ["accessories", "packaging", "visible_markings", "component_count"],
+    "vision_model_can_override_deterministic": false
+  },
+  "retry": {
+    "max_attempts": 3,
+    "on_exhausted_status": "REVIEW_REQUIRED"
+  }
+}

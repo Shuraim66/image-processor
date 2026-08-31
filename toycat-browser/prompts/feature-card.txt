@@ -1,0 +1,26 @@
+{{PRODUCT_LOCK}}
+
+TASK: Feature Card base plate (image 6 of 6)
+
+Produce ONLY the product presentation for a feature card. Do NOT render any
+text, callouts, labels, badges, arrows, icons or logos into this image. All
+text and UI for the feature card is rendered locally afterwards by the
+application.
+
+Requirements:
+- the exact product, unchanged
+- soft, light, low-contrast THE TOY GIFT SHOP background
+- clean, uncluttered composition
+- the closest matching reference for this shot is: {{BEST_VIEW_FEATURE_CARD}}
+
+Product placement constraints:
+- anchor: {{PLACEMENT_ANCHOR}}
+- product width should occupy about {{TARGET_WIDTH_RATIO}} of the frame width
+- leave the {{TEXT_SAFE_REGION}} of the frame visually clean and low-detail so
+  that text can be composited over it later
+- uniform scaling only; never stretch, squash, warp or liquify the product
+
+No generated text. No generated logo or watermark.
+
+Output a single square image at {{CANVAS_W}} x {{CANVAS_H}} (1:1).
+Generate ONE image only.

@@ -1,0 +1,25 @@
+{{PRODUCT_LOCK}}
+
+TASK: Detail (image 4 of 6)
+
+Highlight a real, photographed product feature. The feature to highlight is:
+{{DETAIL_FEATURE}}
+
+Use the clearest available source image for this feature:
+{{BEST_VIEW_DETAIL}}
+
+Requirements:
+- show only detail that is actually captured in the references
+- controlled crop
+- professional enhancement
+- sharp subject
+- soft background
+- no invented details
+
+Do not synthesize a component, texture, seam, marking or label that does not
+appear in the uploaded references.
+
+No generated logo or watermark.
+
+Output a single square image at {{CANVAS_W}} x {{CANVAS_H}} (1:1).
+Generate ONE image only.

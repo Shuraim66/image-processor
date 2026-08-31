@@ -1,0 +1,27 @@
+{{PRODUCT_LOCK}}
+
+TASK: White Background (image 2 of 6)
+
+Use the uploaded product references as the exact physical-product source.
+Use the clearest source angle. The closest matching reference for this shot
+is: {{BEST_VIEW_WHITE_BACKGROUND}}
+
+Requirements:
+- the exact product, unchanged
+- pure white background
+- professional studio lighting
+- subtle contact shadow
+- clean framing
+- product clearly visible
+- no props
+- no generated text
+- no generated logo
+
+Product placement constraints:
+- anchor: {{PLACEMENT_ANCHOR}}
+- product width should occupy about {{TARGET_WIDTH_RATIO}} of the frame width
+- keep at least {{MIN_MARGIN}} of the frame as clear margin on every side
+- uniform scaling only; never stretch, squash, warp or liquify the product
+
+Output a single square image at {{CANVAS_W}} x {{CANVAS_H}} (1:1).
+Generate ONE image only.

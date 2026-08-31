@@ -1,0 +1,19 @@
+{
+  "enabled": true,
+  "mandatory": true,
+  "asset": "assets/brand/the-toy-gift-shop-logo.png",
+  "asset_sha256": "0557751c3b03f7407e772857f07bd3670dc4d66668d0f400729c565b0888c1da",
+  "verify_asset_hash": true,
+  "width_ratio": 0.10,
+  "width_ratio_accepted_range": [0.08, 0.12],
+  "opacity": 0.25,
+  "opacity_accepted_range": [0.20, 0.30],
+  "position": "bottom_right",
+  "margin_ratio": 0.03,
+  "verification": {
+    "mode": "deterministic",
+    "position_tolerance_px": 6,
+    "size_tolerance_px": 6,
+    "min_alpha_correlation": 0.90
+  }
+}

@@ -1,0 +1,29 @@
+{{PRODUCT_LOCK}}
+
+TASK: Packshot (image 3 of 6)
+
+Show the exact product together with its actual packaging as seen in the
+uploaded references. The closest matching reference for this shot is:
+{{BEST_VIEW_PACKSHOT}}
+
+Packaging observed in the references:
+{{PACKAGING_DESCRIPTION}}
+
+Requirements:
+- preserve the actual product
+- preserve the actual packaging
+- preserve the actual packaging artwork and text exactly as photographed
+- clean commercial composition
+- balanced product / packaging relationship
+- soft lighting
+
+NEVER recreate packaging artwork from scratch. Use only the packaging visible
+in the uploaded references. If the packaging artwork or text is not legible in
+the references, keep it as photographed rather than inventing replacements.
+
+Do not invent packaging that is not present in the references.
+
+No generated logo or watermark.
+
+Output a single square image at {{CANVAS_W}} x {{CANVAS_H}} (1:1).
+Generate ONE image only.

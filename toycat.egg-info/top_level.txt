@@ -1,0 +1,16 @@
+analyzer
+copyguard
+gallery
+gallery_pipeline
+intake
+make_hero
+palette
+process_products
+providers
+quality
+scenes
+shopify_export
+slots
+specs
+toycat
+typeset
