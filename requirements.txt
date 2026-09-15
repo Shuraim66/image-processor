@@ -4,3 +4,4 @@ onnxruntime>=1.17
 google-genai>=0.3
 pydantic>=2.0
 ollama>=0.3
+fal-client>=1.0
