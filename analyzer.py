@@ -22,7 +22,22 @@ from typing import List
 from pydantic import BaseModel, Field, ValidationError
 
 OLLAMA_MODEL = os.environ.get("OLLAMA_VLM", "qwen3-vl:8b")
+# product.json keys you can hand-edit; preserved on re-analysis (see fal_listing.py).
+# The catalog block (product_name .. images_pipeline) is the store taxonomy and the sorting
+# decisions — curated by hand and by store_taxonomy, never written by the vision model, so
+# re-analysing a folder must not wipe it.
+MANUAL_KEYS = ("title_override", "hero_photo", "lifestyle_photo", "lifestyle_scene", "slot_photos", "style",
+               "photos", "photo_items", "photo_packaging",
+               "product_name", "category", "sub", "handle", "vendor", "status", "printed_age",
+               "occasions", "store_features", "gender", "variants", "merged_from",
+               "not_a_variant_of", "decisions", "images_done", "images_pipeline",
+               # shop data the copy writer must never touch: price, stock, supplier, the folder's own name
+               "price_pkr", "stock", "compare_at_pkr", "supplier", "variants_off", "folder",
+               # the stock code: the model names products after their folder, which is no longer the SKU
+               "sku")
 INPUT_DIR = "input"
+ANALYZE_PX = 1024          # longest side sent to the model; enough to read box print
+MAX_PHOTOS = 8             # a folder with 10 shots still fits the context window
 VALID_EXTS = (".jpg", ".jpeg", ".png", ".webp")
 ICONS = ["shield", "arrows", "wheel", "smiley"]     # icons the templates can draw
 
@@ -82,10 +97,15 @@ PROMPT = (
     "works, and what it's for. No invented benefits.\n"
     "- bullet_points: exactly 5 concrete, factual points (material, size cue, "
     "moving parts, accessories, intended use) — not generic praise.\n"
-    "- features: EXACTLY 4. Each has 'label' (two short CAPS lines joined by \\n, a "
-    "concrete factual attribute, e.g. 'HARD PLASTIC\\nBUILD' not 'AMAZING\\nQUALITY') "
-    "and 'icon' chosen ONLY from: shield (safety/sturdy), arrows (adjustable/size), "
-    "wheel (movement/smooth), smiley (fun/age).\n"
+    "- features: EXACTLY 4, and every one must be a real selling point of THIS product: "
+    "what it does, what it is made of, what is included, who it is for, or an age/size "
+    "printed on the box. Each has 'label' (two short CAPS lines joined by \\n, a concrete "
+    "factual attribute, e.g. 'HARD PLASTIC\\nBUILD' not 'AMAZING\\nQUALITY') and 'icon' "
+    "chosen ONLY from: shield (safety/sturdy), arrows (adjustable/size), wheel "
+    "(movement/smooth), smiley (fun/age). NEVER state the absence of something as a "
+    "feature — no 'NO MOVEMENT', 'NO BATTERIES', 'NO SIZE ADJUSTMENT'. If the product is "
+    "simple, repeat nothing and use its material, its size, what is in the pack, and its "
+    "age guidance instead.\n"
     "- whats_included: what's in the box (from the packaging if visible).\n"
     "- seo_title (<=60 chars), meta_description (<=155 chars), tags (8-13 RELEVANT "
     "keywords only, no unrelated terms), alt_text (one factual descriptive sentence).\n"
@@ -104,9 +124,10 @@ PROMPT = (
 # Fallback (no Ollama)
 # --------------------------------------------------------------------------- #
 def _fallback(sku: str) -> ProductProfile:
-    pretty = sku.replace("-", " ").title()
+    from process_products import sku_stem
+    pretty = sku_stem(sku).replace("-", " ").title()
     return ProductProfile(
-        sku=sku, name=sku.split("-")[0].upper(), title=pretty,
+        sku=sku, name=sku_stem(sku).split("-")[0].upper(), title=pretty,
         tagline_top="BUILT FOR", tagline_sub="BIG SMILES!",
         description=f"The {pretty} is a fun, well-made toy kids will love.",
         bullet_points=[f"{pretty} — great gift", "Fun and durable",
@@ -143,18 +164,37 @@ def _normalize(data: dict, sku: str) -> dict:
 # Analyze
 # --------------------------------------------------------------------------- #
 def images_in(folder: str) -> List[str]:
-    return sorted(os.path.join(folder, f) for f in os.listdir(folder)
-                  if f.lower().endswith(VALID_EXTS))
+    from process_products import photo_sort_key
+    return sorted((os.path.join(folder, f) for f in os.listdir(folder)
+                   if f.lower().endswith(VALID_EXTS)), key=photo_sort_key)
 
 
-def analyze(sku: str, image_paths: List[str], use_ollama: bool = True) -> ProductProfile:
+def analyze(sku: str, image_paths: List[str], use_ollama: bool = True, known_title: str = "",
+            known_product: str = "", known_category: str = "", variants: dict | None = None) -> ProductProfile:
     if not (use_ollama and image_paths):
         return _fallback(sku)
     try:
         import ollama
+        from photo_tags import _b64       # ~1 MP each: full phone photos overflow the context
+        anchor = ""
+        if known_product:
+            anchor += (f"\n\nThe shop has identified this product as: \"{known_product}\""
+                       + (f", filed under {known_category}" if known_category else "") + ". "
+                       "That identification is correct — trust it over your reading of the photos. "
+                       "It tells you WHAT THE ITEM IS: a squishy or toy version of something is a toy, "
+                       "never the real thing (never describe it as food, or as a working appliance or device), "
+                       "and every field must describe that toy.")
+        if variants and variants.get("values"):
+            anchor += (f"\n\nIt is sold in these {variants.get('option', 'variant')} options: "
+                       + ", ".join(variants["values"]) + ". Some photos show different options of the SAME "
+                       "product — write one listing that covers them, and never present an option as a separate item.")
+        if known_title:
+            anchor += (f"\n\nThe shop has confirmed this product's title: \"{known_title}\". "
+                       "Use it as the title and keep every other field consistent with it.")
         resp = ollama.chat(
             model=OLLAMA_MODEL,
-            messages=[{"role": "user", "content": PROMPT, "images": image_paths}],
+            messages=[{"role": "user", "content": PROMPT + anchor,
+                       "images": [_b64(p, ANALYZE_PX) for p in image_paths[:MAX_PHOTOS]]}],
             format=ProductProfile.model_json_schema(),   # structured output
             options={"temperature": 0.4,
                      "num_ctx": int(os.environ.get("OLLAMA_NUM_CTX", "8192"))},
@@ -173,14 +213,29 @@ def analyze(sku: str, image_paths: List[str], use_ollama: bool = True) -> Produc
         return _fallback(sku)
 
 
+def manual_overrides(product_json: str) -> dict:
+    """Hand-edited keys in product.json that the model never writes."""
+    if not os.path.exists(product_json):
+        return {}
+    raw = json.load(open(product_json, encoding="utf-8"))
+    return {k: raw[k] for k in MANUAL_KEYS if raw.get(k)}
+
+
 def analyze_folder(sku_folder: str, use_ollama: bool = True) -> ProductProfile:
     sku = os.path.basename(os.path.normpath(sku_folder))
     imgs = images_in(sku_folder)
     print(f"[{sku}] {len(imgs)} photo(s) -> {OLLAMA_MODEL if use_ollama else 'fallback'}")
-    profile = analyze(sku, imgs, use_ollama=use_ollama)
     out = os.path.join(sku_folder, "product.json")
+    manual = manual_overrides(out)
+    profile = analyze(sku, imgs, use_ollama=use_ollama, known_title=manual.get("title_override", ""),
+                      known_product=manual.get("product_name", ""),
+                      known_category=" / ".join(x for x in (manual.get("category"), manual.get("sub")) if x),
+                      variants=manual.get("variants"))
+    if manual.get("title_override"):
+        profile.title = manual["title_override"]
+    data = {**json.loads(profile.model_dump_json()), **manual}
     with open(out, "w", encoding="utf-8") as f:
-        f.write(profile.model_dump_json(indent=2))
+        f.write(json.dumps(data, indent=2, ensure_ascii=False))
     print(f"  -> {out}")
     return profile
 

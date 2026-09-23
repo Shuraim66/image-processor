@@ -1,0 +1,34 @@
+{
+  "A.jpg": {
+    "references": 3,
+    "prompt_chars": 1702
+  },
+  "B.jpg": {
+    "references": 3,
+    "prompt_chars": 2120
+  },
+  "qwen-image-edit-2511.jpg": {
+    "timings": {
+      "inference": 4.913929631991778
+    },
+    "seed": 233835707,
+    "has_nsfw_concepts": [
+      false
+    ],
+    "prompt": "Primary e-commerce hero photograph of this exact product on a clean white to very light neutral seamless background, the product the single focal point, no props and no decorative objects. The product's own packaging may appear beside or behind the product when it helps tell the story, but the product itself stays the dominant focal point. Re-photograph this exact object as a professional product photographer would in a studio, replacing the phone snapshot's lighting entirely: a large soft key light from the front upper left with gentle fill from the right, no bare-flash hotspot, no blown-out white patches and no dark muddy shadows on the product. Neutral white balance \u2014 greys read neutral grey and whites read white, with the phone photo's blue, green or yellow cast removed. Crisp focus across the whole object, true edges, and the real material read: plastic looks like plastic, metal like metal, fabric like fabric, glossy surfaces keep clean soft reflections rather than glare. The object fills about 85 percent of the frame, centred, upright and level, with a soft realistic contact shadow directly beneath it. IMPORTANT: the FIRST reference image defines the camera: reproduce its viewpoint, the side of the product facing the camera, and which parts are open, closed or visible. The other reference images are supplied only as evidence of the same product's colours, markings and construction \u2014 never copy their camera angle, their framing or the state they show the product in. The product must stay exactly as in the reference photos: same shape, proportions, colors and colour placement, materials, surface finish, visible components, buttons, switches, wheels, handles, seams, logos and printed markings, and the same number of pieces. Never invent buttons, switches, accessories, controls, batteries, ports, screens, lights, LEDs, remote controls or any feature that is not visible in the photos, and never add objects, packaging or props that are not there. If a detail is unclear, keep it as the photo shows it. Generate exactly one image, square 1:1, no people, no added text, captions or logos.",
+    "references": 3,
+    "prompt_chars": 2120
+  },
+  "muse-image.jpg": {
+    "references": 3,
+    "prompt_chars": 2120
+  },
+  "3d-pen-v2.jpg": {
+    "references": 3,
+    "prompt_chars": 6782
+  },
+  "3d-pen-v2b.jpg": {
+    "references": 3,
+    "prompt_chars": 6895
+  }
+}

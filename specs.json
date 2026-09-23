@@ -7,14 +7,14 @@
     "detail_crop": [0.30, 0.55, 0.90, 1.0],
     "detail_label": "CLOSER LOOK"
   },
-  "SCOOTER-LED-PINK": {
+  "TGS-SCOOTER-LED-PINK": {
     "height": "≈ 66 cm",
     "length": "≈ 56 cm",
     "badges": ["AGE 3+", "MAX 50 KG", "FOLDABLE", "LED WHEELS"],
     "detail_crop": [0.30, 0.62, 0.85, 1.0],
     "detail_label": "LIGHT-UP WHEELS"
   },
-  "SCOOTER-LED-BEIGE": {
+  "TGS-SCOOTER-LED-BEIGE": {
     "height": "≈ 66 cm",
     "length": "≈ 56 cm",
     "badges": ["AGE 3+", "MAX 50 KG", "FOLDABLE", "LED WHEELS"],

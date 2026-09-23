@@ -66,8 +66,9 @@ _PROMPT = (
 
 
 def _fallback(sku):
-    pretty = sku.replace("-", " ").title()
-    short = sku.split("-")[0].upper()
+    from process_products import sku_stem
+    pretty = sku_stem(sku).replace("-", " ").title()
+    short = sku_stem(sku).split("-")[0].upper()
     return {
         "name": short,
         "tagline_top": "BUILT FOR",

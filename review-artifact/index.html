@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Review Artifact — 87 Current Products</title>
+<style>
+  :root { --bg:#f8f7f4; --card:#fff; --text:#1a1a1a; --muted:#6a6a6a; --accent:#c45a2b; --border:#e3e0d8; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#171714; --card:#20201e; --text:#eceae5; --muted:#a3a199; --accent:#e07a4a; --border:#2e2c28; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; padding:2rem 1rem; font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; background:var(--bg); color:var(--text); line-height:1.45; }
+  header { max-width:1100px; margin:0 auto 2.5rem; border-bottom:2px solid var(--accent); padding-bottom:1.25rem; }
+  header h1 { margin:0 0 .35rem; font-size:1.8rem; letter-spacing:-.02em; }
+  .badge { display:inline-block; background:var(--accent); color:#fff; padding:.2rem .55rem; border-radius:999px; font-size:.7rem; font-weight:700; letter-spacing:.02em; text-transform:uppercase; margin-top:.35rem; }
+  .meta { color:var(--muted); font-size:.9rem; }
+  .stale-note { max-width:1100px; margin:0 auto 2rem; background:#fff3e6; border:1px solid #e8cfa8; border-radius:8px; padding:1rem 1.25rem; color:#6b3e00; font-size:.93rem; }
+  .corrections { max-width:1100px; margin:0 auto 2rem; background:#e8f0e8; border:1px solid #b8d6b8; border-radius:8px; padding:1rem 1.25rem; }
+  .corrections h2 { margin:0 0 .6rem; font-size:1rem; }
+  .corrections ul { margin:.2rem 0 0; padding-left:1.1rem; font-size:.9rem; }
+  .corrections li { margin-bottom:.15rem; }
+  .section-title { max-width:1100px; margin:2.5rem auto .75rem; font-size:1.05rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--accent); }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:1rem; max-width:1100px; margin:0 auto; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:1.1rem 1.15rem; transition: box-shadow .15s ease; }
+  .card:hover { box-shadow:0 6px 18px rgba(0,0,0,.08); }
+  .card .sku { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:.72rem; color:var(--muted); letter-spacing:.06em; }
+  .card h3 { margin:.35rem 0 .15rem; font-size:1.05rem; line-height:1.25; }
+  .card .line { display:flex; gap:.75rem; flex-wrap:wrap; font-size:.85rem; color:var(--muted); margin-top:.35rem; }
+  .card .line strong { color:var(--text); }
+  .card .tags { margin-top:.6rem; font-size:.78rem; color:var(--muted); line-height:1.35; }
+  .card .tags strong { color:var(--text); font-size:.85rem; }
+  .card .description { margin-top:.6rem; font-size:.88rem; color:var(--muted); }
+  .card .photo-ref { margin-top:.5rem; font-size:.78rem; color:#8f7a5a; font-family: ui-monospace, monospace; }
+  footer { max-width:1100px; margin:3rem auto 1rem; padding-top:1rem; border-top:1px solid var(--border); color:var(--muted); font-size:.82rem; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Review Artifact — 87 Current Products</h1>
+  <div class="badge">Rebuilt from rebuilt CSV</div>
+  <p class="meta">Source: <code>catalog_products.csv</code> (87 rows, all <code>stock &ge; 2</code>) · Photos: <code>input/</code> folders · No fal.ai / no new images</p>
+</header>
+
+<div class="stale-note">
+  <strong>Stale from previous version (179-product artifact):</strong> old product count (68/179 claim superseded by rebuilt 87-product dataset), old stock/prices, unverified text, missing new squishies, missing corrected box facts. This artifact uses rebuilt <code>catalog_products.csv</code> (all current products listed per <code>stock &ge; 2</code> rule) and references actual <code>input/</code> photo folders for each SKU.
+</div>
+
+<div class="corrections">
+  <h2>Corrected listing facts (box-check / session notes)</h2>
+  <ul>
+    <li><strong>Avengers drawing board:</strong> 380 ball pops (was 180) · SKU TGS-AVENGERS-MAG-DRAWING</li>
+    <li><strong>Baby Rattle Turntable Set:</strong> 3 turntable rattles (Little Tin Lok, 0m+), not "12" · SKU TGS-BABY-RATTLE-TURNTABLE</li>
+    <li><strong>Insect Catching Game:</strong> 1 wooden board, 4 fruit scenes, 1 magnetic wand · SKU TGS-FOUR-INSECT-CATCHING</li>
+    <li><strong>Children's Digital Camera (green):</strong> green with pink lanyard (box tick) · SKU TGS-S-DIGITAL-CAMERA</li>
+    <li><strong>Minion Slide (TGS-ME-SLIDE):</strong> has light/sound · SKU TGS-ME-SLIDE</li>
+    <li><strong>Labubu Bubble Gun:</strong> electric bubble gun with lights · SKU TGS-BUBBLE-GUN</li>
+    <li><strong>ViVi Shape Sorter:</strong> brand name ViVi · SKU TGS-WD-SHAPE-SORTER</li>
+    <li><strong>New squishies from archive:</strong> Mochi (TGS-SQUISHY-MOCHI), Crackle Fluff (TGS-SQUISHY-PASTEL-STICKS), Capsule Squishy Ball (TGS-SQUISHY-CAPSULE-BALL)</li>
+    <li><strong>Football figures split (box-check):</strong> Ronaldo Portugal kept (stock 5), Al-Nassr (stock 2) / Man United (stock 2) / Mbappé (stock 2) listed separately · SKU TGS-FIG-FOOTBALL-STAR</li>
+    <li><strong>Folder names cleaned:</strong> HYPHENATED-CAPS, brand first · SKU/handle split enforced</li>
+  </ul>
+</div>
+
+<div class="section-title">Current 87 Products — sorted by SKU (rebuild from catalog_products.csv)</div>
+<div class="grid" id="product-grid"></div>
+
+<footer>
+  <p><strong>Data sources:</strong> <code>catalog_products.csv</code> (rebuilt), <code>catalog_needs_input.csv</code> (87 rows), <code>happy_toys_prices.csv</code> (supplier batches). Photos: <code>input/</code> folders. Backlog: <code>backlog-products/</code> (119 folders). <strong>No fal.ai spend this session.</strong> Previous review page (179 products) superseded by this rebuilt artifact.</p>
+</footer>
+
+<script>
+  const products = [

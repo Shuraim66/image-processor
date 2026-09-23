@@ -48,8 +48,9 @@ PROMPT = (
 
 
 def category_of(sku):
-    """Coarse pre-filter: the first hyphen-separated word (CASE, CAR, TUMBLER...)."""
-    return sku.split("-")[0]
+    """Coarse pre-filter: the first word after the TGS- prefix (CASE, CAR, TUMBLER...)."""
+    from process_products import sku_stem
+    return sku_stem(sku).split("-")[0]
 
 
 def front_photo(sku_dir):

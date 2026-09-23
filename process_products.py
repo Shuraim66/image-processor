@@ -31,6 +31,7 @@ import argparse
 import csv
 import io
 import os
+import re
 import sys
 import time
 import json
@@ -60,6 +61,20 @@ SHADOW_BLUR = 40                        # Gaussian blur radius in px
 SHADOW_OFFSET = (0, 45)                 # (x, y) shadow offset in px
 
 VALID_EXTENSIONS = (".jpg", ".jpeg", ".png", ".webp")
+
+# Store SKU convention (matches the live Shopify catalog: TGS-CONNECT4, TGS-DOLL-01).
+# The product folder name IS the SKU, so every folder carries the prefix.
+SKU_PREFIX = "TGS-"
+
+
+def store_sku(name: str) -> str:
+    name = name.strip().upper()
+    return name if name.startswith(SKU_PREFIX) else SKU_PREFIX + name
+
+
+def sku_stem(sku: str) -> str:
+    """SKU without the store prefix: TGS-CAR-SUV-BLACK -> CAR-SUV-BLACK."""
+    return sku[len(SKU_PREFIX):] if sku.upper().startswith(SKU_PREFIX) else sku
 
 # Gemini
 GEMINI_MODEL = "gemini-3.6-flash"
@@ -267,11 +282,32 @@ def find_sku_folders(root: str) -> list[str]:
     )
 
 
+def sku_of(folder_name: str, root: str = INPUT_DIR) -> str:
+    """The shop's stock code for a product folder. The folder is named for people (e.g.
+    INTEX-BEAR-INFLATABLE-CHAIR); product.json's "sku" is the short code that goes on the
+    listing (INTEX-BEAR-CHAIR). Falls back to the folder name when none is set."""
+    path = os.path.join(root, folder_name, "product.json")
+    if os.path.exists(path):
+        with open(path, encoding="utf-8") as f:
+            sku = (json.load(f).get("sku") or "").strip()
+        if sku:
+            return sku
+    return folder_name
+
+
+def photo_sort_key(path: str):
+    """front.* first (it's the main reference), then natural order: angle2 < angle10."""
+    stem = os.path.splitext(os.path.basename(path))[0].lower()
+    parts = [int(t) if t.isdigit() else t for t in re.split(r"(\d+)", stem)]
+    return (stem != "front", parts)
+
+
 def raw_images_in(folder: str) -> list[str]:
     return sorted(
-        os.path.join(folder, f)
-        for f in os.listdir(folder)
-        if f.lower().endswith(VALID_EXTENSIONS)
+        (os.path.join(folder, f)
+         for f in os.listdir(folder)
+         if f.lower().endswith(VALID_EXTENSIONS)),
+        key=photo_sort_key,
     )
 
 

@@ -1,0 +1,2393 @@
+{
+ "at": "2026-09-17T20:42:58",
+ "moves": [
+  {
+   "from": "input/TGS-RC-SPIDER-WALL/output",
+   "to": "_archive/superseded_catalog_images/TGS-RC-SPIDER-WALL_pilot-2026-09-15",
+   "files": 10,
+   "why": "pilot set: controller on the wall"
+  },
+  {
+   "from": "/private/tmp/claude-501/-Users-junaidali-Desktop-image-processor/00bdbc89-8eb9-432b-9639-83e888e44810/scratchpad/buildtest/TGS-RC-SPIDER-WALL",
+   "to": "input/TGS-RC-SPIDER-WALL/output",
+   "files": 10,
+   "why": "approved set (studio hero + lifestyle)"
+  },
+  {
+   "from": "output/TGS-INSUL-TUMBLER-GRADIENT",
+   "to": "input/TGS-INSUL-TUMBLER-GRADIENT/output",
+   "files": 12,
+   "why": "finished product images"
+  },
+  {
+   "from": "output/TGS-KUROMI-MOON-LAMP",
+   "to": "input/TGS-KUROMI-MOON-LAMP/output",
+   "files": 17,
+   "why": "finished product images"
+  },
+  {
+   "from": "output/TGS-SQUISHY-BUN-STEAMER",
+   "to": "input/TGS-SQUISHY-BUN-STEAMER/output",
+   "files": 12,
+   "why": "finished product images"
+  },
+  {
+   "from": "gallery_out/TGS-GT-R-DIECAST",
+   "to": "input/TGS-GT-R-DIECAST/output",
+   "files": 15,
+   "why": "paid fal images from the test batch"
+  },
+  {
+   "from": "gallery_out/TGS-AL-QURAN-LEARNING",
+   "to": "input/TGS-AL-QURAN-LEARNING/output",
+   "files": 3,
+   "why": "paid fal images from the test batch"
+  },
+  {
+   "from": "raw_footages",
+   "to": "_archive/raw_footages_batch1_original",
+   "files": 480,
+   "why": "your original shoot, batch 1"
+  },
+  {
+   "from": "raw_footages_batch_2",
+   "to": "_archive/raw_footages_batch2_original",
+   "files": 280,
+   "why": "your original shoot, batch 2"
+  },
+  {
+   "from": "products",
+   "to": "_archive/products_zip_folders",
+   "files": 431,
+   "why": "named folders from products.zip (incl. the 4 skipped products)"
+  },
+  {
+   "from": "input_superseded",
+   "to": "_archive/superseded_photos",
+   "files": 46,
+   "why": "old photos replaced by re-shoots + 2 duplicate folders"
+  },
+  {
+   "from": "input_before_20260916",
+   "to": "_archive/pilot_input_before_20260916",
+   "files": 417,
+   "why": "pilot sample photos"
+  },
+  {
+   "from": "_duplicates_already_processed",
+   "to": "_archive/pilot_duplicates_already_processed",
+   "files": 4,
+   "why": "pilot sample photos"
+  },
+  {
+   "from": "output",
+   "to": "_archive/pilot_output",
+   "files": 72,
+   "why": "pilot cutouts and manifest"
+  },
+  {
+   "from": "gallery_out",
+   "to": "_archive/pilot_gallery_out",
+   "files": 69,
+   "why": "model comparison tests"
+  },
+  {
+   "from": "Revised images from Batch 1 & batch 2",
+   "to": null,
+   "files": 0,
+   "why": "empty after placement"
+  }
+ ],
+ "merges": [
+  {
+   "at": "2026-09-17T21:09:26",
+   "into": "TGS-FIG-FOOTBALL-STAR",
+   "from": [
+    "TGS-FIG-RONALDO",
+    "TGS-FIG-FOOTBALL-STARS"
+   ],
+   "moved_photo": {
+    "from": "input/TGS-FIG-FOOTBALL-STARS/front.jpeg",
+    "to": "input/TGS-FIG-FOOTBALL-STAR/angle6.jpeg",
+    "md5": "2e000ae46aee8dbf18926c3656daa958"
+   },
+   "why": "user: same product, different figures — variants by Star"
+  },
+  {
+   "at": "2026-09-17T21:14:02",
+   "into": "TGS-HOUSEHOLD-SET-MINI",
+   "from": [
+    "TGS-HOUSE-VACUUM-CLEANER",
+    "TGS-HOUSE-WASH"
+   ],
+   "moved_photos": [
+    {
+     "from": "input/TGS-HOUSE-WASH/front.jpeg",
+     "to": "input/TGS-HOUSEHOLD-SET-MINI/angle5.jpeg",
+     "md5": "374fb967c69043e6e3187a673a1d1465"
+    },
+    {
+     "from": "input/TGS-HOUSE-WASH/angle2.jpeg",
+     "to": "input/TGS-HOUSEHOLD-SET-MINI/angle6.jpeg",
+     "md5": "3d1f1e40c9880342f6d3c3098f6accf6"
+    },
+    {
+     "from": "input/TGS-HOUSE-WASH/angle3.jpeg",
+     "to": "input/TGS-HOUSEHOLD-SET-MINI/angle7.jpeg",
+     "md5": "82edeb0d191e83eafbc3e7e53caf8d1f"
+    },
+    {
+     "from": "input/TGS-HOUSE-WASH/angle4.jpeg",
+     "to": "input/TGS-HOUSEHOLD-SET-MINI/angle8.jpeg",
+     "md5": "2e58d40320d44a8ade8600db4f5ac3e4"
+    }
+   ],
+   "why": "same pink 'Household Set' box; the box back shows the whole series grid — one appliance per box"
+  },
+  {
+   "at": "2026-09-17T21:14:03",
+   "into": "TGS-MAKEUP-SET-CASE",
+   "from": [
+    "TGS-COLORFUL-PRINCESS-BAG",
+    "TGS-MAKEUP-TREASURE-CHEST"
+   ],
+   "moved_photos": [
+    {
+     "from": "input/TGS-MAKEUP-TREASURE-CHEST/front.jpeg",
+     "to": "input/TGS-MAKEUP-SET-CASE/angle10.jpeg",
+     "md5": "ab7173d8522e05ab8a2e5d1f6329797a"
+    },
+    {
+     "from": "input/TGS-MAKEUP-TREASURE-CHEST/angle2.jpeg",
+     "to": "input/TGS-MAKEUP-SET-CASE/angle11.jpeg",
+     "md5": "288df95bc68ed3dd9906acecdfcc8614"
+    },
+    {
+     "from": "input/TGS-MAKEUP-TREASURE-CHEST/angle3.jpeg",
+     "to": "input/TGS-MAKEUP-SET-CASE/angle12.jpeg",
+     "md5": "044929c39af7d011240661fc6debceaa"
+    },
+    {
+     "from": "input/TGS-MAKEUP-TREASURE-CHEST/angle4.jpeg",
+     "to": "input/TGS-MAKEUP-SET-CASE/angle13.jpeg",
+     "md5": "02613330a42605847214a8b1b472b579"
+    },
+    {
+     "from": "input/TGS-MAKEUP-TREASURE-CHEST/angle5.jpeg",
+     "to": "input/TGS-MAKEUP-SET-CASE/angle14.jpeg",
+     "md5": "e6c90adf3c5bd8a083ff70707f806d28"
+    },
+    {
+     "from": "input/TGS-MAKEUP-TREASURE-CHEST/angle6.jpeg",
+     "to": "input/TGS-MAKEUP-SET-CASE/angle15.jpeg",
+     "md5": "3a5054f552d6d9c430d94a6d6e59051c"
+    },
+    {
+     "from": "input/TGS-MAKEUP-TREASURE-CHEST/angle7.jpeg",
+     "to": "input/TGS-MAKEUP-SET-CASE/angle16.jpeg",
+     "md5": "e2d76d0b3c289f9b56d1de7ce0b0c7c8"
+    },
+    {
+     "from": "input/TGS-MAKEUP-TREASURE-CHEST/angle8.jpeg",
+     "to": "input/TGS-MAKEUP-SET-CASE/angle17.jpeg",
+     "md5": "5c2df4ed9c0c91c31c540e0d1dc5d8f3"
+    }
+   ],
+   "why": "same 'Makeup set' box and artwork; only the case shape differs"
+  },
+  {
+   "at": "2026-09-17T21:14:03",
+   "into": "TGS-FOLLOW-ME-CAR",
+   "from": [
+    "TGS-FOLLOW-ME-CAR",
+    "TGS-PINK-CAR"
+   ],
+   "moved_photos": [
+    {
+     "from": "input/TGS-PINK-CAR/front.jpeg",
+     "to": "input/TGS-FOLLOW-ME-CAR/angle5.jpeg",
+     "md5": "214b7d38fa4995886ea17bc89ff8ed0f"
+    },
+    {
+     "from": "input/TGS-PINK-CAR/angle2.jpeg",
+     "to": "input/TGS-FOLLOW-ME-CAR/angle6.jpeg",
+     "md5": "6c4215d30f1a4504b9f146a2f2f3215d"
+    },
+    {
+     "from": "input/TGS-PINK-CAR/angle3.jpeg",
+     "to": "input/TGS-FOLLOW-ME-CAR/angle7.jpeg",
+     "md5": "14f27522ef9d452d7c23662c443757c9"
+    },
+    {
+     "from": "input/TGS-PINK-CAR/angle4.jpeg",
+     "to": "input/TGS-FOLLOW-ME-CAR/angle8.jpeg",
+     "md5": "2dd8f974341c78523ff666efdc039122"
+    }
+   ],
+   "why": "same box, same car, same ball and papers — pink and green units"
+  }
+ ],
+ "restored_as_extra_photos": [
+  {
+   "from": "_archive/superseded_photos/TGS-ANIMAL-SHAPED-PHONE/front.jpeg",
+   "to": "input/TGS-ANIMAL-SHAPED-PHONE/angle6.jpeg",
+   "md5": "29edc503607b53cefe36fa27234cec1f",
+   "labelled": true
+  },
+  {
+   "from": "_archive/superseded_photos/TGS-APPLIANCE-FRIDGE/angle2.jpeg",
+   "to": "input/TGS-APPLIANCE-FRIDGE/angle6.jpeg",
+   "md5": "1097bb018211f403ac3c3b789730b281",
+   "labelled": true
+  },
+  {
+   "from": "_archive/superseded_photos/TGS-APPLIANCE-FRIDGE/angle3.jpeg",
+   "to": "input/TGS-APPLIANCE-FRIDGE/angle7.jpeg",
+   "md5": "fb1367f20c960ec99bf021a8e2e21d24",
+   "labelled": true
+  },
+  {
+   "from": "_archive/superseded_photos/TGS-APPLIANCE-FRIDGE/angle4.jpeg",
+   "to": "input/TGS-APPLIANCE-FRIDGE/angle8.jpeg",
+   "md5": "ed3fcd68f7cec0ede5d38bf6c92f2aff",
+   "labelled": true
+  },
+  {
+   "from": "_archive/superseded_photos/TGS-APPLIANCE-FRIDGE/front.jpeg",
+   "to": "input/TGS-APPLIANCE-FRIDGE/angle9.jpeg",
+   "md5": "ba652238c347c7bf155b7c792cd5befa",
+   "labelled": true
+  },
+  {
+   "from": "_archive/superseded_photos/TGS-ARABIC-SOUND-LEARNING/front.jpg",
+   "to": "input/TGS-ARABIC-SOUND-LEARNING/angle5.jpg",
+   "md5": "1bc7442bbcdf8a8b572cba10eb1517b9",
+   "labelled": true
+  },
+  {
+   "from": "_archive/superseded_photos/TGS-BEAUTY-GIRL-MAKEUP/front.jpg",
+   "to": "input/TGS-BEAUTY-GIRL-MAKEUP/angle5.jpg",
+   "md5": "50adb4d6babe831eb3c7751ebe5e002e",
+   "labelled": true
+  },
+  {
+   "from": "_archive/superseded_photos/TGS-CARD-PUZZLE/front.jpg",
+   "to": "input/TGS-CARD-PUZZLE/angle5.jpg",
+   "md5": "f27404c6b0f40b998b4244e9d2a1b7ae",
+   "labelled": true
+  },
+  {
+   "from": "_archive/superseded_photos/TGS-CARTOON-ANIMAL-XYLO/front.jpg",
+   "to": "input/TGS-CARTOON-ANIMAL-XYLO/angle5.jpg",
+   "md5": "bc94c826ee62a8d4c74ab90cc8414096",
+   "labelled": true
+  },
+  {
+   "from": "_archive/superseded_photos/TGS-CUBE-SQUEEZE-FIDGET/front.jpg",
+   "to": "input/TGS-CUBE-SQUEEZE-FIDGET/angle6.jpg",
+   "md5": "0a8fc24b2e2edf810e690f507f325a21",
+   "labelled": true
+  },
+  {
+   "from": "_archive/superseded_photos/TGS-EDU-LAPTOP/front.jpg",
+   "to": "input/TGS-EDU-LAPTOP/angle6.jpg",
+   "md5": "0e0e1da9bf10a5182f893c61c7be7c34",
+   "labelled": true
+  },
+  {
+   "from": "_archive/superseded_photos/TGS-FAN-VISOR-HAT/front.jpg",
+   "to": "input/TGS-FAN-VISOR-HAT/angle6.jpg",
+   "md5": "57bbc9a3c86805170b2a51296e9f247c",
+   "labelled": true
+  },
+  {
+   "from": "_archive/superseded_photos/TGS-FIG-RONALDO/angle2.jpeg",
+   "to": "input/TGS-FIG-FOOTBALL-STAR/angle7.jpeg",
+   "md5": "b1c90c5e63541bd5659dc10c8a2c90a4",
+   "labelled": true
+  },
+  {
+   "from": "_archive/superseded_photos/TGS-FIG-RONALDO/angle3.jpeg",
+   "to": "input/TGS-FIG-FOOTBALL-STAR/angle8.jpeg",
+   "md5": "ff3345736ed2027b900d41bf57b32a68",
+   "labelled": true
+  },
+  {
+   "from": "_archive/superseded_photos/TGS-FIG-RONALDO/angle4.jpeg",
+   "to": "input/TGS-FIG-FOOTBALL-STAR/angle9.jpeg",
+   "md5": "abf2134652199bcdd00db83d80437d3b",
+   "labelled": true
+  },
+  {
+   "from": "_archive/superseded_photos/TGS-FIG-RONALDO/angle5.jpg",
+   "to": "input/TGS-FIG-FOOTBALL-STAR/angle10.jpg",
+   "md5": "906e0195e023c60d1599da177fe6cad3",
+   "labelled": true
+  },
+  {
+   "from": "_archive/superseded_photos/TGS-FIG-RONALDO/front.jpeg",
+   "to": "input/TGS-FIG-FOOTBALL-STAR/angle11.jpeg",
+   "md5": "97fd39e5b3dc44c16d02520dfc7136b4",
+   "labelled": true
+  },
+  {
+   "from": "_archive/superseded_photos/TGS-FOUR-AXIS-DRONE/front.jpg",
+   "to": "input/TGS-FOUR-AXIS-DRONE/angle6.jpg",
+   "md5": "6763390d296e6ee068fe3c23726b018a",
+   "labelled": true
+  },
+  {
+   "from": "_archive/superseded_photos/TGS-PIANO-HEDGEHOG/angle2.jpeg",
+   "to": "input/TGS-PIANO-HEDGEHOG/angle6.jpeg",
+   "md5": "bf93a96f90d159e9558087d64fbbaca5",
+   "labelled": true
+  },
+  {
+   "from": "_archive/superseded_photos/TGS-PIANO-HEDGEHOG/angle3.jpeg",
+   "to": "input/TGS-PIANO-HEDGEHOG/angle7.jpeg",
+   "md5": "3a48a8bff02f4c4b49270353cbec21a2",
+   "labelled": true
+  },
+  {
+   "from": "_archive/superseded_photos/TGS-PIANO-HEDGEHOG/angle4.jpeg",
+   "to": "input/TGS-PIANO-HEDGEHOG/angle8.jpeg",
+   "md5": "d5557f9d1f1497a71b16c30f7bf1b756",
+   "labelled": true
+  },
+  {
+   "from": "_archive/superseded_photos/TGS-PIANO-HEDGEHOG/angle5.jpeg",
+   "to": "input/TGS-PIANO-HEDGEHOG/angle9.jpeg",
+   "md5": "e948d361437df1cb942d72e4b178bef4",
+   "labelled": true
+  },
+  {
+   "from": "_archive/superseded_photos/TGS-PIANO-HEDGEHOG/front.jpg",
+   "to": "input/TGS-PIANO-HEDGEHOG/angle10.jpg",
+   "md5": "98c6828ba05476785b1f478b01aa9633",
+   "labelled": true
+  },
+  {
+   "from": "_archive/superseded_photos/TGS-SQUISHY-BUN-STEAMER/angle2.jpg",
+   "to": "input/TGS-SQUISHY-BUN-STEAMER/angle5.jpg",
+   "md5": "2ce9154390460c4b25dfa13f15d6a2c3",
+   "labelled": true
+  },
+  {
+   "from": "_archive/superseded_photos/TGS-SQUISHY-BUN-STEAMER/angle3.jpg",
+   "to": "input/TGS-SQUISHY-BUN-STEAMER/angle6.jpg",
+   "md5": "b52e2099a89742936a9c0ba5a3d970e9",
+   "labelled": true
+  },
+  {
+   "from": "_archive/superseded_photos/TGS-SQUISHY-BUN-STEAMER/front.jpg",
+   "to": "input/TGS-SQUISHY-BUN-STEAMER/angle7.jpg",
+   "md5": "f6eed8aa2cf596029db3f0f4380c2c3a",
+   "labelled": true
+  },
+  {
+   "from": "_archive/superseded_photos/TGS-SQUISHY-CRISP-CHOCO/angle2.jpeg",
+   "to": "input/TGS-SQUISHY-CRISP-CHOCO/angle9.jpeg",
+   "md5": "a136b4a76c7830dad471f317114fb323",
+   "labelled": true
+  },
+  {
+   "from": "_archive/superseded_photos/TGS-SQUISHY-CRISP-CHOCO/angle3.jpeg",
+   "to": "input/TGS-SQUISHY-CRISP-CHOCO/angle10.jpeg",
+   "md5": "ae556cddfe45a88954168ac11bda93cc",
+   "labelled": true
+  },
+  {
+   "from": "_archive/superseded_photos/TGS-SQUISHY-CRISP-CHOCO/angle4.jpeg",
+   "to": "input/TGS-SQUISHY-CRISP-CHOCO/angle11.jpeg",
+   "md5": "d34d7c502ea32ca4941dfed585e3b482",
+   "labelled": true
+  },
+  {
+   "from": "_archive/superseded_photos/TGS-SQUISHY-CRISP-CHOCO/angle5.jpeg",
+   "to": "input/TGS-SQUISHY-CRISP-CHOCO/angle12.jpeg",
+   "md5": "41076d5b482fca32053417cd8b9070a1",
+   "labelled": true
+  },
+  {
+   "from": "_archive/superseded_photos/TGS-SQUISHY-CRISP-CHOCO/front.jpg",
+   "to": "input/TGS-SQUISHY-CRISP-CHOCO/angle13.jpg",
+   "md5": "1bb4f617d1f6fbc40b04da9abd929d70",
+   "labelled": true
+  },
+  {
+   "from": "_archive/superseded_photos/TGS-SQUISHY-OREO/angle2.jpeg",
+   "to": "input/TGS-SQUISHY-OREO/angle5.jpeg",
+   "md5": "a95083454124b14017af262ebc88713a",
+   "labelled": true
+  },
+  {
+   "from": "_archive/superseded_photos/TGS-SQUISHY-OREO/angle3.jpeg",
+   "to": "input/TGS-SQUISHY-OREO/angle6.jpeg",
+   "md5": "3bd38c12ad5b4096ec1097a9cab2b0b6",
+   "labelled": true
+  },
+  {
+   "from": "_archive/superseded_photos/TGS-SQUISHY-OREO/angle4.jpeg",
+   "to": "input/TGS-SQUISHY-OREO/angle7.jpeg",
+   "md5": "195d47964a52d34548be1610053634b7",
+   "labelled": true
+  },
+  {
+   "from": "_archive/superseded_photos/TGS-SQUISHY-OREO/angle5.jpeg",
+   "to": "input/TGS-SQUISHY-OREO/angle8.jpeg",
+   "md5": "35771d05739563989df35dd46ea38b00",
+   "labelled": true
+  },
+  {
+   "from": "_archive/superseded_photos/TGS-SQUISHY-OREO/front.jpg",
+   "to": "input/TGS-SQUISHY-OREO/angle9.jpg",
+   "md5": "6e3bc28648c45abc4f6793316e71633f",
+   "labelled": true
+  },
+  {
+   "from": "_archive/superseded_photos/TGS-STACKED-CIRCLE-RING/front.jpg",
+   "to": "input/TGS-STACKED-CIRCLE-RING/angle6.jpg",
+   "md5": "5366519b41238fe1cabc0b91c41158b7",
+   "labelled": true
+  },
+  {
+   "from": "_archive/superseded_photos/TGS-TABLET-DRAWING/angle2.jpg",
+   "to": "input/TGS-TABLET-DRAWING/angle5.jpg",
+   "md5": "f1d3748bdb71db6a790b4138c745540f",
+   "labelled": true
+  },
+  {
+   "from": "_archive/superseded_photos/TGS-TABLET-DRAWING/front.jpg",
+   "to": "input/TGS-TABLET-DRAWING-CALC/angle5.jpg",
+   "md5": "e0e511cfd06bb1e483ed5d60717fdbe4",
+   "labelled": true
+  },
+  {
+   "from": "_archive/superseded_photos/TGS-TOUCH-TEACH-WORDS/front.jpg",
+   "to": "input/TGS-TOUCH-TEACH-WORDS/angle6.jpg",
+   "md5": "4dc08987471b2df4068a3ec2b5c74a9d",
+   "labelled": true
+  },
+  {
+   "from": "_archive/superseded_photos/_duplicates/TGS-INTERACTI-LEARNING-BOOK/angle2.jpeg",
+   "to": "input/TGS-ARABIC-SOUND-LEARNING/angle6.jpeg",
+   "md5": "3f5e09ee1de5d4c5a40c691201e0e663",
+   "labelled": true
+  },
+  {
+   "from": "_archive/superseded_photos/_duplicates/TGS-INTERACTI-LEARNING-BOOK/angle3.jpeg",
+   "to": "input/TGS-ARABIC-SOUND-LEARNING/angle7.jpeg",
+   "md5": "9dfc7137f288571c1acb8be95ab8cd9e",
+   "labelled": true
+  },
+  {
+   "from": "_archive/superseded_photos/_duplicates/TGS-INTERACTI-LEARNING-BOOK/angle4.jpeg",
+   "to": "input/TGS-ARABIC-SOUND-LEARNING/angle8.jpeg",
+   "md5": "f70eba1880da7f234db40de52f2a5a6a",
+   "labelled": true
+  },
+  {
+   "from": "_archive/superseded_photos/_duplicates/TGS-INTERACTI-LEARNING-BOOK/front.jpeg",
+   "to": "input/TGS-ARABIC-SOUND-LEARNING/angle9.jpeg",
+   "md5": "6853e9683b8dd6f18c71145adbd5b6a9",
+   "labelled": true
+  }
+ ],
+ "renamed_by_user": [
+  {
+   "from": "TGS-UNICORN",
+   "to": "TGS-UNICORN-NIGHTLIGHT",
+   "seen": "2026-09-17T21:24:02"
+  }
+ ],
+ "removed_from_catalog": [
+  {
+   "sku": "TGS-BABY-CONTROLLE",
+   "to": "_archive/removed_products/TGS-BABY-CONTROLLE",
+   "at": "2026-09-18T16:19:24",
+   "why": "user 2026-09-18: remove for now (only one boxed photo; the Huanger console is a different product)"
+  }
+ ],
+ "renamed_to_product_names": {
+  "at": "2026-09-18T20:20:22",
+  "folders": [
+   {
+    "from": "TGS-3D-PRINTING-PEN",
+    "to": "3D-PRINTING-PEN",
+    "sku": "TGS-3D-PRINTING-PEN",
+    "handle": "3d-printing-pen"
+   },
+   {
+    "from": "TGS-7-DIECAST-CAR",
+    "to": "BMW-7-SERIES-DIECAST-MODEL-CAR",
+    "sku": "TGS-7-DIECAST-CAR",
+    "handle": "bmw-7-series-diecast-model-car"
+   },
+   {
+    "from": "TGS-AIR-COMBAT-FIGHTER",
+    "to": "AIR-COMBAT-FIGHTER-JET-TOY",
+    "sku": "TGS-AIR-COMBAT-FIGHTER",
+    "handle": "air-combat-fighter-jet-toy"
+   },
+   {
+    "from": "TGS-AIR-FALCON-DRONE",
+    "to": "AIR-FALCON-DRONE-AIR-RACER-2-IN-1-FLYING-CAR",
+    "sku": "TGS-AIR-FALCON-DRONE",
+    "handle": "air-falcon-drone-air-racer-2-in-1-flying-car"
+   },
+   {
+    "from": "TGS-AKS-74U-WATER",
+    "to": "AKS-74U-ELECTRIC-WATER-BOMB-SHOOTER",
+    "sku": "TGS-AKS-74U-WATER",
+    "handle": "aks-74u-electric-water-bomb-shooter"
+   },
+   {
+    "from": "TGS-AL-QURAN-LEARNING",
+    "to": "OZCH-STAR-ISLAMIC-LEARNING-TABLET",
+    "sku": "TGS-AL-QURAN-LEARNING",
+    "handle": "ozch-star-islamic-learning-tablet"
+   },
+   {
+    "from": "TGS-ANIMAL-PIANO-KEYS",
+    "to": "ANIMAL-PIANO-KEYBOARD",
+    "sku": "TGS-ANIMAL-PIANO-KEYS",
+    "handle": "animal-piano-keyboard"
+   },
+   {
+    "from": "TGS-ANIMAL-SHAPED-PHONE",
+    "to": "ANIMAL-SHAPED-EDUCATIONAL-TOY-PHONE",
+    "sku": "TGS-ANIMAL-SHAPED-PHONE",
+    "handle": "animal-shaped-educational-toy-phone"
+   },
+   {
+    "from": "TGS-APPLIANCE-FRIDGE",
+    "to": "MINI-APPLIANCES-TOY-REFRIGERATOR",
+    "sku": "TGS-APPLIANCE-FRIDGE",
+    "handle": "mini-appliances-toy-refrigerator"
+   },
+   {
+    "from": "TGS-AQUAFLOW-SWIM-CAP",
+    "to": "INTEX-AQUAFLOW-SWIM-CAP",
+    "sku": "TGS-AQUAFLOW-SWIM-CAP",
+    "handle": "intex-aquaflow-swim-cap"
+   },
+   {
+    "from": "TGS-ARABIC-SOUND-LEARNING",
+    "to": "OZEN-STAR-ARABIC-SOUND-LEARNING-BOOK",
+    "sku": "TGS-ARABIC-SOUND-LEARNING",
+    "handle": "ozen-star-arabic-sound-learning-book"
+   },
+   {
+    "from": "TGS-AVENGERS-MAG-DRAWING",
+    "to": "AVENGERS-AGE-OF-ULTRON-MAGNETIC-DRAWING-BOARD",
+    "sku": "TGS-AVENGERS-MAG-DRAWING",
+    "handle": "avengers-age-of-ultron-magnetic-drawing-board"
+   },
+   {
+    "from": "TGS-BABY-ACTIVITY",
+    "to": "LION-KING-BABY-ACTIVITY-TOY",
+    "sku": "TGS-BABY-ACTIVITY",
+    "handle": "lion-king-baby-activity-toy"
+   },
+   {
+    "from": "TGS-BABY-GAMES-CONSOLE",
+    "to": "HUANGER-BABY-GAMES-CONSOLE",
+    "sku": "TGS-BABY-GAMES-CONSOLE",
+    "handle": "huanger-baby-games-console"
+   },
+   {
+    "from": "TGS-BABY-RATTLE-TURNTABLE",
+    "to": "BABY-RATTLE-TURNTABLE-SET",
+    "sku": "TGS-BABY-RATTLE-TURNTABLE",
+    "handle": "baby-rattle-turntable-set"
+   },
+   {
+    "from": "TGS-BALL-CATCHING-CLAW",
+    "to": "BALL-CATCHING-CLAW-GAME",
+    "sku": "TGS-BALL-CATCHING-CLAW",
+    "handle": "ball-catching-claw-game"
+   },
+   {
+    "from": "TGS-BASEBALL-SPORT",
+    "to": "BASEBALL-SPORT-GAME-SET",
+    "sku": "TGS-BASEBALL-SPORT",
+    "handle": "baseball-sport-game-set"
+   },
+   {
+    "from": "TGS-BBALL-BOARD",
+    "to": "BASKETBALL-BOARD-GAME-CHAMPIONSHIP-TROPHY",
+    "sku": "TGS-BBALL-BOARD",
+    "handle": "basketball-board-game-championship-trophy"
+   },
+   {
+    "from": "TGS-BBALL-SHOOTING",
+    "to": "BASKETBALL-SHOOTING-MACHINE",
+    "sku": "TGS-BBALL-SHOOTING",
+    "handle": "basketball-shooting-machine"
+   },
+   {
+    "from": "TGS-BEAR-INFLATABL-CHAIR",
+    "to": "INTEX-BEAR-INFLATABLE-CHAIR",
+    "sku": "TGS-BEAR-INFLATABL-CHAIR",
+    "handle": "intex-bear-inflatable-chair"
+   },
+   {
+    "from": "TGS-BEAUTY-GIRL-MAKEUP",
+    "to": "KPOP-DEMON-HUNTERS-BEAUTY-GIRL-MAKEUP-CASE",
+    "sku": "TGS-BEAUTY-GIRL-MAKEUP",
+    "handle": "kpop-demon-hunters-beauty-girl-makeup-case"
+   },
+   {
+    "from": "TGS-BINOCULAR",
+    "to": "OUBIAO-10X38-TOY-BINOCULARS-WITH-CASE",
+    "sku": "TGS-BINOCULAR",
+    "handle": "oubiao-10x38-toy-binoculars-with-case"
+   },
+   {
+    "from": "TGS-BLAST-FLAMES",
+    "to": "BLAST-OF-FLAMES-LED-LIGHT-SWORD-TOY",
+    "sku": "TGS-BLAST-FLAMES",
+    "handle": "blast-of-flames-led-light-sword-toy"
+   },
+   {
+    "from": "TGS-BLOCK-BUILDING",
+    "to": "BLOCK-BUILDING-TOYS-IN-CLEAR-STORAGE-JAR",
+    "sku": "TGS-BLOCK-BUILDING",
+    "handle": "block-building-toys-in-clear-storage-jar"
+   },
+   {
+    "from": "TGS-BLUE-TILE",
+    "to": "NOTEBOOK-AND-PEN-GIFT-SET",
+    "sku": "TGS-BLUE-TILE",
+    "handle": "notebook-and-pen-gift-set"
+   },
+   {
+    "from": "TGS-BOOM-STRIKE-HAMMER",
+    "to": "BOOM-STRIKE-HAMMER-GAME",
+    "sku": "TGS-BOOM-STRIKE-HAMMER",
+    "handle": "boom-strike-hammer-game"
+   },
+   {
+    "from": "TGS-BOTTLE-PAIRING",
+    "to": "BOTTLE-PAIRING-COLOR-MATCHING-GAME",
+    "sku": "TGS-BOTTLE-PAIRING",
+    "handle": "bottle-pairing-color-matching-game"
+   },
+   {
+    "from": "TGS-BOTTLE-SQUISHY",
+    "to": "PRIME-BOTTLE-SQUISHY-500ML-BLUE-AND-PINK",
+    "sku": "TGS-BOTTLE-SQUISHY",
+    "handle": "prime-bottle-squishy-500ml-blue-and-pink"
+   },
+   {
+    "from": "TGS-BREAK-THROUGH-CAR",
+    "to": "BREAK-THROUGH-GAME-CAR",
+    "sku": "TGS-BREAK-THROUGH-CAR",
+    "handle": "break-through-game-car"
+   },
+   {
+    "from": "TGS-BRILLIANT-TALKING-PHONE",
+    "to": "BRILLIANT-TALKING-TELEPHONE-TOY",
+    "sku": "TGS-BRILLIANT-TALKING-PHONE",
+    "handle": "brilliant-talking-telephone-toy"
+   },
+   {
+    "from": "TGS-BUBBLE-GUN",
+    "to": "LABUBU-BUBBLE-GUN",
+    "sku": "TGS-BUBBLE-GUN",
+    "handle": "labubu-bubble-gun"
+   },
+   {
+    "from": "TGS-CARD-PUZZLE",
+    "to": "CHILDRENS-PUZZLE-GAME-CARD-MACHINE",
+    "sku": "TGS-CARD-PUZZLE",
+    "handle": "childrens-puzzle-game-card-machine"
+   },
+   {
+    "from": "TGS-CARS-RC-RADIO",
+    "to": "CARS-DINOCO-RC-RADIO-CONTROL-CAR",
+    "sku": "TGS-CARS-RC-RADIO",
+    "handle": "cars-dinoco-rc-radio-control-car"
+   },
+   {
+    "from": "TGS-CARTOON-ANIMAL-XYLO",
+    "to": "CARTOON-ANIMAL-HAND-KNOCK-PIANO-SERIES-8-TONE",
+    "sku": "TGS-CARTOON-ANIMAL-XYLO",
+    "handle": "cartoon-animal-hand-knock-piano-series-8-tone"
+   },
+   {
+    "from": "TGS-CATAPULT-EFORMATIO-TRUCK",
+    "to": "CATAPULT-DEFORMATION-TRUCK-CAR-CARRIER",
+    "sku": "TGS-CATAPULT-EFORMATIO-TRUCK",
+    "handle": "catapult-deformation-truck-car-carrier"
+   },
+   {
+    "from": "TGS-CHOCOLATE-BAR-SQUISHY",
+    "to": "CHOCOLATE-BAR-SQUISHY-KINDER-AND-SNICKERS",
+    "sku": "TGS-CHOCOLATE-BAR-SQUISHY",
+    "handle": "chocolate-bar-squishy-kinder-and-snickers"
+   },
+   {
+    "from": "TGS-CIRCULAR-SAW",
+    "to": "TOY-CIRCULAR-SAW-CUTTING-EDGE-TOOL",
+    "sku": "TGS-CIRCULAR-SAW",
+    "handle": "toy-circular-saw-cutting-edge-tool"
+   },
+   {
+    "from": "TGS-COCA-COLA-MONSTERS",
+    "to": "COCA-COLA-MONSTERS-VINYL-FACE-BLIND-BOX",
+    "sku": "TGS-COCA-COLA-MONSTERS",
+    "handle": "coca-cola-monsters-vinyl-face-blind-box"
+   },
+   {
+    "from": "TGS-COLORFUL-MAG-BLOCKS",
+    "to": "COLORFUL-MAGNETIC-BLOCKS-FOREST-THEME-SET",
+    "sku": "TGS-COLORFUL-MAG-BLOCKS",
+    "handle": "colorful-magnetic-blocks-forest-theme-set"
+   },
+   {
+    "from": "TGS-CONTAINER-TRUCK",
+    "to": "RED-AND-GRAY-CONTAINER-TRUCK-TOY",
+    "sku": "TGS-CONTAINER-TRUCK",
+    "handle": "red-and-gray-container-truck-toy"
+   },
+   {
+    "from": "TGS-CUBE-SQUEEZE-FIDGET",
+    "to": "CUBE-SQUEEZE-BALL-SUPER-SOLID-SQUISH-TOY",
+    "sku": "TGS-CUBE-SQUEEZE-FIDGET",
+    "handle": "cube-squeeze-ball-super-solid-squish-toy"
+   },
+   {
+    "from": "TGS-CUTE-COW-SINGING",
+    "to": "CUTE-COW-SING-AND-DANCING-TOY",
+    "sku": "TGS-CUTE-COW-SINGING",
+    "handle": "cute-cow-sing-and-dancing-toy"
+   },
+   {
+    "from": "TGS-CUTE-DUCK-SLIDE",
+    "to": "CUTE-DUCK-SLIDE-ELECTRIC-TRACK-TOY",
+    "sku": "TGS-CUTE-DUCK-SLIDE",
+    "handle": "cute-duck-slide-electric-track-toy"
+   },
+   {
+    "from": "TGS-CUTE-DUCK-WATER",
+    "to": "CUTE-DUCK-WATER-WHEEL-BATH-TOY",
+    "sku": "TGS-CUTE-DUCK-WATER",
+    "handle": "cute-duck-water-wheel-bath-toy"
+   },
+   {
+    "from": "TGS-CUTE-INTELLIGE-ROBOT",
+    "to": "CUTE-INTELLIGENT-ROBOT-REMOTE-CONTROL",
+    "sku": "TGS-CUTE-INTELLIGE-ROBOT",
+    "handle": "cute-intelligent-robot-remote-control"
+   },
+   {
+    "from": "TGS-DANCING-ELEC",
+    "to": "SONIC-DANCING-ELECTRIC-TOY",
+    "sku": "TGS-DANCING-ELEC",
+    "handle": "sonic-dancing-electric-toy"
+   },
+   {
+    "from": "TGS-DEFORM-ROBOT-CAR",
+    "to": "TWO-IN-ONE-DEFORM-ROBOT-CAR",
+    "sku": "TGS-DEFORM-ROBOT-CAR",
+    "handle": "two-in-one-deform-robot-car"
+   },
+   {
+    "from": "TGS-DELUXE-ART-PAINT",
+    "to": "KUROMI-15TH-ANNIVERSARY-ART-PAINTING-SET",
+    "sku": "TGS-DELUXE-ART-PAINT",
+    "handle": "kuromi-15th-anniversary-art-painting-set"
+   },
+   {
+    "from": "TGS-DELUXE-HAIR-STYLING",
+    "to": "DELUXE-HAIR-STYLING-SET",
+    "sku": "TGS-DELUXE-HAIR-STYLING",
+    "handle": "deluxe-hair-styling-set"
+   },
+   {
+    "from": "TGS-DESERT-EAGLE-GUN",
+    "to": "DESERT-EAGLE-MODEL-GUN",
+    "sku": "TGS-DESERT-EAGLE-GUN",
+    "handle": "desert-eagle-model-gun"
+   },
+   {
+    "from": "TGS-DIECAST-MOUNTAIN-BIKE",
+    "to": "1-8-SCALE-DIE-CAST-MOUNTAIN-BIKE-MODEL",
+    "sku": "TGS-DIECAST-MOUNTAIN-BIKE",
+    "handle": "1-8-scale-die-cast-mountain-bike-model"
+   },
+   {
+    "from": "TGS-DINO-BUSY-BOARD",
+    "to": "DINOSAUR-BUSY-BOARD",
+    "sku": "TGS-DINO-BUSY-BOARD",
+    "handle": "dinosaur-busy-board"
+   },
+   {
+    "from": "TGS-DINO-RUNNING-DINO",
+    "to": "DINO-RUNNING-DINOSAUR-WORLD-ELECTRIC-SERIES",
+    "sku": "TGS-DINO-RUNNING-DINO",
+    "handle": "dino-running-dinosaur-world-electric-series"
+   },
+   {
+    "from": "TGS-DISHWASHE",
+    "to": "KIDS-KITCHEN-TOY-DISHWASHER",
+    "sku": "TGS-DISHWASHE",
+    "handle": "kids-kitchen-toy-dishwasher"
+   },
+   {
+    "from": "TGS-DIY-MAG-LEVITATIO",
+    "to": "DIY-MAGNETIC-LEVITATION-TRAIN-TRACK",
+    "sku": "TGS-DIY-MAG-LEVITATIO",
+    "handle": "diy-magnetic-levitation-train-track"
+   },
+   {
+    "from": "TGS-DRAWING-ROBOT-JQR",
+    "to": "DRAWING-ROBOT-JQR-02",
+    "sku": "TGS-DRAWING-ROBOT-JQR",
+    "handle": "drawing-robot-jqr-02"
+   },
+   {
+    "from": "TGS-DREAM-UNICORN-BUBBLE",
+    "to": "DREAM-UNICORN-BUBBLE-CAMERA-TOY",
+    "sku": "TGS-DREAM-UNICORN-BUBBLE",
+    "handle": "dream-unicorn-bubble-camera-toy"
+   },
+   {
+    "from": "TGS-E99-PRO-MAX",
+    "to": "E99-PRO-MAX-REMOTE-CONTROL-DRONE",
+    "sku": "TGS-E99-PRO-MAX",
+    "handle": "e99-pro-max-remote-control-drone"
+   },
+   {
+    "from": "TGS-EDU-KEYS",
+    "to": "EDUCATIONAL-KEYBOARD-TABLET",
+    "sku": "TGS-EDU-KEYS",
+    "handle": "educational-keyboard-tablet"
+   },
+   {
+    "from": "TGS-EDU-LAPTOP",
+    "to": "EDUCATIVO-TWO-IN-ONE-LEARNING-LAPTOP",
+    "sku": "TGS-EDU-LAPTOP",
+    "handle": "educativo-two-in-one-learning-laptop"
+   },
+   {
+    "from": "TGS-ELEC-CARTOON-DINO",
+    "to": "ELECTRIC-CARTOON-DINOSAUR-TOY",
+    "sku": "TGS-ELEC-CARTOON-DINO",
+    "handle": "electric-cartoon-dinosaur-toy"
+   },
+   {
+    "from": "TGS-ELEC-KETTLE",
+    "to": "TOY-ELECTRIC-KETTLE",
+    "sku": "TGS-ELEC-KETTLE",
+    "handle": "toy-electric-kettle"
+   },
+   {
+    "from": "TGS-ELEPHANT-FIGURE",
+    "to": "3-IN-1-WALKING-ELEPHANT-TOY",
+    "sku": "TGS-ELEPHANT-FIGURE",
+    "handle": "3-in-1-walking-elephant-toy"
+   },
+   {
+    "from": "TGS-FAN-VISOR-HAT",
+    "to": "GIVELONG-CUTE-FAN-VISOR-HAT",
+    "sku": "TGS-FAN-VISOR-HAT",
+    "handle": "givelong-cute-fan-visor-hat"
+   },
+   {
+    "from": "TGS-FIG-FOOTBALL-STAR",
+    "to": "FOOTBALL-STAR-ACTION-FIGURE-TROPHY-AND-BALL",
+    "sku": "TGS-FIG-FOOTBALL-STAR",
+    "handle": "football-star-action-figure-trophy-and-ball"
+   },
+   {
+    "from": "TGS-FIG-NARUTO",
+    "to": "NARUTO-SHIPPUDEN-NARUTO-UZUMAKI-ACTION-FIGURE",
+    "sku": "TGS-FIG-NARUTO",
+    "handle": "naruto-shippuden-naruto-uzumaki-action-figure"
+   },
+   {
+    "from": "TGS-FIGHTERS-FIGURE",
+    "to": "KING-OF-FIGHTERS-KYO-KUSANAGI-FIGURE",
+    "sku": "TGS-FIGHTERS-FIGURE",
+    "handle": "king-of-fighters-kyo-kusanagi-figure"
+   },
+   {
+    "from": "TGS-FOLLOW-ME-CAR",
+    "to": "FOLLOW-ME-GESTURE-CAR-GREEN-AND-PINK",
+    "sku": "TGS-FOLLOW-ME-CAR",
+    "handle": "follow-me-gesture-car-green-and-pink"
+   },
+   {
+    "from": "TGS-FOUR-AXIS-DRONE",
+    "to": "AEROBAT-FOUR-AXIS-MINI-DRONE",
+    "sku": "TGS-FOUR-AXIS-DRONE",
+    "handle": "aerobat-four-axis-mini-drone"
+   },
+   {
+    "from": "TGS-FOUR-INSECT-CATCHING",
+    "to": "FOUR-IN-ONE-INSECT-CATCHING-GAME",
+    "sku": "TGS-FOUR-INSECT-CATCHING",
+    "handle": "four-in-one-insect-catching-game"
+   },
+   {
+    "from": "TGS-FOUR-PLAYERS-DICE",
+    "to": "FOUR-PLAYERS-DICE-BOARD-GAME",
+    "sku": "TGS-FOUR-PLAYERS-DICE",
+    "handle": "four-players-dice-board-game"
+   },
+   {
+    "from": "TGS-GEAR-DINO",
+    "to": "GEAR-DINOSAUR-TOY",
+    "sku": "TGS-GEAR-DINO",
+    "handle": "gear-dinosaur-toy"
+   },
+   {
+    "from": "TGS-GEAR-VEHICLE-CLEAR",
+    "to": "TRANSPARENT-GEAR-VEHICLE-EXCAVATOR-SET",
+    "sku": "TGS-GEAR-VEHICLE-CLEAR",
+    "handle": "transparent-gear-vehicle-excavator-set"
+   },
+   {
+    "from": "TGS-GLOW-LEARN-BILINGUAL",
+    "to": "WINFUN-GLOW-AND-LEARN-BILINGUAL-PAD",
+    "sku": "TGS-GLOW-LEARN-BILINGUAL",
+    "handle": "winfun-glow-and-learn-bilingual-pad"
+   },
+   {
+    "from": "TGS-GRASS-FROG",
+    "to": "GRASS-FROG-LIGHT-SOUND-TOY",
+    "sku": "TGS-GRASS-FROG",
+    "handle": "grass-frog-light-sound-toy"
+   },
+   {
+    "from": "TGS-GREEN-TRUCK",
+    "to": "GREEN-TRUCK-REMOTE-CONTROL-TOY",
+    "sku": "TGS-GREEN-TRUCK",
+    "handle": "green-truck-remote-control-toy"
+   },
+   {
+    "from": "TGS-GT-DIECAST-CAR",
+    "to": "MERCEDES-AMG-VISION-GT-DIECAST-MODEL-CAR",
+    "sku": "TGS-GT-DIECAST-CAR",
+    "handle": "mercedes-amg-vision-gt-diecast-model-car"
+   },
+   {
+    "from": "TGS-GT-R-DIECAST",
+    "to": "NISSAN-GT-R-MOTUL-DIECAST-MODEL-CAR",
+    "sku": "TGS-GT-R-DIECAST",
+    "handle": "nissan-gt-r-motul-diecast-model-car"
+   },
+   {
+    "from": "TGS-HAND-CONSOLE",
+    "to": "SUP-HANDHELD-GAME-CONSOLE",
+    "sku": "TGS-HAND-CONSOLE",
+    "handle": "sup-handheld-game-console"
+   },
+   {
+    "from": "TGS-HAND-MIXER",
+    "to": "MINI-KITCHEN-APPLIANCE-TOY-HAND-MIXER",
+    "sku": "TGS-HAND-MIXER",
+    "handle": "mini-kitchen-appliance-toy-hand-mixer"
+   },
+   {
+    "from": "TGS-HOUSEHOLD-SET-MINI",
+    "to": "HOUSEHOLD-SET-MINI-APPLIANCE-TOY",
+    "sku": "TGS-HOUSEHOLD-SET-MINI",
+    "handle": "household-set-mini-appliance-toy"
+   },
+   {
+    "from": "TGS-INFLATABL-BABY-POOL",
+    "to": "INTEX-INFLATABLE-BABY-POOL",
+    "sku": "TGS-INFLATABL-BABY-POOL",
+    "handle": "intex-inflatable-baby-pool"
+   },
+   {
+    "from": "TGS-INFLATABL-POOL-FAMILY",
+    "to": "INTEX-WET-SET-RECTANGULAR-FAMILY-POOL",
+    "sku": "TGS-INFLATABL-POOL-FAMILY",
+    "handle": "intex-wet-set-rectangular-family-pool"
+   },
+   {
+    "from": "TGS-INFLATABL-POOL-ROUND",
+    "to": "INTEX-WET-SET-ROUND-KIDDIE-POOL",
+    "sku": "TGS-INFLATABL-POOL-ROUND",
+    "handle": "intex-wet-set-round-kiddie-pool"
+   },
+   {
+    "from": "TGS-INFLATABL-SOFA-LOUNGER",
+    "to": "INFLATABLE-LOUNGER-SOFA-SINGLE-SIZE",
+    "sku": "TGS-INFLATABL-SOFA-LOUNGER",
+    "handle": "inflatable-lounger-sofa-single-size"
+   },
+   {
+    "from": "TGS-INFLATABL-SOFA-ROUND",
+    "to": "INFLATABLE-ROUND-SOFA-CHAIR-SINGLE-SIZE",
+    "sku": "TGS-INFLATABL-SOFA-ROUND",
+    "handle": "inflatable-round-sofa-chair-single-size"
+   },
+   {
+    "from": "TGS-INSUL-COFFEE-TUMBLER",
+    "to": "INSULATED-COFFEE-TUMBLER-WITH-STRAP",
+    "sku": "TGS-INSUL-COFFEE-TUMBLER",
+    "handle": "insulated-coffee-tumbler-with-strap"
+   },
+   {
+    "from": "TGS-INSUL-TUMBLER-GRADIENT",
+    "to": "INSULATED-TRAVEL-TUMBLER-GRADIENT-HANDLE",
+    "sku": "TGS-INSUL-TUMBLER-GRADIENT",
+    "handle": "insulated-travel-tumbler-gradient-handle"
+   },
+   {
+    "from": "TGS-INSUL-TUMBLER-HANDLE",
+    "to": "INSULATED-TUMBLER-HEART-PATTERN-STRAW-LID",
+    "sku": "TGS-INSUL-TUMBLER-HANDLE",
+    "handle": "insulated-tumbler-heart-pattern-straw-lid"
+   },
+   {
+    "from": "TGS-INTELLIGE-LEARNING",
+    "to": "INTELLIGENCE-LEARNING-GAME-EDUCATIONAL-TOY",
+    "sku": "TGS-INTELLIGE-LEARNING",
+    "handle": "intelligence-learning-game-educational-toy"
+   },
+   {
+    "from": "TGS-IRON-APPLIANCE",
+    "to": "PLAYROOM-TOY-IRON-APPLIANCE",
+    "sku": "TGS-IRON-APPLIANCE",
+    "handle": "playroom-toy-iron-appliance"
+   },
+   {
+    "from": "TGS-JELLYFISH-BUMP-GO",
+    "to": "JELLYFISH-BUMP-AND-GO-DANCING-TOY",
+    "sku": "TGS-JELLYFISH-BUMP-GO",
+    "handle": "jellyfish-bump-and-go-dancing-toy"
+   },
+   {
+    "from": "TGS-JUDY-HOPPS",
+    "to": "ZOOTOPIA-JUDY-HOPPS-TALKING-TOY",
+    "sku": "TGS-JUDY-HOPPS",
+    "handle": "zootopia-judy-hopps-talking-toy"
+   },
+   {
+    "from": "TGS-JUMP-O-RAMA",
+    "to": "BESTWAY-JUMP-O-RAMA-BOUNCER",
+    "sku": "TGS-JUMP-O-RAMA",
+    "handle": "bestway-jump-o-rama-bouncer"
+   },
+   {
+    "from": "TGS-KUROMI-MOON-LAMP",
+    "to": "KUROMI-MOON-LIGHT-LAMP",
+    "sku": "TGS-KUROMI-MOON-LAMP",
+    "handle": "kuromi-moon-light-lamp"
+   },
+   {
+    "from": "TGS-KUROMI-NIGHT-LIGHT",
+    "to": "KUROMI-CHARACTER-NIGHT-LIGHT",
+    "sku": "TGS-KUROMI-NIGHT-LIGHT",
+    "handle": "kuromi-character-night-light"
+   },
+   {
+    "from": "TGS-LAUGH-N-LEAP",
+    "to": "BESTWAY-LAUGH-N-LEAP-BOUNCER-INFLATABLE-PLAY",
+    "sku": "TGS-LAUGH-N-LEAP",
+    "handle": "bestway-laugh-n-leap-bouncer-inflatable-play"
+   },
+   {
+    "from": "TGS-LBWK-DIECAST-CAR",
+    "to": "LBWK-TOYOTA-SUPRA-DIECAST-MODEL-CAR",
+    "sku": "TGS-LBWK-DIECAST-CAR",
+    "handle": "lbwk-toyota-supra-diecast-model-car"
+   },
+   {
+    "from": "TGS-LEGO-TRAIN",
+    "to": "SOFT-BUILDING-BLOCKS-TOY-SET",
+    "sku": "TGS-SOFT-BLOCKS",
+    "handle": "soft-building-blocks-toy-set"
+   },
+   {
+    "from": "TGS-LIGHT-UP-SWORD",
+    "to": "LIGHT-UP-SWORD",
+    "sku": "TGS-LIGHT-UP-SWORD",
+    "handle": "light-up-sword"
+   },
+   {
+    "from": "TGS-LIGHTSABE",
+    "to": "LIGHTSABER-TOY",
+    "sku": "TGS-LIGHTSABE",
+    "handle": "lightsaber-toy"
+   },
+   {
+    "from": "TGS-LITTLE-HELPER-CLEANING",
+    "to": "LITTLE-HELPER-SIMULATED-CLEANING-KIT",
+    "sku": "TGS-LITTLE-HELPER-CLEANING",
+    "handle": "little-helper-simulated-cleaning-kit"
+   },
+   {
+    "from": "TGS-M3-E30-DIECAST",
+    "to": "BMW-M3-E30-DIECAST-MODEL-CAR",
+    "sku": "TGS-M3-E30-DIECAST",
+    "handle": "bmw-m3-e30-diecast-model-car"
+   },
+   {
+    "from": "TGS-MAG-BUILDING-BLOCKS",
+    "to": "MAGNETIC-BUILDING-BLOCKS-MINECRAFT-THEME-SET",
+    "sku": "TGS-MAG-BUILDING-BLOCKS",
+    "handle": "magnetic-building-blocks-minecraft-theme-set"
+   },
+   {
+    "from": "TGS-MAG-DIGITAL-TRAIN",
+    "to": "MAGNETIC-DIGITAL-CAR-TRAIN-SET",
+    "sku": "TGS-MAG-DIGITAL-TRAIN",
+    "handle": "magnetic-digital-car-train-set"
+   },
+   {
+    "from": "TGS-MAG-WORLD",
+    "to": "MAGNETIC-WORLD-CUTE-PET-BUILDING-SET",
+    "sku": "TGS-MAG-WORLD",
+    "handle": "magnetic-world-cute-pet-building-set"
+   },
+   {
+    "from": "TGS-MAGIC-BUBBLE-BAT",
+    "to": "MAGIC-BUBBLE-BAT-GAME",
+    "sku": "TGS-MAGIC-BUBBLE-BAT",
+    "handle": "magic-bubble-bat-game"
+   },
+   {
+    "from": "TGS-MAGIC-WAND-CROWN",
+    "to": "MAGIC-WAND-CROWN-TIARA",
+    "sku": "TGS-MAGIC-WAND-CROWN",
+    "handle": "magic-wand-crown-tiara"
+   },
+   {
+    "from": "TGS-MAKEUP-CASE",
+    "to": "KUROMI-MAKEUP-CASE",
+    "sku": "TGS-MAKEUP-CASE",
+    "handle": "kuromi-makeup-case"
+   },
+   {
+    "from": "TGS-MAKEUP-SET-CASE",
+    "to": "MAKEUP-SET-CASE-PRINCESS-BAG-AND-CHEST",
+    "sku": "TGS-MAKEUP-SET-CASE",
+    "handle": "makeup-set-case-princess-bag-and-chest"
+   },
+   {
+    "from": "TGS-ME-SLIDE",
+    "to": "DESPICABLE-ME-2-MINION-SLIDE-TOY",
+    "sku": "TGS-ME-SLIDE",
+    "handle": "despicable-me-2-minion-slide-toy"
+   },
+   {
+    "from": "TGS-MONTSSRI-HANDLE-LIGHT",
+    "to": "MONTESSORI-HANDLE-LIGHT-GAME",
+    "sku": "TGS-MONTSSRI-HANDLE-LIGHT",
+    "handle": "montessori-handle-light-game"
+   },
+   {
+    "from": "TGS-MOTO-DIECAST",
+    "to": "MAISTO-DUCATI-STREETFIGHTER-S-1-12-SCALE",
+    "sku": "TGS-MOTO-DIECAST",
+    "handle": "maisto-ducati-streetfighter-s-1-12-scale"
+   },
+   {
+    "from": "TGS-MULTI-LEARN-SHELF",
+    "to": "MULTIFUNCTION-LEARN-SHELF",
+    "sku": "TGS-MULTI-LEARN-SHELF",
+    "handle": "multifunction-learn-shelf"
+   },
+   {
+    "from": "TGS-NOTEBOOK-PC",
+    "to": "ANGELO-NOTEBOOK-PC-EDUCATIONAL-TOY-WITH-MOUSE",
+    "sku": "TGS-NOTEBOOK-PC",
+    "handle": "angelo-notebook-pc-educational-toy-with-mouse"
+   },
+   {
+    "from": "TGS-OCEAN-LINER-WATER",
+    "to": "OCEAN-LINER-WATER-GUN-TOY",
+    "sku": "TGS-OCEAN-LINER-WATER",
+    "handle": "ocean-liner-water-gun-toy"
+   },
+   {
+    "from": "TGS-ORANGE-MONSTER-TRUCK",
+    "to": "ORANGE-DIE-CAST-METAL-OFF-ROAD-MONSTER-TRUCK",
+    "sku": "TGS-ORANGE-MONSTER-TRUCK",
+    "handle": "orange-die-cast-metal-off-road-monster-truck"
+   },
+   {
+    "from": "TGS-PAGANI-DIECAST-CAR",
+    "to": "PAGANI-HUAYRA-DIECAST-MODEL-CAR",
+    "sku": "TGS-PAGANI-DIECAST-CAR",
+    "handle": "pagani-huayra-diecast-model-car"
+   },
+   {
+    "from": "TGS-PAW-PATROL-GO",
+    "to": "PAW-PATROL-GO-FISHING-GAME",
+    "sku": "TGS-PAW-PATROL-GO",
+    "handle": "paw-patrol-go-fishing-game"
+   },
+   {
+    "from": "TGS-PIANO-HEDGEHOG",
+    "to": "HEDGEHOG-PIANO-BABY-TOY",
+    "sku": "TGS-PIANO-HEDGEHOG",
+    "handle": "hedgehog-piano-baby-toy"
+   },
+   {
+    "from": "TGS-PINBALL",
+    "to": "PINBALL-GAME-MACHINE",
+    "sku": "TGS-PINBALL",
+    "handle": "pinball-game-machine"
+   },
+   {
+    "from": "TGS-POP-FIGURES",
+    "to": "KUROMI-POP-FIGURES-SET-OF-4",
+    "sku": "TGS-POP-FIGURES",
+    "handle": "kuromi-pop-figures-set-of-4"
+   },
+   {
+    "from": "TGS-POWER-PUNCH-ARCADE",
+    "to": "POWER-PUNCH-ARCADE-GAME",
+    "sku": "TGS-POWER-PUNCH-ARCADE",
+    "handle": "power-punch-arcade-game"
+   },
+   {
+    "from": "TGS-PUZZLE-BUSY-BOARD",
+    "to": "PUZZLE-BUSY-BOARD-HOUSE-EDUCATIONAL-TOY",
+    "sku": "TGS-PUZZLE-BUSY-BOARD",
+    "handle": "puzzle-busy-board-house-educational-toy"
+   },
+   {
+    "from": "TGS-RACING-CAR",
+    "to": "MINI-RACING-CAR-REMOTE-CONTROL-VEHICLE",
+    "sku": "TGS-RACING-CAR",
+    "handle": "mini-racing-car-remote-control-vehicle"
+   },
+   {
+    "from": "TGS-RAINBOW-TOWER-UNICORN",
+    "to": "RAINBOW-TOWER-UNICORN-STACKER-TOY",
+    "sku": "TGS-RAINBOW-TOWER-UNICORN",
+    "handle": "rainbow-tower-unicorn-stacker-toy"
+   },
+   {
+    "from": "TGS-RANGE-DIECAST-CAR",
+    "to": "RANGE-ROVER-DIECAST-MODEL-CAR",
+    "sku": "TGS-RANGE-DIECAST-CAR",
+    "handle": "range-rover-diecast-model-car"
+   },
+   {
+    "from": "TGS-RC-CONTROL-TRAIN",
+    "to": "CLASSIC-EXPRESS-REMOTE-CONTROL-TRAIN-SET",
+    "sku": "TGS-RC-CONTROL-TRAIN",
+    "handle": "classic-express-remote-control-train-set"
+   },
+   {
+    "from": "TGS-RC-DRIFT-RACING",
+    "to": "RC-DRIFT-RACING-CAR",
+    "sku": "TGS-RC-DRIFT-RACING",
+    "handle": "rc-drift-racing-car"
+   },
+   {
+    "from": "TGS-RC-FORKLIFT",
+    "to": "MINI-RC-FORKLIFT-1-64-SCALE",
+    "sku": "TGS-RC-FORKLIFT",
+    "handle": "mini-rc-forklift-1-64-scale"
+   },
+   {
+    "from": "TGS-RC-MASERATI-MC20",
+    "to": "RC-MASERATI-MC20-REMOTE-CONTROL-CAR",
+    "sku": "TGS-RC-MASERATI-MC20",
+    "handle": "rc-maserati-mc20-remote-control-car"
+   },
+   {
+    "from": "TGS-RC-SPIDER-WALL",
+    "to": "SPIDER-WALL-RALLYIST-REMOTE-CONTROL-TOY",
+    "sku": "TGS-RC-SPIDER-WALL",
+    "handle": "spider-wall-rallyist-remote-control-toy"
+   },
+   {
+    "from": "TGS-REASSEMBL-SCREW-CAR",
+    "to": "REASSEMBLY-SCREW-CAR-WOODEN-TOY",
+    "sku": "TGS-REASSEMBL-SCREW-CAR",
+    "handle": "reassembly-screw-car-wooden-toy"
+   },
+   {
+    "from": "TGS-RETRO-ARCADE-DUEL",
+    "to": "RETRO-ARCADE-DUEL-MINI-GAME",
+    "sku": "TGS-RETRO-ARCADE-DUEL",
+    "handle": "retro-arcade-duel-mini-game"
+   },
+   {
+    "from": "TGS-RHINOCERO-BABY",
+    "to": "RHINOCEROS-BABY-UNICORN-TOY",
+    "sku": "TGS-RHINOCERO-BABY",
+    "handle": "rhinoceros-baby-unicorn-toy"
+   },
+   {
+    "from": "TGS-ROTATING-ORBIT-BALL",
+    "to": "ROTATING-ORBIT-BALL-TRACK",
+    "sku": "TGS-ROTATING-ORBIT-BALL",
+    "handle": "rotating-orbit-ball-track"
+   },
+   {
+    "from": "TGS-S-CAMERA",
+    "to": "CHILDRENS-CAMERA",
+    "sku": "TGS-S-CAMERA",
+    "handle": "childrens-camera"
+   },
+   {
+    "from": "TGS-S-CAR",
+    "to": "DELUXE-CHILDRENS-CAR-RIDE-ON-TOY",
+    "sku": "TGS-S-CAR",
+    "handle": "deluxe-childrens-car-ride-on-toy"
+   },
+   {
+    "from": "TGS-S-DIGITAL-CAMERA",
+    "to": "CHILDRENS-DIGITAL-CAMERA",
+    "sku": "TGS-S-DIGITAL-CAMERA",
+    "handle": "childrens-digital-camera"
+   },
+   {
+    "from": "TGS-S-DIGITAL-PRINT",
+    "to": "CHILDRENS-DIGITAL-PRINT-CAMERA",
+    "sku": "TGS-S-DIGITAL-PRINT",
+    "handle": "childrens-digital-print-camera"
+   },
+   {
+    "from": "TGS-SHINING-UNICORN-MAKEUP",
+    "to": "SHINING-UNICORN-MAKEUP-CASE",
+    "sku": "TGS-SHINING-UNICORN-MAKEUP",
+    "handle": "shining-unicorn-makeup-case"
+   },
+   {
+    "from": "TGS-SMART-RC-BABY",
+    "to": "HUANGER-SMART-REMOTE-BABY-TOY",
+    "sku": "TGS-SMART-RC-BABY",
+    "handle": "huanger-smart-remote-baby-toy"
+   },
+   {
+    "from": "TGS-SMART-ROBOT",
+    "to": "SMART-ROBOT-INTERACTIVE-REMOTE-CONTROL-TOY",
+    "sku": "TGS-SMART-ROBOT",
+    "handle": "smart-robot-interactive-remote-control-toy"
+   },
+   {
+    "from": "TGS-SPACE-JOURNEY-BUBBLE",
+    "to": "SPACE-JOURNEY-BUBBLE-MACHINE",
+    "sku": "TGS-SPACE-JOURNEY-BUBBLE",
+    "handle": "space-journey-bubble-machine"
+   },
+   {
+    "from": "TGS-SPIDER-LAUNCHER",
+    "to": "SPIDER-LAUNCHER-TOY",
+    "sku": "TGS-SPIDER-LAUNCHER",
+    "handle": "spider-launcher-toy"
+   },
+   {
+    "from": "TGS-SQUISHY-BUN-STEAMER",
+    "to": "GLITTER-SQUISHY-DUMPLING",
+    "sku": "TGS-SQUISHY-BUN-STEAMER",
+    "handle": "glitter-squishy-dumpling"
+   },
+   {
+    "from": "TGS-SQUISHY-CRISP-CHOCO",
+    "to": "CRISP-CHOCO-SQUISHY-CREAM-AND-CHOCOLATE",
+    "sku": "TGS-SQUISHY-CRISP-CHOCO",
+    "handle": "crisp-choco-squishy-cream-and-chocolate"
+   },
+   {
+    "from": "TGS-SQUISHY-OREO",
+    "to": "NEEDOH-OREO-SQUISHY",
+    "sku": "TGS-SQUISHY-OREO",
+    "handle": "needoh-oreo-squishy"
+   },
+   {
+    "from": "TGS-STACKED-CIRCLE-RING",
+    "to": "STACKED-CIRCLE-RING-STACKER-TOY",
+    "sku": "TGS-STACKED-CIRCLE-RING",
+    "handle": "stacked-circle-ring-stacker-toy"
+   },
+   {
+    "from": "TGS-STACKED-CUP-BATTLE",
+    "to": "STACKED-CUP-BATTLE-GAME",
+    "sku": "TGS-STACKED-CUP-BATTLE",
+    "handle": "stacked-cup-battle-game"
+   },
+   {
+    "from": "TGS-STEM-CHEM-EXPERMNT",
+    "to": "STEM-CHEMISTRY-EXPERIMENT-SET",
+    "sku": "TGS-STEM-CHEM-EXPERMNT",
+    "handle": "stem-chemistry-experiment-set"
+   },
+   {
+    "from": "TGS-STUDY-BOOK",
+    "to": "STUDY-BOOK-INTELLECTUAL-LEARNING-TOY",
+    "sku": "TGS-STUDY-BOOK",
+    "handle": "study-book-intellectual-learning-toy"
+   },
+   {
+    "from": "TGS-SUV-DIECAST-CAR",
+    "to": "LAND-CRUISER-SUV-DIECAST-MODEL-CAR",
+    "sku": "TGS-SUV-DIECAST-CAR",
+    "handle": "land-cruiser-suv-diecast-model-car"
+   },
+   {
+    "from": "TGS-SWIM-CROCODILE",
+    "to": "REMOTE-CONTROL-SWIM-CROCODILE-TOY",
+    "sku": "TGS-SWIM-CROCODILE",
+    "handle": "remote-control-swim-crocodile-toy"
+   },
+   {
+    "from": "TGS-SWIMMING-GOGGLES",
+    "to": "ZOTO-BRAND-SWIMMING-GOGGLES-IN-CLEAR-CASE",
+    "sku": "TGS-SWIMMING-GOGGLES",
+    "handle": "zoto-brand-swimming-goggles-in-clear-case"
+   },
+   {
+    "from": "TGS-TABLET-DRAWING",
+    "to": "EARLY-EDUCATION-KIDS-DRAWING-TABLET",
+    "sku": "TGS-TABLET-DRAWING",
+    "handle": "early-education-kids-drawing-tablet"
+   },
+   {
+    "from": "TGS-TABLET-DRAWING-CALC",
+    "to": "CHILDRENS-LCD-DRAWING-TABLET-WITH-CALCULATOR",
+    "sku": "TGS-TABLET-DRAWING-CALC",
+    "handle": "childrens-lcd-drawing-tablet-with-calculator"
+   },
+   {
+    "from": "TGS-TEA-PARTY-PAINT",
+    "to": "COLORDAY-TEA-PARTY-ARTISTIC-PAINTING-SET",
+    "sku": "TGS-TEA-PARTY-PAINT",
+    "handle": "colorday-tea-party-artistic-painting-set"
+   },
+   {
+    "from": "TGS-TEACHER-LAPTOP",
+    "to": "TEACHER-LAPTOP-EDUCATIONAL-TOY",
+    "sku": "TGS-TEACHER-LAPTOP",
+    "handle": "teacher-laptop-educational-toy"
+   },
+   {
+    "from": "TGS-TELESCOPI-LIGHTSABE",
+    "to": "TELESCOPIC-LIGHTSABER-TOY",
+    "sku": "TGS-TELESCOPI-LIGHTSABE",
+    "handle": "telescopic-lightsaber-toy"
+   },
+   {
+    "from": "TGS-THOMAS-FRIENDS-BUILDING",
+    "to": "THOMAS-AND-FRIENDS-BUILDING-BLOCKS-TOY-SET",
+    "sku": "TGS-THOMAS-FRIENDS-BUILDING",
+    "handle": "thomas-and-friends-building-blocks-toy-set"
+   },
+   {
+    "from": "TGS-TIGER-BUBBLE",
+    "to": "TIGER-BUBBLE-MACHINE",
+    "sku": "TGS-TIGER-BUBBLE",
+    "handle": "tiger-bubble-machine"
+   },
+   {
+    "from": "TGS-TOOL-DRILL",
+    "to": "KIDS-TOOL-DRILL-SET",
+    "sku": "TGS-TOOL-DRILL",
+    "handle": "kids-tool-drill-set"
+   },
+   {
+    "from": "TGS-TOUCH-TEACH-WORDS",
+    "to": "HUG-HAPPY-TOUCH-AND-TEACH-WORDS-BOOK",
+    "sku": "TGS-TOUCH-TEACH-WORDS",
+    "handle": "hug-happy-touch-and-teach-words-book"
+   },
+   {
+    "from": "TGS-TRAIN-STACKING",
+    "to": "TRAIN-STACKING-DOMINO-TOY",
+    "sku": "TGS-TRAIN-STACKING",
+    "handle": "train-stacking-domino-toy"
+   },
+   {
+    "from": "TGS-TRICYCLE",
+    "to": "YELLOW-AND-GREEN-RIDE-ON-TRICYCLE-TOY",
+    "sku": "TGS-TRICYCLE",
+    "handle": "yellow-and-green-ride-on-tricycle-toy"
+   },
+   {
+    "from": "TGS-TRUCKS",
+    "to": "MINIATURE-TRUCK-COLLECTION",
+    "sku": "TGS-TRUCKS",
+    "handle": "miniature-truck-collection"
+   },
+   {
+    "from": "TGS-UNICORN-MAKEUP-CASE",
+    "to": "UNICORN-MAKEUP-CASE",
+    "sku": "TGS-UNICORN-MAKEUP-CASE",
+    "handle": "unicorn-makeup-case"
+   },
+   {
+    "from": "TGS-UNICORN-NIGHTLIGHT",
+    "to": "UNICORN-NIGHT-LIGHT",
+    "sku": "TGS-UNICORN-NIGHTLIGHT",
+    "handle": "unicorn-night-light"
+   },
+   {
+    "from": "TGS-VENDING",
+    "to": "VENDING-MACHINE-TOY",
+    "sku": "TGS-VENDING",
+    "handle": "vending-machine-toy"
+   },
+   {
+    "from": "TGS-VIDEO-WALKIE-TALKIE",
+    "to": "KIDS-VIDEO-WALKIE-TALKIE-SET",
+    "sku": "TGS-VIDEO-WALKIE-TALKIE",
+    "handle": "kids-video-walkie-talkie-set"
+   },
+   {
+    "from": "TGS-VINTAGE-DIECAST-CAR",
+    "to": "ROLLS-ROYCE-PHANTOM-VINTAGE-DIECAST-MODEL-CAR",
+    "sku": "TGS-VINTAGE-DIECAST-CAR",
+    "handle": "rolls-royce-phantom-vintage-diecast-model-car"
+   },
+   {
+    "from": "TGS-VITA-50-DRONE",
+    "to": "4DRC-VITA-50-4-AXIS-REMOTE-CONTROL-DRONE",
+    "sku": "TGS-VITA-50-DRONE",
+    "handle": "4drc-vita-50-4-axis-remote-control-drone"
+   },
+   {
+    "from": "TGS-VOICE-BROADCAST-RC",
+    "to": "VOICE-BROADCAST-RC-POLICE-CAR",
+    "sku": "TGS-VOICE-BROADCAST-RC",
+    "handle": "voice-broadcast-rc-police-car"
+   },
+   {
+    "from": "TGS-WD-BUSY-BOARD",
+    "to": "WOODEN-BUSY-BOARD",
+    "sku": "TGS-WD-BUSY-BOARD",
+    "handle": "wooden-busy-board"
+   },
+   {
+    "from": "TGS-WD-CLOCK-LEARNING",
+    "to": "WOODEN-CLOCK-LEARNING-TOY",
+    "sku": "TGS-WD-CLOCK-LEARNING",
+    "handle": "wooden-clock-learning-toy"
+   },
+   {
+    "from": "TGS-WD-MARBLE-BALANCE",
+    "to": "WOODEN-MARBLE-BALANCE-TOWER-GAME",
+    "sku": "TGS-WD-MARBLE-BALANCE",
+    "handle": "wooden-marble-balance-tower-game"
+   },
+   {
+    "from": "TGS-WD-SHAPE-SORTER",
+    "to": "WOODEN-SHAPE-SORTER-HOUSE",
+    "sku": "TGS-WD-SHAPE-SORTER",
+    "handle": "wooden-shape-sorter-house"
+   },
+   {
+    "from": "TGS-WINNIE-POOH",
+    "to": "WINNIE-THE-POOH-ACTION-FIGURE",
+    "sku": "TGS-WINNIE-POOH",
+    "handle": "winnie-the-pooh-action-figure"
+   }
+  ]
+ },
+ "backlog_2026_09_18": {
+  "at": "2026-09-18T22:37:18",
+  "rule": "keep only products in the Happy Toys chat with more than 2 pieces; everything else to backlog-products/",
+  "kept": [
+   "TGS-3D-PRINTING-PEN",
+   "TGS-AL-QURAN-LEARNING",
+   "TGS-AQUAFLOW-SWIM-CAP",
+   "TGS-AVENGERS-MAG-DRAWING",
+   "TGS-BABY-RATTLE-TURNTABLE",
+   "TGS-BEAUTY-GIRL-MAKEUP",
+   "TGS-BINOCULAR",
+   "TGS-BLOCK-BUILDING",
+   "TGS-BLUE-TILE",
+   "TGS-CARTOON-ANIMAL-XYLO",
+   "TGS-COLORFUL-MAG-BLOCKS",
+   "TGS-EDU-KEYS",
+   "TGS-FAN-VISOR-HAT",
+   "TGS-FIG-FOOTBALL-STAR",
+   "TGS-FOLLOW-ME-CAR",
+   "TGS-FOUR-AXIS-DRONE",
+   "TGS-INTELLIGE-LEARNING",
+   "TGS-KUROMI-NIGHT-LIGHT",
+   "TGS-MAG-BUILDING-BLOCKS",
+   "TGS-MAG-WORLD",
+   "TGS-NOTEBOOK-PC",
+   "TGS-ORANGE-MONSTER-TRUCK",
+   "TGS-RHINOCERO-BABY",
+   "TGS-S-CAMERA",
+   "TGS-S-DIGITAL-CAMERA",
+   "TGS-SQUISHY-BUN-STEAMER",
+   "TGS-SQUISHY-CRISP-CHOCO",
+   "TGS-SQUISHY-OREO",
+   "TGS-STACKED-CIRCLE-RING",
+   "TGS-STUDY-BOOK",
+   "TGS-SWIMMING-GOGGLES",
+   "TGS-TEACHER-LAPTOP",
+   "TGS-THOMAS-FRIENDS-BUILDING",
+   "TGS-TRUCKS",
+   "TGS-UNICORN-NIGHTLIGHT"
+  ],
+  "moved": [
+   {
+    "sku": "TGS-7-DIECAST-CAR",
+    "folder": "BMW-7-SERIES-DIECAST-MODEL-CAR"
+   },
+   {
+    "sku": "TGS-AIR-COMBAT-FIGHTER",
+    "folder": "AIR-COMBAT-FIGHTER-JET-TOY"
+   },
+   {
+    "sku": "TGS-AIR-FALCON-DRONE",
+    "folder": "AIR-FALCON-DRONE-AIR-RACER-2-IN-1-FLYING-CAR"
+   },
+   {
+    "sku": "TGS-AKS-74U-WATER",
+    "folder": "AKS-74U-ELECTRIC-WATER-BOMB-SHOOTER"
+   },
+   {
+    "sku": "TGS-ANIMAL-PIANO-KEYS",
+    "folder": "ANIMAL-PIANO-KEYBOARD"
+   },
+   {
+    "sku": "TGS-ANIMAL-SHAPED-PHONE",
+    "folder": "ANIMAL-SHAPED-EDUCATIONAL-TOY-PHONE"
+   },
+   {
+    "sku": "TGS-APPLIANCE-FRIDGE",
+    "folder": "MINI-APPLIANCES-TOY-REFRIGERATOR"
+   },
+   {
+    "sku": "TGS-ARABIC-SOUND-LEARNING",
+    "folder": "OZEN-STAR-ARABIC-SOUND-LEARNING-BOOK"
+   },
+   {
+    "sku": "TGS-BABY-ACTIVITY",
+    "folder": "LION-KING-BABY-ACTIVITY-TOY"
+   },
+   {
+    "sku": "TGS-BABY-GAMES-CONSOLE",
+    "folder": "HUANGER-BABY-GAMES-CONSOLE"
+   },
+   {
+    "sku": "TGS-BALL-CATCHING-CLAW",
+    "folder": "BALL-CATCHING-CLAW-GAME"
+   },
+   {
+    "sku": "TGS-BASEBALL-SPORT",
+    "folder": "BASEBALL-SPORT-GAME-SET"
+   },
+   {
+    "sku": "TGS-BBALL-BOARD",
+    "folder": "BASKETBALL-BOARD-GAME-CHAMPIONSHIP-TROPHY"
+   },
+   {
+    "sku": "TGS-BBALL-SHOOTING",
+    "folder": "BASKETBALL-SHOOTING-MACHINE"
+   },
+   {
+    "sku": "TGS-BEAR-INFLATABL-CHAIR",
+    "folder": "INTEX-BEAR-INFLATABLE-CHAIR"
+   },
+   {
+    "sku": "TGS-BLAST-FLAMES",
+    "folder": "BLAST-OF-FLAMES-LED-LIGHT-SWORD-TOY"
+   },
+   {
+    "sku": "TGS-BOOM-STRIKE-HAMMER",
+    "folder": "BOOM-STRIKE-HAMMER-GAME"
+   },
+   {
+    "sku": "TGS-BOTTLE-PAIRING",
+    "folder": "BOTTLE-PAIRING-COLOR-MATCHING-GAME"
+   },
+   {
+    "sku": "TGS-BOTTLE-SQUISHY",
+    "folder": "PRIME-BOTTLE-SQUISHY-500ML-BLUE-AND-PINK"
+   },
+   {
+    "sku": "TGS-BREAK-THROUGH-CAR",
+    "folder": "BREAK-THROUGH-GAME-CAR"
+   },
+   {
+    "sku": "TGS-BRILLIANT-TALKING-PHONE",
+    "folder": "BRILLIANT-TALKING-TELEPHONE-TOY"
+   },
+   {
+    "sku": "TGS-BUBBLE-GUN",
+    "folder": "LABUBU-BUBBLE-GUN"
+   },
+   {
+    "sku": "TGS-CARD-PUZZLE",
+    "folder": "CHILDRENS-PUZZLE-GAME-CARD-MACHINE"
+   },
+   {
+    "sku": "TGS-CARS-RC-RADIO",
+    "folder": "CARS-DINOCO-RC-RADIO-CONTROL-CAR"
+   },
+   {
+    "sku": "TGS-CATAPULT-EFORMATIO-TRUCK",
+    "folder": "CATAPULT-DEFORMATION-TRUCK-CAR-CARRIER"
+   },
+   {
+    "sku": "TGS-CHOCOLATE-BAR-SQUISHY",
+    "folder": "CHOCOLATE-BAR-SQUISHY-KINDER-AND-SNICKERS"
+   },
+   {
+    "sku": "TGS-CIRCULAR-SAW",
+    "folder": "TOY-CIRCULAR-SAW-CUTTING-EDGE-TOOL"
+   },
+   {
+    "sku": "TGS-COCA-COLA-MONSTERS",
+    "folder": "COCA-COLA-MONSTERS-VINYL-FACE-BLIND-BOX"
+   },
+   {
+    "sku": "TGS-CONTAINER-TRUCK",
+    "folder": "RED-AND-GRAY-CONTAINER-TRUCK-TOY"
+   },
+   {
+    "sku": "TGS-CUBE-SQUEEZE-FIDGET",
+    "folder": "CUBE-SQUEEZE-BALL-SUPER-SOLID-SQUISH-TOY"
+   },
+   {
+    "sku": "TGS-CUTE-COW-SINGING",
+    "folder": "CUTE-COW-SING-AND-DANCING-TOY"
+   },
+   {
+    "sku": "TGS-CUTE-DUCK-SLIDE",
+    "folder": "CUTE-DUCK-SLIDE-ELECTRIC-TRACK-TOY"
+   },
+   {
+    "sku": "TGS-CUTE-DUCK-WATER",
+    "folder": "CUTE-DUCK-WATER-WHEEL-BATH-TOY"
+   },
+   {
+    "sku": "TGS-CUTE-INTELLIGE-ROBOT",
+    "folder": "CUTE-INTELLIGENT-ROBOT-REMOTE-CONTROL"
+   },
+   {
+    "sku": "TGS-DANCING-ELEC",
+    "folder": "SONIC-DANCING-ELECTRIC-TOY"
+   },
+   {
+    "sku": "TGS-DEFORM-ROBOT-CAR",
+    "folder": "TWO-IN-ONE-DEFORM-ROBOT-CAR"
+   },
+   {
+    "sku": "TGS-DELUXE-ART-PAINT",
+    "folder": "KUROMI-15TH-ANNIVERSARY-ART-PAINTING-SET"
+   },
+   {
+    "sku": "TGS-DELUXE-HAIR-STYLING",
+    "folder": "DELUXE-HAIR-STYLING-SET"
+   },
+   {
+    "sku": "TGS-DESERT-EAGLE-GUN",
+    "folder": "DESERT-EAGLE-MODEL-GUN"
+   },
+   {
+    "sku": "TGS-DIECAST-MOUNTAIN-BIKE",
+    "folder": "1-8-SCALE-DIE-CAST-MOUNTAIN-BIKE-MODEL"
+   },
+   {
+    "sku": "TGS-DINO-BUSY-BOARD",
+    "folder": "DINOSAUR-BUSY-BOARD"
+   },
+   {
+    "sku": "TGS-DINO-RUNNING-DINO",
+    "folder": "DINO-RUNNING-DINOSAUR-WORLD-ELECTRIC-SERIES"
+   },
+   {
+    "sku": "TGS-DISHWASHE",
+    "folder": "KIDS-KITCHEN-TOY-DISHWASHER"
+   },
+   {
+    "sku": "TGS-DIY-MAG-LEVITATIO",
+    "folder": "DIY-MAGNETIC-LEVITATION-TRAIN-TRACK"
+   },
+   {
+    "sku": "TGS-DRAWING-ROBOT-JQR",
+    "folder": "DRAWING-ROBOT-JQR-02"
+   },
+   {
+    "sku": "TGS-DREAM-UNICORN-BUBBLE",
+    "folder": "DREAM-UNICORN-BUBBLE-CAMERA-TOY"
+   },
+   {
+    "sku": "TGS-E99-PRO-MAX",
+    "folder": "E99-PRO-MAX-REMOTE-CONTROL-DRONE"
+   },
+   {
+    "sku": "TGS-EDU-LAPTOP",
+    "folder": "EDUCATIVO-TWO-IN-ONE-LEARNING-LAPTOP"
+   },
+   {
+    "sku": "TGS-ELEC-CARTOON-DINO",
+    "folder": "ELECTRIC-CARTOON-DINOSAUR-TOY"
+   },
+   {
+    "sku": "TGS-ELEC-KETTLE",
+    "folder": "TOY-ELECTRIC-KETTLE"
+   },
+   {
+    "sku": "TGS-ELEPHANT-FIGURE",
+    "folder": "3-IN-1-WALKING-ELEPHANT-TOY"
+   },
+   {
+    "sku": "TGS-FIG-NARUTO",
+    "folder": "NARUTO-SHIPPUDEN-NARUTO-UZUMAKI-ACTION-FIGURE"
+   },
+   {
+    "sku": "TGS-FIGHTERS-FIGURE",
+    "folder": "KING-OF-FIGHTERS-KYO-KUSANAGI-FIGURE"
+   },
+   {
+    "sku": "TGS-FOUR-INSECT-CATCHING",
+    "folder": "FOUR-IN-ONE-INSECT-CATCHING-GAME"
+   },
+   {
+    "sku": "TGS-FOUR-PLAYERS-DICE",
+    "folder": "FOUR-PLAYERS-DICE-BOARD-GAME"
+   },
+   {
+    "sku": "TGS-GEAR-DINO",
+    "folder": "GEAR-DINOSAUR-TOY"
+   },
+   {
+    "sku": "TGS-GEAR-VEHICLE-CLEAR",
+    "folder": "TRANSPARENT-GEAR-VEHICLE-EXCAVATOR-SET"
+   },
+   {
+    "sku": "TGS-GLOW-LEARN-BILINGUAL",
+    "folder": "WINFUN-GLOW-AND-LEARN-BILINGUAL-PAD"
+   },
+   {
+    "sku": "TGS-GRASS-FROG",
+    "folder": "GRASS-FROG-LIGHT-SOUND-TOY"
+   },
+   {
+    "sku": "TGS-GREEN-TRUCK",
+    "folder": "GREEN-TRUCK-REMOTE-CONTROL-TOY"
+   },
+   {
+    "sku": "TGS-GT-DIECAST-CAR",
+    "folder": "MERCEDES-AMG-VISION-GT-DIECAST-MODEL-CAR"
+   },
+   {
+    "sku": "TGS-GT-R-DIECAST",
+    "folder": "NISSAN-GT-R-MOTUL-DIECAST-MODEL-CAR"
+   },
+   {
+    "sku": "TGS-HAND-CONSOLE",
+    "folder": "SUP-HANDHELD-GAME-CONSOLE"
+   },
+   {
+    "sku": "TGS-HAND-MIXER",
+    "folder": "MINI-KITCHEN-APPLIANCE-TOY-HAND-MIXER"
+   },
+   {
+    "sku": "TGS-HOUSEHOLD-SET-MINI",
+    "folder": "HOUSEHOLD-SET-MINI-APPLIANCE-TOY"
+   },
+   {
+    "sku": "TGS-INFLATABL-BABY-POOL",
+    "folder": "INTEX-INFLATABLE-BABY-POOL"
+   },
+   {
+    "sku": "TGS-INFLATABL-POOL-FAMILY",
+    "folder": "INTEX-WET-SET-RECTANGULAR-FAMILY-POOL"
+   },
+   {
+    "sku": "TGS-INFLATABL-POOL-ROUND",
+    "folder": "INTEX-WET-SET-ROUND-KIDDIE-POOL"
+   },
+   {
+    "sku": "TGS-INFLATABL-SOFA-LOUNGER",
+    "folder": "INFLATABLE-LOUNGER-SOFA-SINGLE-SIZE"
+   },
+   {
+    "sku": "TGS-INFLATABL-SOFA-ROUND",
+    "folder": "INFLATABLE-ROUND-SOFA-CHAIR-SINGLE-SIZE"
+   },
+   {
+    "sku": "TGS-INSUL-COFFEE-TUMBLER",
+    "folder": "INSULATED-COFFEE-TUMBLER-WITH-STRAP"
+   },
+   {
+    "sku": "TGS-INSUL-TUMBLER-GRADIENT",
+    "folder": "INSULATED-TRAVEL-TUMBLER-GRADIENT-HANDLE"
+   },
+   {
+    "sku": "TGS-INSUL-TUMBLER-HANDLE",
+    "folder": "INSULATED-TUMBLER-HEART-PATTERN-STRAW-LID"
+   },
+   {
+    "sku": "TGS-IRON-APPLIANCE",
+    "folder": "PLAYROOM-TOY-IRON-APPLIANCE"
+   },
+   {
+    "sku": "TGS-JELLYFISH-BUMP-GO",
+    "folder": "JELLYFISH-BUMP-AND-GO-DANCING-TOY"
+   },
+   {
+    "sku": "TGS-JUDY-HOPPS",
+    "folder": "ZOOTOPIA-JUDY-HOPPS-TALKING-TOY"
+   },
+   {
+    "sku": "TGS-JUMP-O-RAMA",
+    "folder": "BESTWAY-JUMP-O-RAMA-BOUNCER"
+   },
+   {
+    "sku": "TGS-KUROMI-MOON-LAMP",
+    "folder": "KUROMI-MOON-LIGHT-LAMP"
+   },
+   {
+    "sku": "TGS-LAUGH-N-LEAP",
+    "folder": "BESTWAY-LAUGH-N-LEAP-BOUNCER-INFLATABLE-PLAY"
+   },
+   {
+    "sku": "TGS-LBWK-DIECAST-CAR",
+    "folder": "LBWK-TOYOTA-SUPRA-DIECAST-MODEL-CAR"
+   },
+   {
+    "sku": "TGS-LIGHT-UP-SWORD",
+    "folder": "LIGHT-UP-SWORD"
+   },
+   {
+    "sku": "TGS-LIGHTSABE",
+    "folder": "LIGHTSABER-TOY"
+   },
+   {
+    "sku": "TGS-LITTLE-HELPER-CLEANING",
+    "folder": "LITTLE-HELPER-SIMULATED-CLEANING-KIT"
+   },
+   {
+    "sku": "TGS-M3-E30-DIECAST",
+    "folder": "BMW-M3-E30-DIECAST-MODEL-CAR"
+   },
+   {
+    "sku": "TGS-MAG-DIGITAL-TRAIN",
+    "folder": "MAGNETIC-DIGITAL-CAR-TRAIN-SET"
+   },
+   {
+    "sku": "TGS-MAGIC-BUBBLE-BAT",
+    "folder": "MAGIC-BUBBLE-BAT-GAME"
+   },
+   {
+    "sku": "TGS-MAGIC-WAND-CROWN",
+    "folder": "MAGIC-WAND-CROWN-TIARA"
+   },
+   {
+    "sku": "TGS-MAKEUP-CASE",
+    "folder": "KUROMI-MAKEUP-CASE"
+   },
+   {
+    "sku": "TGS-MAKEUP-SET-CASE",
+    "folder": "MAKEUP-SET-CASE-PRINCESS-BAG-AND-CHEST"
+   },
+   {
+    "sku": "TGS-ME-SLIDE",
+    "folder": "DESPICABLE-ME-2-MINION-SLIDE-TOY"
+   },
+   {
+    "sku": "TGS-MONTSSRI-HANDLE-LIGHT",
+    "folder": "MONTESSORI-HANDLE-LIGHT-GAME"
+   },
+   {
+    "sku": "TGS-MOTO-DIECAST",
+    "folder": "MAISTO-DUCATI-STREETFIGHTER-S-1-12-SCALE"
+   },
+   {
+    "sku": "TGS-MULTI-LEARN-SHELF",
+    "folder": "MULTIFUNCTION-LEARN-SHELF"
+   },
+   {
+    "sku": "TGS-OCEAN-LINER-WATER",
+    "folder": "OCEAN-LINER-WATER-GUN-TOY"
+   },
+   {
+    "sku": "TGS-PAGANI-DIECAST-CAR",
+    "folder": "PAGANI-HUAYRA-DIECAST-MODEL-CAR"
+   },
+   {
+    "sku": "TGS-PAW-PATROL-GO",
+    "folder": "PAW-PATROL-GO-FISHING-GAME"
+   },
+   {
+    "sku": "TGS-PIANO-HEDGEHOG",
+    "folder": "HEDGEHOG-PIANO-BABY-TOY"
+   },
+   {
+    "sku": "TGS-PINBALL",
+    "folder": "PINBALL-GAME-MACHINE"
+   },
+   {
+    "sku": "TGS-POP-FIGURES",
+    "folder": "KUROMI-POP-FIGURES-SET-OF-4"
+   },
+   {
+    "sku": "TGS-POWER-PUNCH-ARCADE",
+    "folder": "POWER-PUNCH-ARCADE-GAME"
+   },
+   {
+    "sku": "TGS-PUZZLE-BUSY-BOARD",
+    "folder": "PUZZLE-BUSY-BOARD-HOUSE-EDUCATIONAL-TOY"
+   },
+   {
+    "sku": "TGS-RACING-CAR",
+    "folder": "MINI-RACING-CAR-REMOTE-CONTROL-VEHICLE"
+   },
+   {
+    "sku": "TGS-RAINBOW-TOWER-UNICORN",
+    "folder": "RAINBOW-TOWER-UNICORN-STACKER-TOY"
+   },
+   {
+    "sku": "TGS-RANGE-DIECAST-CAR",
+    "folder": "RANGE-ROVER-DIECAST-MODEL-CAR"
+   },
+   {
+    "sku": "TGS-RC-CONTROL-TRAIN",
+    "folder": "CLASSIC-EXPRESS-REMOTE-CONTROL-TRAIN-SET"
+   },
+   {
+    "sku": "TGS-RC-DRIFT-RACING",
+    "folder": "RC-DRIFT-RACING-CAR"
+   },
+   {
+    "sku": "TGS-RC-FORKLIFT",
+    "folder": "MINI-RC-FORKLIFT-1-64-SCALE"
+   },
+   {
+    "sku": "TGS-RC-MASERATI-MC20",
+    "folder": "RC-MASERATI-MC20-REMOTE-CONTROL-CAR"
+   },
+   {
+    "sku": "TGS-RC-SPIDER-WALL",
+    "folder": "SPIDER-WALL-RALLYIST-REMOTE-CONTROL-TOY"
+   },
+   {
+    "sku": "TGS-REASSEMBL-SCREW-CAR",
+    "folder": "REASSEMBLY-SCREW-CAR-WOODEN-TOY"
+   },
+   {
+    "sku": "TGS-RETRO-ARCADE-DUEL",
+    "folder": "RETRO-ARCADE-DUEL-MINI-GAME"
+   },
+   {
+    "sku": "TGS-ROTATING-ORBIT-BALL",
+    "folder": "ROTATING-ORBIT-BALL-TRACK"
+   },
+   {
+    "sku": "TGS-S-CAR",
+    "folder": "DELUXE-CHILDRENS-CAR-RIDE-ON-TOY"
+   },
+   {
+    "sku": "TGS-S-DIGITAL-PRINT",
+    "folder": "CHILDRENS-DIGITAL-PRINT-CAMERA"
+   },
+   {
+    "sku": "TGS-SHINING-UNICORN-MAKEUP",
+    "folder": "SHINING-UNICORN-MAKEUP-CASE"
+   },
+   {
+    "sku": "TGS-SMART-RC-BABY",
+    "folder": "HUANGER-SMART-REMOTE-BABY-TOY"
+   },
+   {
+    "sku": "TGS-SMART-ROBOT",
+    "folder": "SMART-ROBOT-INTERACTIVE-REMOTE-CONTROL-TOY"
+   },
+   {
+    "sku": "TGS-SOFT-BLOCKS",
+    "folder": "SOFT-BUILDING-BLOCKS-TOY-SET"
+   },
+   {
+    "sku": "TGS-SPACE-JOURNEY-BUBBLE",
+    "folder": "SPACE-JOURNEY-BUBBLE-MACHINE"
+   },
+   {
+    "sku": "TGS-SPIDER-LAUNCHER",
+    "folder": "SPIDER-LAUNCHER-TOY"
+   },
+   {
+    "sku": "TGS-STACKED-CUP-BATTLE",
+    "folder": "STACKED-CUP-BATTLE-GAME"
+   },
+   {
+    "sku": "TGS-STEM-CHEM-EXPERMNT",
+    "folder": "STEM-CHEMISTRY-EXPERIMENT-SET"
+   },
+   {
+    "sku": "TGS-SUV-DIECAST-CAR",
+    "folder": "LAND-CRUISER-SUV-DIECAST-MODEL-CAR"
+   },
+   {
+    "sku": "TGS-SWIM-CROCODILE",
+    "folder": "REMOTE-CONTROL-SWIM-CROCODILE-TOY"
+   },
+   {
+    "sku": "TGS-TABLET-DRAWING",
+    "folder": "EARLY-EDUCATION-KIDS-DRAWING-TABLET"
+   },
+   {
+    "sku": "TGS-TABLET-DRAWING-CALC",
+    "folder": "CHILDRENS-LCD-DRAWING-TABLET-WITH-CALCULATOR"
+   },
+   {
+    "sku": "TGS-TEA-PARTY-PAINT",
+    "folder": "COLORDAY-TEA-PARTY-ARTISTIC-PAINTING-SET"
+   },
+   {
+    "sku": "TGS-TELESCOPI-LIGHTSABE",
+    "folder": "TELESCOPIC-LIGHTSABER-TOY"
+   },
+   {
+    "sku": "TGS-TIGER-BUBBLE",
+    "folder": "TIGER-BUBBLE-MACHINE"
+   },
+   {
+    "sku": "TGS-TOOL-DRILL",
+    "folder": "KIDS-TOOL-DRILL-SET"
+   },
+   {
+    "sku": "TGS-TOUCH-TEACH-WORDS",
+    "folder": "HUG-HAPPY-TOUCH-AND-TEACH-WORDS-BOOK"
+   },
+   {
+    "sku": "TGS-TRAIN-STACKING",
+    "folder": "TRAIN-STACKING-DOMINO-TOY"
+   },
+   {
+    "sku": "TGS-TRICYCLE",
+    "folder": "YELLOW-AND-GREEN-RIDE-ON-TRICYCLE-TOY"
+   },
+   {
+    "sku": "TGS-UNICORN-MAKEUP-CASE",
+    "folder": "UNICORN-MAKEUP-CASE"
+   },
+   {
+    "sku": "TGS-VENDING",
+    "folder": "VENDING-MACHINE-TOY"
+   },
+   {
+    "sku": "TGS-VIDEO-WALKIE-TALKIE",
+    "folder": "KIDS-VIDEO-WALKIE-TALKIE-SET"
+   },
+   {
+    "sku": "TGS-VINTAGE-DIECAST-CAR",
+    "folder": "ROLLS-ROYCE-PHANTOM-VINTAGE-DIECAST-MODEL-CAR"
+   },
+   {
+    "sku": "TGS-VITA-50-DRONE",
+    "folder": "4DRC-VITA-50-4-AXIS-REMOTE-CONTROL-DRONE"
+   },
+   {
+    "sku": "TGS-VOICE-BROADCAST-RC",
+    "folder": "VOICE-BROADCAST-RC-POLICE-CAR"
+   },
+   {
+    "sku": "TGS-WD-BUSY-BOARD",
+    "folder": "WOODEN-BUSY-BOARD"
+   },
+   {
+    "sku": "TGS-WD-CLOCK-LEARNING",
+    "folder": "WOODEN-CLOCK-LEARNING-TOY"
+   },
+   {
+    "sku": "TGS-WD-MARBLE-BALANCE",
+    "folder": "WOODEN-MARBLE-BALANCE-TOWER-GAME"
+   },
+   {
+    "sku": "TGS-WD-SHAPE-SORTER",
+    "folder": "WOODEN-SHAPE-SORTER-HOUSE"
+   },
+   {
+    "sku": "TGS-WINNIE-POOH",
+    "folder": "WINNIE-THE-POOH-ACTION-FIGURE"
+   }
+  ]
+ },
+ "variant_photos_moved": [
+  {
+   "at": "2026-09-18T22:40:56",
+   "from": "input/KUROMI-CHARACTER-NIGHT-LIGHT",
+   "to": "backlog-products/KUROMI-CHARACTER-NIGHT-LIGHT-MY-MELODY",
+   "photos": [
+    {
+     "photo": "angle2.jpeg",
+     "md5": "ae60669fac29e761c5dba2b6cb7392ac"
+    }
+   ]
+  },
+  {
+   "at": "2026-09-18T22:43:01",
+   "from": "input/FOLLOW-ME-GESTURE-CAR-GREEN-AND-PINK",
+   "to": "backlog-products/FOLLOW-ME-GESTURE-CAR-GREEN",
+   "photos": [
+    {
+     "photo": "front.jpeg",
+     "md5": "219ade6fe9abf8f97a65e0a93e3d67d5"
+    },
+    {
+     "photo": "angle2.jpeg",
+     "md5": "328287ca213b5ca60deb5110f2d661ae"
+    },
+    {
+     "photo": "angle3.jpeg",
+     "md5": "27fafdf962f35959af6952e3bcce9f5a"
+    },
+    {
+     "photo": "angle4.jpeg",
+     "md5": "cafb071b1fc9e19d994b3b22445da3e2"
+    }
+   ]
+  },
+  {
+   "at": "2026-09-18T22:43:01",
+   "from": "input/CRISP-CHOCO-SQUISHY-CREAM-AND-CHOCOLATE",
+   "to": "backlog-products/CRISP-CHOCO-SQUISHY-CHOCOLATE",
+   "photos": [
+    {
+     "photo": "angle5.jpeg",
+     "md5": "67b423a3e114500b500f30f228617376"
+    },
+    {
+     "photo": "angle6.jpeg",
+     "md5": "e669b551426c4768a022f1327ac86511"
+    },
+    {
+     "photo": "angle7.jpeg",
+     "md5": "f4332b0d70717224aca6e8b8f0cbcbfe"
+    },
+    {
+     "photo": "angle8.jpeg",
+     "md5": "386fc570f578fd2b415daa45c275a987"
+    }
+   ]
+  },
+  {
+   "at": "2026-09-19T17:23:16",
+   "from": "input/FOOTBALL-STAR-ACTION-FIGURE-TROPHY-AND-BALL",
+   "to": "backlog-products/FOOTBALL-STAR-ACTION-FIGURE-AL-NASSR-MAN-UNITED-MBAPPE",
+   "photos": [
+    {
+     "photo": "angle6.jpeg",
+     "md5": "2e000ae46aee8dbf18926c3656daa958"
+    }
+   ]
+  }
+ ],
+ "renamed_after_variant_split": [
+  {
+   "from": "FOLLOW-ME-GESTURE-CAR-GREEN-AND-PINK",
+   "to": "FOLLOW-ME-GESTURE-CAR-PINK"
+  },
+  {
+   "from": "CRISP-CHOCO-SQUISHY-CREAM-AND-CHOCOLATE",
+   "to": "CRISP-CHOCO-SQUISHY-CREAM"
+  }
+ ],
+ "listed_from_backlog_2026_09_19": {
+  "at": "2026-09-19T17:42:24",
+  "rule": "Happy Toys price photos, units>2 -> input, stock=units-1",
+  "moved": [
+   "VENDING-MACHINE-TOY",
+   "COLORDAY-TEA-PARTY-ARTISTIC-PAINTING-SET",
+   "SUP-HANDHELD-GAME-CONSOLE",
+   "MAGIC-WAND-CROWN-TIARA",
+   "KUROMI-15TH-ANNIVERSARY-ART-PAINTING-SET",
+   "MAGNETIC-DIGITAL-CAR-TRAIN-SET",
+   "MONTESSORI-HANDLE-LIGHT-GAME",
+   "FOUR-IN-ONE-INSECT-CATCHING-GAME",
+   "BASKETBALL-BOARD-GAME-CHAMPIONSHIP-TROPHY",
+   "WOODEN-SHAPE-SORTER-HOUSE",
+   "1-8-SCALE-DIE-CAST-MOUNTAIN-BIKE-MODEL",
+   "WOODEN-MARBLE-BALANCE-TOWER-GAME",
+   "TWO-IN-ONE-DEFORM-ROBOT-CAR"
+  ]
+ },
+ "listed_from_backlog_2026_09_19_b3": {
+  "at": "2026-09-19T18:01:26",
+  "rule": "Happy Toys price photos 12:15-12:46 AM, units>2 -> input, stock=units-1",
+  "moved": [
+   "DESPICABLE-ME-2-MINION-SLIDE-TOY",
+   "PLAYROOM-TOY-IRON-APPLIANCE",
+   "BOOM-STRIKE-HAMMER-GAME",
+   "STACKED-CUP-BATTLE-GAME",
+   "PAW-PATROL-GO-FISHING-GAME",
+   "LABUBU-BUBBLE-GUN",
+   "TRAIN-STACKING-DOMINO-TOY",
+   "LIGHTSABER-TOY",
+   "DESERT-EAGLE-MODEL-GUN",
+   "HOUSEHOLD-SET-MINI-APPLIANCE-TOY",
+   "CHOCOLATE-BAR-SQUISHY-KINDER-AND-SNICKERS"
+  ],
+  "variant_relisted": {
+   "from": "backlog-products/CRISP-CHOCO-SQUISHY-CHOCOLATE",
+   "to": "input/CRISP-CHOCO-SQUISHY-CREAM-AND-CHOCOLATE",
+   "renamed_from": "input/CRISP-CHOCO-SQUISHY-CREAM"
+  }
+ },
+ "listed_2026_09_19_b4": {
+  "at": "2026-09-19T18:28:54",
+  "moved_or_created": [
+   "WINNIE-THE-POOH-ACTION-FIGURE",
+   "KING-OF-FIGHTERS-KYO-KUSANAGI-FIGURE",
+   "CUTE-DUCK-SLIDE-ELECTRIC-TRACK-TOY",
+   "SPIDER-LAUNCHER-TOY",
+   "CARS-DINOCO-RC-RADIO-CONTROL-CAR",
+   "CUTE-INTELLIGENT-ROBOT-REMOTE-CONTROL",
+   "MOCHI-SQUISHY",
+   "PASTEL-SQUISHY-STICKS",
+   "CAPSULE-SQUISHY-BALL"
+  ],
+  "football_mix_photo_returned": {
+   "from": "backlog-products/FOOTBALL-STAR-ACTION-FIGURE-AL-NASSR-MAN-UNITED-MBAPPE",
+   "to": "input/FOOTBALL-STAR-ACTION-FIGURE-TROPHY-AND-BALL",
+   "photo": "angle6.jpeg"
+  },
+  "squishies_created_from": "_archive/products_zip_folders (copied, originals kept)"
+ },
+ "renamed_2026_09_19": [
+  {
+   "from": "input/FOOTBALL-STAR-ACTION-FIGURE-TROPHY-AND-BALL",
+   "to": "input/RONALDO-MBAPPE-FOOTBALL-FIGURE-WITH-TROPHY-AND-BALL"
+  }
+ ],
+ "football_split_2026_09_19": {
+  "at": "2026-09-20T22:43:08",
+  "listed": "STARS-FOOTBALL-FIGURE-RONALDO-AND-MBAPPE (Al-Nassr 3 and Mbappé 3 -> stock 2 each)",
+  "backlog": [
+   "backlog-products/FIFA-RONALDO-2026-WORLD-CUP-PORTUGAL-FIGURE",
+   "backlog-products/STARS-RONALDO-MAN-UNITED-FOOTBALL-FIGURE"
+  ],
+  "source": "user's 7:43 PM per-figure price photos; box photos supplied in chat"
+ },
+ "new_products_2026_09_21": {
+  "source": "new-products/ (81+4 photos, filenames matched to the supplier's price photos)",
+  "listed": [
+   "STICKY-BALL-DART-BOARD-72CM",
+   "DIGITAL-MINI-TRAIN-WOODEN-NUMBER-TRAIN",
+   "LEDING-THE-LIFE-DIY-ACRYLIC-MESSAGE-LAMP",
+   "BUSY-BOOK-MATCH-AND-LEARN-ACTIVITY-BOOK",
+   "STEERING-WHEEL-SIMULATED-DRIVING-TOY",
+   "PENG-JIA-MULTICOLOURED-FLASH-DRUM",
+   "ABERO-ENLIGHTENING-STEERING-WHEEL",
+   "SMART-REMOTE-BABY-KEY-FOB-TOY",
+   "HUANGER-PUZZLE-PHONE-DINOSAUR",
+   "ENGINEERING-TRUCK-ADVENTURE-TRACK",
+   "TOY-STORY-FRICTION-CAR-WOODY",
+   "DANCING-CACTUS-TOY-WITH-HAT-AND-SCARF",
+   "RAM-ANIMAL-FIGURE",
+   "CAMEL-ANIMAL-FIGURE",
+   "SHEEP-ANIMAL-FIGURE",
+   "AIKE-LED-DIGITAL-WATCH-BLACK",
+   "LASIKA-W-F181-DIGITAL-WATCH",
+   "HEART-BEAD-BOX-JEWELLERY-KIT",
+   "BEAD-BOX-JEWELLERY-KIT-TEAL"
+  ],
+  "backlog": [
+   "TWO-HEADED-DRAGON-FIGURE",
+   "CARS-LIGHTNING-MCQUEEN-STEERING-WHEEL"
+  ]
+ }
+}

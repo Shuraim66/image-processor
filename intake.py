@@ -140,9 +140,10 @@ def apply(groups, names, dest, overwrite=False):
     Copies rather than moves: the shoot folder stays untouched, so a wrong
     grouping costs a re-run and not the photos.
     """
+    from process_products import store_sku
     written = []
     for i, group in enumerate(groups, 1):
-        sku = names.get(i, f"UNNAMED-{i:02d}")
+        sku = store_sku(names[i]) if i in names else f"UNNAMED-{i:02d}"
         folder = os.path.join(dest, sku)
         if os.path.isdir(folder) and os.listdir(folder) and not overwrite:
             raise FileExistsError(

@@ -22,4 +22,19 @@ _duplicates_already_processed/
 products.zip
 input/**/*.jpg
 input/**/*.jpeg
+# same reasoning as input/ above -- these hold raw shoot photos too (low-stock and
+# image-generation-failed products moved out of input/, not a separate photo source)
+backlog-products/**/*.jpg
+backlog-products/**/*.jpeg
+backlog-products/**/product.json
+backlog-products-image-failed/**/*.jpg
+backlog-products-image-failed/**/*.jpeg
+backlog-products-image-failed/**/product.json
 .DS_Store
+photo_labels.json
+photo_labels.json.tmp
+# everything that is not the catalog (original shoots, superseded photos, pilot runs)
+_archive/
+# supplier price list (business data, not code)
+happy_toys_prices.csv
+recovered-photos/

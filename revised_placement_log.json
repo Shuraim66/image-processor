@@ -1,0 +1,832 @@
+{
+  "at": "2026-09-17T19:49:04",
+  "moves": [
+    {
+      "from": "input/TGS-FOUR-AXIS-DRONE/front.jpg",
+      "to": "_archive/superseded_photos/TGS-FOUR-AXIS-DRONE/front.jpg",
+      "md5": "6763390d296e6ee068fe3c23726b018a",
+      "why": "superseded by re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/AEROBAT FOUR-AXIS DRONE/IMG_20260917_010404.jpg.jpeg",
+      "to": "input/TGS-FOUR-AXIS-DRONE/front.jpeg",
+      "md5": "5332010363213cf1b60d4298798f2850",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/AEROBAT FOUR-AXIS DRONE/IMG_20260917_010421.jpg.jpeg",
+      "to": "input/TGS-FOUR-AXIS-DRONE/angle2.jpeg",
+      "md5": "22140581701b9c16080cea917f9bcd29",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/AEROBAT FOUR-AXIS DRONE/IMG_20260917_010442.jpg.jpeg",
+      "to": "input/TGS-FOUR-AXIS-DRONE/angle3.jpeg",
+      "md5": "d44cd09da3cf98c966fe41c290f2d0dd",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/AEROBAT FOUR-AXIS DRONE/IMG_20260917_010458.jpg.jpeg",
+      "to": "input/TGS-FOUR-AXIS-DRONE/angle4.jpeg",
+      "md5": "1a8fbff01050e7b0e46f0eaaddedc02e",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/AEROBAT FOUR-AXIS DRONE/IMG_20260917_010505.jpg.jpeg",
+      "to": "input/TGS-FOUR-AXIS-DRONE/angle5.jpeg",
+      "md5": "e1654f27270447f413a20591289bc255",
+      "why": "re-shoot"
+    },
+    {
+      "from": "input/TGS-ANIMAL-SHAPED-PHONE/front.jpeg",
+      "to": "_archive/superseded_photos/TGS-ANIMAL-SHAPED-PHONE/front.jpeg",
+      "md5": "29edc503607b53cefe36fa27234cec1f",
+      "why": "superseded by re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/ANIMAL SHAPE EDUCATIONAL TOY PHONE/IMG_20260917_012211.jpg.jpeg",
+      "to": "input/TGS-ANIMAL-SHAPED-PHONE/front.jpeg",
+      "md5": "04e199dff6259183c5e9a7dc349a25ed",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/ANIMAL SHAPE EDUCATIONAL TOY PHONE/IMG_20260917_012216.jpg.jpeg",
+      "to": "input/TGS-ANIMAL-SHAPED-PHONE/angle2.jpeg",
+      "md5": "a18a69935431cf6ab785e4ed6894ad15",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/ANIMAL SHAPE EDUCATIONAL TOY PHONE/IMG_20260917_012221.jpg.jpeg",
+      "to": "input/TGS-ANIMAL-SHAPED-PHONE/angle3.jpeg",
+      "md5": "5e1f58e2645fecbbddec9b7da8b5941e",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/ANIMAL SHAPE EDUCATIONAL TOY PHONE/IMG_20260917_012244.jpg.jpeg",
+      "to": "input/TGS-ANIMAL-SHAPED-PHONE/angle4.jpeg",
+      "md5": "2042c42d57fb2f5e385beb6cb9f1e046",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/ANIMAL SHAPE EDUCATIONAL TOY PHONE/IMG_20260917_012249.jpg.jpeg",
+      "to": "input/TGS-ANIMAL-SHAPED-PHONE/angle5.jpeg",
+      "md5": "75d2cbda48ad587895b905c2dcb2394b",
+      "why": "re-shoot"
+    },
+    {
+      "from": "input/TGS-CARD-PUZZLE/front.jpg",
+      "to": "_archive/superseded_photos/TGS-CARD-PUZZLE/front.jpg",
+      "md5": "f27404c6b0f40b998b4244e9d2a1b7ae",
+      "why": "superseded by re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/CARD PUZZLE MACHINE/IMG_20260917_004819.jpg.jpeg",
+      "to": "input/TGS-CARD-PUZZLE/front.jpeg",
+      "md5": "4ce03c5613471585dfc3ce8c0fff6814",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/CARD PUZZLE MACHINE/IMG_20260917_004827.jpg.jpeg",
+      "to": "input/TGS-CARD-PUZZLE/angle2.jpeg",
+      "md5": "30f75cbcf3f6906a0c3fa7f668e82086",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/CARD PUZZLE MACHINE/IMG_20260917_004935.jpg.jpeg",
+      "to": "input/TGS-CARD-PUZZLE/angle3.jpeg",
+      "md5": "7336966850063c6e4ec9ede4978ec675",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/CARD PUZZLE MACHINE/IMG_20260917_004942.jpg.jpeg",
+      "to": "input/TGS-CARD-PUZZLE/angle4.jpeg",
+      "md5": "a8c7d2f2c08dd4abb8a36c21f144b9d5",
+      "why": "re-shoot"
+    },
+    {
+      "from": "input/TGS-SQUISHY-CRISP-CHOCO/front.jpg",
+      "to": "_archive/superseded_photos/TGS-SQUISHY-CRISP-CHOCO/front.jpg",
+      "md5": "1bb4f617d1f6fbc40b04da9abd929d70",
+      "why": "superseded by re-shoot"
+    },
+    {
+      "from": "input/TGS-SQUISHY-CRISP-CHOCO/angle2.jpeg",
+      "to": "_archive/superseded_photos/TGS-SQUISHY-CRISP-CHOCO/angle2.jpeg",
+      "md5": "a136b4a76c7830dad471f317114fb323",
+      "why": "superseded by re-shoot"
+    },
+    {
+      "from": "input/TGS-SQUISHY-CRISP-CHOCO/angle3.jpeg",
+      "to": "_archive/superseded_photos/TGS-SQUISHY-CRISP-CHOCO/angle3.jpeg",
+      "md5": "ae556cddfe45a88954168ac11bda93cc",
+      "why": "superseded by re-shoot"
+    },
+    {
+      "from": "input/TGS-SQUISHY-CRISP-CHOCO/angle4.jpeg",
+      "to": "_archive/superseded_photos/TGS-SQUISHY-CRISP-CHOCO/angle4.jpeg",
+      "md5": "d34d7c502ea32ca4941dfed585e3b482",
+      "why": "superseded by re-shoot"
+    },
+    {
+      "from": "input/TGS-SQUISHY-CRISP-CHOCO/angle5.jpeg",
+      "to": "_archive/superseded_photos/TGS-SQUISHY-CRISP-CHOCO/angle5.jpeg",
+      "md5": "41076d5b482fca32053417cd8b9070a1",
+      "why": "superseded by re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/CRISP CHOCO CRISPY-ERUISHY!/IMG_20260917_011429.jpg.jpeg",
+      "to": "input/TGS-SQUISHY-CRISP-CHOCO/front.jpeg",
+      "md5": "1596bde8845c95b95e82319f709d7649",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/CRISP CHOCO CRISPY-ERUISHY!/IMG_20260917_011457.jpg.jpeg",
+      "to": "input/TGS-SQUISHY-CRISP-CHOCO/angle2.jpeg",
+      "md5": "ee6a19f0bf34a18be0cb4d5c6f14dfcf",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/CRISP CHOCO CRISPY-ERUISHY!/IMG_20260917_011505.jpg.jpeg",
+      "to": "input/TGS-SQUISHY-CRISP-CHOCO/angle3.jpeg",
+      "md5": "a2eaedaf6e8029c351c395f1b1d0f094",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/CRISP CHOCO CRISPY-ERUISHY!/IMG_20260917_011517.jpg.jpeg",
+      "to": "input/TGS-SQUISHY-CRISP-CHOCO/angle4.jpeg",
+      "md5": "f2c161cfcbce04289b45b17fbb114f4f",
+      "why": "re-shoot"
+    },
+    {
+      "from": "input/TGS-SQUISHY-CRISP-CHOCO/angle6.jpeg",
+      "to": "input/TGS-SQUISHY-CRISP-CHOCO/angle5.jpeg",
+      "md5": "67b423a3e114500b500f30f228617376",
+      "why": "kept from earlier shoot"
+    },
+    {
+      "from": "input/TGS-SQUISHY-CRISP-CHOCO/angle7.jpeg",
+      "to": "input/TGS-SQUISHY-CRISP-CHOCO/angle6.jpeg",
+      "md5": "e669b551426c4768a022f1327ac86511",
+      "why": "kept from earlier shoot"
+    },
+    {
+      "from": "input/TGS-SQUISHY-CRISP-CHOCO/angle8.jpeg",
+      "to": "input/TGS-SQUISHY-CRISP-CHOCO/angle7.jpeg",
+      "md5": "f4332b0d70717224aca6e8b8f0cbcbfe",
+      "why": "kept from earlier shoot"
+    },
+    {
+      "from": "input/TGS-SQUISHY-CRISP-CHOCO/angle9.jpeg",
+      "to": "input/TGS-SQUISHY-CRISP-CHOCO/angle8.jpeg",
+      "md5": "386fc570f578fd2b415daa45c275a987",
+      "why": "kept from earlier shoot"
+    },
+    {
+      "from": "input/TGS-CARTOON-ANIMAL-XYLO/front.jpg",
+      "to": "_archive/superseded_photos/TGS-CARTOON-ANIMAL-XYLO/front.jpg",
+      "md5": "bc94c826ee62a8d4c74ab90cc8414096",
+      "why": "superseded by re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/Cartoon animal hand Knock Piano Series/IMG_20260917_011710.jpg.jpeg",
+      "to": "input/TGS-CARTOON-ANIMAL-XYLO/front.jpeg",
+      "md5": "bb9a579c00a0bdd7b1cc8cb7edba2b1a",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/Cartoon animal hand Knock Piano Series/IMG_20260917_011720.jpg.jpeg",
+      "to": "input/TGS-CARTOON-ANIMAL-XYLO/angle2.jpeg",
+      "md5": "4bf4a735ca8ce475f530c1b1c89009fd",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/Cartoon animal hand Knock Piano Series/IMG_20260917_011750.jpg.jpeg",
+      "to": "input/TGS-CARTOON-ANIMAL-XYLO/angle3.jpeg",
+      "md5": "c5ee5582b7ac1b8ab92398ee2488f9fc",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/Cartoon animal hand Knock Piano Series/IMG_20260917_011802.jpg.jpeg",
+      "to": "input/TGS-CARTOON-ANIMAL-XYLO/angle4.jpeg",
+      "md5": "169d270e02b81649856efbac4a9851d9",
+      "why": "re-shoot"
+    },
+    {
+      "from": "input/TGS-FAN-VISOR-HAT/front.jpg",
+      "to": "_archive/superseded_photos/TGS-FAN-VISOR-HAT/front.jpg",
+      "md5": "57bbc9a3c86805170b2a51296e9f247c",
+      "why": "superseded by re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/Cute Fan Hat/IMG_20260917_010049.jpg.jpeg",
+      "to": "input/TGS-FAN-VISOR-HAT/front.jpeg",
+      "md5": "850591f00c362f1a00ddbf06a905ccef",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/Cute Fan Hat/IMG_20260917_010057.jpg.jpeg",
+      "to": "input/TGS-FAN-VISOR-HAT/angle2.jpeg",
+      "md5": "85bfe904c2a06523a2535af5407b7f37",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/Cute Fan Hat/IMG_20260917_010105.jpg.jpeg",
+      "to": "input/TGS-FAN-VISOR-HAT/angle3.jpeg",
+      "md5": "c3d491421f11fd4cc3da5234e8d3e4fa",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/Cute Fan Hat/IMG_20260917_010146.jpg.jpeg",
+      "to": "input/TGS-FAN-VISOR-HAT/angle4.jpeg",
+      "md5": "1fe3890e8d1b405d5ce390e3fd978a6a",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/Cute Fan Hat/IMG_20260917_010157.jpg.jpeg",
+      "to": "input/TGS-FAN-VISOR-HAT/angle5.jpeg",
+      "md5": "dbf98fa1409559d84972a0a1aea8f9ba",
+      "why": "re-shoot"
+    },
+    {
+      "from": "input/TGS-TABLET-DRAWING/front.jpg",
+      "to": "_archive/superseded_photos/TGS-TABLET-DRAWING/front.jpg",
+      "md5": "e0e511cfd06bb1e483ed5d60717fdbe4",
+      "why": "superseded by re-shoot"
+    },
+    {
+      "from": "input/TGS-TABLET-DRAWING/angle2.jpg",
+      "to": "_archive/superseded_photos/TGS-TABLET-DRAWING/angle2.jpg",
+      "md5": "f1d3748bdb71db6a790b4138c745540f",
+      "why": "superseded by re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/Early Education Device/IMG_20260917_004110.jpg.jpeg",
+      "to": "input/TGS-TABLET-DRAWING/front.jpeg",
+      "md5": "0f3755e4db6da317d2dde2295daea215",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/Early Education Device/IMG_20260917_004117.jpg.jpeg",
+      "to": "input/TGS-TABLET-DRAWING/angle2.jpeg",
+      "md5": "5a3c948f71b8d85f817fdc16cdfc77b5",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/Early Education Device/IMG_20260917_004236.jpg.jpeg",
+      "to": "input/TGS-TABLET-DRAWING/angle3.jpeg",
+      "md5": "634ff3a4f9a50f693137df2641633718",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/Early Education Device/IMG_20260917_004254.jpg.jpeg",
+      "to": "input/TGS-TABLET-DRAWING/angle4.jpeg",
+      "md5": "b5340d52db0c697fbe58838c6d6ffe71",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/Early educadation machines CHILDREN'S/IMG_20260917_005250.jpg.jpeg",
+      "to": "input/TGS-TABLET-DRAWING-CALC/front.jpeg",
+      "md5": "06a657e69450cd7ad4c6ae1d2ea58ebb",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/Early educadation machines CHILDREN'S/IMG_20260917_005256.jpg.jpeg",
+      "to": "input/TGS-TABLET-DRAWING-CALC/angle2.jpeg",
+      "md5": "fd522a522cad45e049cde00341af622c",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/Early educadation machines CHILDREN'S/IMG_20260917_005347.jpg.jpeg",
+      "to": "input/TGS-TABLET-DRAWING-CALC/angle3.jpeg",
+      "md5": "3cc9839d58226889df356b5ffdbe3fcf",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/Early educadation machines CHILDREN'S/IMG_20260917_005353.jpg.jpeg",
+      "to": "input/TGS-TABLET-DRAWING-CALC/angle4.jpeg",
+      "md5": "63a04bde27284b00cd83d8743d1b7812",
+      "why": "re-shoot"
+    },
+    {
+      "from": "input/TGS-PIANO-HEDGEHOG/front.jpg",
+      "to": "_archive/superseded_photos/TGS-PIANO-HEDGEHOG/front.jpg",
+      "md5": "98c6828ba05476785b1f478b01aa9633",
+      "why": "superseded by re-shoot"
+    },
+    {
+      "from": "input/TGS-PIANO-HEDGEHOG/angle2.jpeg",
+      "to": "_archive/superseded_photos/TGS-PIANO-HEDGEHOG/angle2.jpeg",
+      "md5": "bf93a96f90d159e9558087d64fbbaca5",
+      "why": "superseded by re-shoot"
+    },
+    {
+      "from": "input/TGS-PIANO-HEDGEHOG/angle3.jpeg",
+      "to": "_archive/superseded_photos/TGS-PIANO-HEDGEHOG/angle3.jpeg",
+      "md5": "3a48a8bff02f4c4b49270353cbec21a2",
+      "why": "superseded by re-shoot"
+    },
+    {
+      "from": "input/TGS-PIANO-HEDGEHOG/angle4.jpeg",
+      "to": "_archive/superseded_photos/TGS-PIANO-HEDGEHOG/angle4.jpeg",
+      "md5": "d5557f9d1f1497a71b16c30f7bf1b756",
+      "why": "superseded by re-shoot"
+    },
+    {
+      "from": "input/TGS-PIANO-HEDGEHOG/angle5.jpeg",
+      "to": "_archive/superseded_photos/TGS-PIANO-HEDGEHOG/angle5.jpeg",
+      "md5": "e948d361437df1cb942d72e4b178bef4",
+      "why": "superseded by re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/HEDGEHOG PIANO/IMG_20260917_012322.jpg.jpeg",
+      "to": "input/TGS-PIANO-HEDGEHOG/front.jpeg",
+      "md5": "9d09f11d34ff3d340ff894d8fec81e18",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/HEDGEHOG PIANO/IMG_20260917_012328.jpg.jpeg",
+      "to": "input/TGS-PIANO-HEDGEHOG/angle2.jpeg",
+      "md5": "22d10969c6b652f5506bfbdcc617af9f",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/HEDGEHOG PIANO/IMG_20260917_012333.jpg.jpeg",
+      "to": "input/TGS-PIANO-HEDGEHOG/angle3.jpeg",
+      "md5": "125b0deaf69da15b0946b7f693c406de",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/HEDGEHOG PIANO/IMG_20260917_012411.jpg.jpeg",
+      "to": "input/TGS-PIANO-HEDGEHOG/angle4.jpeg",
+      "md5": "5e297870c8ed13d86227e78b0c653eca",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/HEDGEHOG PIANO/IMG_20260917_012421.jpg.jpeg",
+      "to": "input/TGS-PIANO-HEDGEHOG/angle5.jpeg",
+      "md5": "1623bf6f7ec76df86e2130ad97660584",
+      "why": "re-shoot"
+    },
+    {
+      "from": "input/TGS-APPLIANCE-FRIDGE/front.jpeg",
+      "to": "_archive/superseded_photos/TGS-APPLIANCE-FRIDGE/front.jpeg",
+      "md5": "ba652238c347c7bf155b7c792cd5befa",
+      "why": "superseded by re-shoot"
+    },
+    {
+      "from": "input/TGS-APPLIANCE-FRIDGE/angle2.jpeg",
+      "to": "_archive/superseded_photos/TGS-APPLIANCE-FRIDGE/angle2.jpeg",
+      "md5": "1097bb018211f403ac3c3b789730b281",
+      "why": "superseded by re-shoot"
+    },
+    {
+      "from": "input/TGS-APPLIANCE-FRIDGE/angle3.jpeg",
+      "to": "_archive/superseded_photos/TGS-APPLIANCE-FRIDGE/angle3.jpeg",
+      "md5": "fb1367f20c960ec99bf021a8e2e21d24",
+      "why": "superseded by re-shoot"
+    },
+    {
+      "from": "input/TGS-APPLIANCE-FRIDGE/angle4.jpeg",
+      "to": "_archive/superseded_photos/TGS-APPLIANCE-FRIDGE/angle4.jpeg",
+      "md5": "ed3fcd68f7cec0ede5d38bf6c92f2aff",
+      "why": "superseded by re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/HOME APPLIANCE REFRIGIRATOR/IMG_20260917_005732.jpg.jpeg",
+      "to": "input/TGS-APPLIANCE-FRIDGE/front.jpeg",
+      "md5": "af3ddd3bdc2e3f5b8d4cb0ea5bf8ca70",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/HOME APPLIANCE REFRIGIRATOR/IMG_20260917_005740.jpg.jpeg",
+      "to": "input/TGS-APPLIANCE-FRIDGE/angle2.jpeg",
+      "md5": "16e0ff0a42c96aaf1105ab100bbdf275",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/HOME APPLIANCE REFRIGIRATOR/IMG_20260917_005747.jpg.jpeg",
+      "to": "input/TGS-APPLIANCE-FRIDGE/angle3.jpeg",
+      "md5": "95b940e64fb9acdbe1d654ca06ab3dd0",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/HOME APPLIANCE REFRIGIRATOR/IMG_20260917_005822.jpg.jpeg",
+      "to": "input/TGS-APPLIANCE-FRIDGE/angle4.jpeg",
+      "md5": "f590476695277403897b3243b199644d",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/HOME APPLIANCE REFRIGIRATOR/IMG_20260917_005852.jpg.jpeg",
+      "to": "input/TGS-APPLIANCE-FRIDGE/angle5.jpeg",
+      "md5": "e6c7fb4f346a20cba5716f8be62457d1",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/Hanger Game Console/IMG_20260917_012447.jpg.jpeg",
+      "to": "input/TGS-BABY-GAMES-CONSOLE/front.jpeg",
+      "md5": "9090054817edbba20a58dfe0d55d6f3e",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/Hanger Game Console/IMG_20260917_012453.jpg.jpeg",
+      "to": "input/TGS-BABY-GAMES-CONSOLE/angle2.jpeg",
+      "md5": "af4dc06bc831d7ed48928671d0389480",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/Hanger Game Console/IMG_20260917_012553.jpg.jpeg",
+      "to": "input/TGS-BABY-GAMES-CONSOLE/angle3.jpeg",
+      "md5": "d0992b219f54792d183ddc5e05f56f6d",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/Hanger Game Console/IMG_20260917_012558.jpg.jpeg",
+      "to": "input/TGS-BABY-GAMES-CONSOLE/angle4.jpeg",
+      "md5": "2a11ecac6e1145ef09b403f25b26230b",
+      "why": "re-shoot"
+    },
+    {
+      "from": "input/TGS-TOUCH-TEACH-WORDS/front.jpg",
+      "to": "_archive/superseded_photos/TGS-TOUCH-TEACH-WORDS/front.jpg",
+      "md5": "4dc08987471b2df4068a3ec2b5c74a9d",
+      "why": "superseded by re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/Hug Happy Word Book/IMG_20260917_003616.jpg.jpeg",
+      "to": "input/TGS-TOUCH-TEACH-WORDS/front.jpeg",
+      "md5": "4951fe579f137c6a6adb676c18c56923",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/Hug Happy Word Book/IMG_20260917_003625.jpg.jpeg",
+      "to": "input/TGS-TOUCH-TEACH-WORDS/angle2.jpeg",
+      "md5": "ec5504b2da5d7cbcfd8c27ae6600bcb7",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/Hug Happy Word Book/IMG_20260917_003631.jpg.jpeg",
+      "to": "input/TGS-TOUCH-TEACH-WORDS/angle3.jpeg",
+      "md5": "daa85abc54dd8362d4539a6942b95c3f",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/Hug Happy Word Book/IMG_20260917_003900.jpg.jpeg",
+      "to": "input/TGS-TOUCH-TEACH-WORDS/angle4.jpeg",
+      "md5": "bb139f7525bc57ca58c61894cb5cfd19",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/Hug Happy Word Book/IMG_20260917_003912.jpg.jpeg",
+      "to": "input/TGS-TOUCH-TEACH-WORDS/angle5.jpeg",
+      "md5": "af8e1d5a4a647bb491d2fc5aa08e529d",
+      "why": "re-shoot"
+    },
+    {
+      "from": "input/TGS-BEAUTY-GIRL-MAKEUP/front.jpg",
+      "to": "_archive/superseded_photos/TGS-BEAUTY-GIRL-MAKEUP/front.jpg",
+      "md5": "50adb4d6babe831eb3c7751ebe5e002e",
+      "why": "superseded by re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/Kpop Makeup Kit/IMG_20260917_005541.jpg.jpeg",
+      "to": "input/TGS-BEAUTY-GIRL-MAKEUP/front.jpeg",
+      "md5": "ee0726bba3bc384a522d23a29aff5a03",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/Kpop Makeup Kit/IMG_20260917_005614.jpg.jpeg",
+      "to": "input/TGS-BEAUTY-GIRL-MAKEUP/angle2.jpeg",
+      "md5": "27c16c703100e802697066a635200c86",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/Kpop Makeup Kit/IMG_20260917_005620.jpg.jpeg",
+      "to": "input/TGS-BEAUTY-GIRL-MAKEUP/angle3.jpeg",
+      "md5": "f84cbc09b6da905993a5652a456a4d17",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/Kpop Makeup Kit/IMG_20260917_005633.jpg.jpeg",
+      "to": "input/TGS-BEAUTY-GIRL-MAKEUP/angle4.jpeg",
+      "md5": "c96b2f8d80f0fabb13b6b458fd67bbbb",
+      "why": "re-shoot"
+    },
+    {
+      "from": "input/TGS-CUBE-SQUEEZE-FIDGET/front.jpg",
+      "to": "_archive/superseded_photos/TGS-CUBE-SQUEEZE-FIDGET/front.jpg",
+      "md5": "0a8fc24b2e2edf810e690f507f325a21",
+      "why": "superseded by re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/NeeDoh Nice Cube Super Solid Squishy/IMG_20260917_011204.jpg.jpeg",
+      "to": "input/TGS-CUBE-SQUEEZE-FIDGET/front.jpeg",
+      "md5": "400dc3c9d3e8f0e31c2af611c0830a92",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/NeeDoh Nice Cube Super Solid Squishy/IMG_20260917_011211.jpg.jpeg",
+      "to": "input/TGS-CUBE-SQUEEZE-FIDGET/angle2.jpeg",
+      "md5": "4dfda97f63d87ca6dcce70904ecffc43",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/NeeDoh Nice Cube Super Solid Squishy/IMG_20260917_011223.jpg.jpeg",
+      "to": "input/TGS-CUBE-SQUEEZE-FIDGET/angle3.jpeg",
+      "md5": "2c39ce7d79c6b5828c618edf5a1808f2",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/NeeDoh Nice Cube Super Solid Squishy/IMG_20260917_011235.jpg.jpeg",
+      "to": "input/TGS-CUBE-SQUEEZE-FIDGET/angle4.jpeg",
+      "md5": "3e8982e7ec30d700dd1b2979a48b825d",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/NeeDoh Nice Cube Super Solid Squishy/IMG_20260917_011312.jpg.jpeg",
+      "to": "input/TGS-CUBE-SQUEEZE-FIDGET/angle5.jpeg",
+      "md5": "e0efee76830ad1bc8fbc8b171efc1029",
+      "why": "re-shoot"
+    },
+    {
+      "from": "input/TGS-SQUISHY-BUN-STEAMER/front.jpg",
+      "to": "_archive/superseded_photos/TGS-SQUISHY-BUN-STEAMER/front.jpg",
+      "md5": "f6eed8aa2cf596029db3f0f4380c2c3a",
+      "why": "superseded by re-shoot"
+    },
+    {
+      "from": "input/TGS-SQUISHY-BUN-STEAMER/angle2.jpg",
+      "to": "_archive/superseded_photos/TGS-SQUISHY-BUN-STEAMER/angle2.jpg",
+      "md5": "2ce9154390460c4b25dfa13f15d6a2c3",
+      "why": "superseded by re-shoot"
+    },
+    {
+      "from": "input/TGS-SQUISHY-BUN-STEAMER/angle3.jpg",
+      "to": "_archive/superseded_photos/TGS-SQUISHY-BUN-STEAMER/angle3.jpg",
+      "md5": "b52e2099a89742936a9c0ba5a3d970e9",
+      "why": "superseded by re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/Rainbow MYSTERY Squishy/IMG_20260917_010922.jpg.jpeg",
+      "to": "input/TGS-SQUISHY-BUN-STEAMER/front.jpeg",
+      "md5": "357e135c71b4b224eb433a4f84a830a9",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/Rainbow MYSTERY Squishy/IMG_20260917_010954.jpg.jpeg",
+      "to": "input/TGS-SQUISHY-BUN-STEAMER/angle2.jpeg",
+      "md5": "67556ca6ceb2034640356485b6108a5a",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/Rainbow MYSTERY Squishy/IMG_20260917_011008.jpg.jpeg",
+      "to": "input/TGS-SQUISHY-BUN-STEAMER/angle3.jpeg",
+      "md5": "29dcc9c100569161091c29b11ba78e1e",
+      "why": "re-shoot"
+    },
+    {
+      "from": "input/TGS-FIG-RONALDO/front.jpeg",
+      "to": "_archive/superseded_photos/TGS-FIG-RONALDO/front.jpeg",
+      "md5": "97fd39e5b3dc44c16d02520dfc7136b4",
+      "why": "superseded by re-shoot"
+    },
+    {
+      "from": "input/TGS-FIG-RONALDO/angle2.jpeg",
+      "to": "_archive/superseded_photos/TGS-FIG-RONALDO/angle2.jpeg",
+      "md5": "b1c90c5e63541bd5659dc10c8a2c90a4",
+      "why": "superseded by re-shoot"
+    },
+    {
+      "from": "input/TGS-FIG-RONALDO/angle3.jpeg",
+      "to": "_archive/superseded_photos/TGS-FIG-RONALDO/angle3.jpeg",
+      "md5": "ff3345736ed2027b900d41bf57b32a68",
+      "why": "superseded by re-shoot"
+    },
+    {
+      "from": "input/TGS-FIG-RONALDO/angle4.jpeg",
+      "to": "_archive/superseded_photos/TGS-FIG-RONALDO/angle4.jpeg",
+      "md5": "abf2134652199bcdd00db83d80437d3b",
+      "why": "superseded by re-shoot"
+    },
+    {
+      "from": "input/TGS-FIG-RONALDO/angle5.jpg",
+      "to": "_archive/superseded_photos/TGS-FIG-RONALDO/angle5.jpg",
+      "md5": "906e0195e023c60d1599da177fe6cad3",
+      "why": "superseded by re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/Ronaldo Figure/IMG_20260917_012852.jpg.jpeg",
+      "to": "input/TGS-FIG-RONALDO/front.jpeg",
+      "md5": "120f68c9c03ff43934ecf72c61b6412f",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/Ronaldo Figure/IMG_20260917_012859.jpg.jpeg",
+      "to": "input/TGS-FIG-RONALDO/angle2.jpeg",
+      "md5": "4e042350655a01d739f8237965b7972d",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/Ronaldo Figure/IMG_20260917_012908.jpg.jpeg",
+      "to": "input/TGS-FIG-RONALDO/angle3.jpeg",
+      "md5": "2e2cd246a52b57ddf3d7e1e3b643f68c",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/Ronaldo Figure/IMG_20260917_012944.jpg.jpeg",
+      "to": "input/TGS-FIG-RONALDO/angle4.jpeg",
+      "md5": "56642da283186243c1b8e988348c0b9b",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/Ronaldo Figure/IMG_20260917_012948.jpg.jpeg",
+      "to": "input/TGS-FIG-RONALDO/angle5.jpeg",
+      "md5": "1ee82d6966fbbbd109891c212f8e73e7",
+      "why": "re-shoot"
+    },
+    {
+      "from": "input/TGS-STACKED-CIRCLE-RING/front.jpg",
+      "to": "_archive/superseded_photos/TGS-STACKED-CIRCLE-RING/front.jpg",
+      "md5": "5366519b41238fe1cabc0b91c41158b7",
+      "why": "superseded by re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/STACKED CIRCLE/IMG_20260917_011838.jpg.jpeg",
+      "to": "input/TGS-STACKED-CIRCLE-RING/front.jpeg",
+      "md5": "f7cb78d3871597753b5bfbc0d73ea3d3",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/STACKED CIRCLE/IMG_20260917_011844.jpg.jpeg",
+      "to": "input/TGS-STACKED-CIRCLE-RING/angle2.jpeg",
+      "md5": "d3a61dfa0fff4d643822f1b67a6783fe",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/STACKED CIRCLE/IMG_20260917_011848.jpg.jpeg",
+      "to": "input/TGS-STACKED-CIRCLE-RING/angle3.jpeg",
+      "md5": "e04c36342700ad76e8447591061aa57c",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/STACKED CIRCLE/IMG_20260917_011921.jpg.jpeg",
+      "to": "input/TGS-STACKED-CIRCLE-RING/angle4.jpeg",
+      "md5": "045e1b60a4031ac93c8756317ce5246f",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/STACKED CIRCLE/IMG_20260917_011926.jpg.jpeg",
+      "to": "input/TGS-STACKED-CIRCLE-RING/angle5.jpeg",
+      "md5": "481a0c101240763754474e3fd7d76716",
+      "why": "re-shoot"
+    },
+    {
+      "from": "input/TGS-SQUISHY-OREO/front.jpg",
+      "to": "_archive/superseded_photos/TGS-SQUISHY-OREO/front.jpg",
+      "md5": "6e3bc28648c45abc4f6793316e71633f",
+      "why": "superseded by re-shoot"
+    },
+    {
+      "from": "input/TGS-SQUISHY-OREO/angle2.jpeg",
+      "to": "_archive/superseded_photos/TGS-SQUISHY-OREO/angle2.jpeg",
+      "md5": "a95083454124b14017af262ebc88713a",
+      "why": "superseded by re-shoot"
+    },
+    {
+      "from": "input/TGS-SQUISHY-OREO/angle3.jpeg",
+      "to": "_archive/superseded_photos/TGS-SQUISHY-OREO/angle3.jpeg",
+      "md5": "3bd38c12ad5b4096ec1097a9cab2b0b6",
+      "why": "superseded by re-shoot"
+    },
+    {
+      "from": "input/TGS-SQUISHY-OREO/angle4.jpeg",
+      "to": "_archive/superseded_photos/TGS-SQUISHY-OREO/angle4.jpeg",
+      "md5": "195d47964a52d34548be1610053634b7",
+      "why": "superseded by re-shoot"
+    },
+    {
+      "from": "input/TGS-SQUISHY-OREO/angle5.jpeg",
+      "to": "_archive/superseded_photos/TGS-SQUISHY-OREO/angle5.jpeg",
+      "md5": "35771d05739563989df35dd46ea38b00",
+      "why": "superseded by re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/Square Cube Squeeshy/IMG_20260917_013141.jpg.jpeg",
+      "to": "input/TGS-SQUISHY-OREO/front.jpeg",
+      "md5": "34d3f606c07b051e5feb99adac8018a4",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/Square Cube Squeeshy/IMG_20260917_013147.jpg.jpeg",
+      "to": "input/TGS-SQUISHY-OREO/angle2.jpeg",
+      "md5": "53ee80bbb5986b09c8a4cf5eccd7fa44",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/Square Cube Squeeshy/IMG_20260917_013205.jpg.jpeg",
+      "to": "input/TGS-SQUISHY-OREO/angle3.jpeg",
+      "md5": "c927c89bb2683b3bb2d1aad8943791be",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/Square Cube Squeeshy/IMG_20260917_013210.jpg.jpeg",
+      "to": "input/TGS-SQUISHY-OREO/angle4.jpeg",
+      "md5": "fa26cd008bfaae1a30b7a980feb26b5a",
+      "why": "re-shoot"
+    },
+    {
+      "from": "input/TGS-EDU-LAPTOP/front.jpg",
+      "to": "_archive/superseded_photos/TGS-EDU-LAPTOP/front.jpg",
+      "md5": "0e0e1da9bf10a5182f893c61c7be7c34",
+      "why": "superseded by re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/ordenado-no-3-Educativo-Laptop/IMG_20260917_004352.jpg.jpeg",
+      "to": "input/TGS-EDU-LAPTOP/front.jpeg",
+      "md5": "489d86a324555bf8a105e15a3abd53ef",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/ordenado-no-3-Educativo-Laptop/IMG_20260917_004359.jpg.jpeg",
+      "to": "input/TGS-EDU-LAPTOP/angle2.jpeg",
+      "md5": "0c4cca8ffe36c5292c3f95713e0a3398",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/ordenado-no-3-Educativo-Laptop/IMG_20260917_004434.jpg.jpeg",
+      "to": "input/TGS-EDU-LAPTOP/angle3.jpeg",
+      "md5": "ba2f8ed3388103533a44a1534b97396b",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/ordenado-no-3-Educativo-Laptop/IMG_20260917_004529.jpg.jpeg",
+      "to": "input/TGS-EDU-LAPTOP/angle4.jpeg",
+      "md5": "e004d21f5586a5372a3168fa42dacaf1",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/ordenado-no-3-Educativo-Laptop/IMG_20260917_004534.jpg.jpeg",
+      "to": "input/TGS-EDU-LAPTOP/angle5.jpeg",
+      "md5": "90b30153698c677b0246ccc42a62d9fb",
+      "why": "re-shoot"
+    },
+    {
+      "from": "input/TGS-ARABIC-SOUND-LEARNING/front.jpg",
+      "to": "_archive/superseded_photos/TGS-ARABIC-SOUND-LEARNING/front.jpg",
+      "md5": "1bc7442bbcdf8a8b572cba10eb1517b9",
+      "why": "superseded by re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/كتاب إلكتروني للتعلم/IMG_20260917_004625.jpg.jpeg",
+      "to": "input/TGS-ARABIC-SOUND-LEARNING/front.jpeg",
+      "md5": "b0c4e1fd7926d2fadd90f8374d689996",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/كتاب إلكتروني للتعلم/IMG_20260917_004636.jpg.jpeg",
+      "to": "input/TGS-ARABIC-SOUND-LEARNING/angle2.jpeg",
+      "md5": "1d3c6e463677f66d23520b7a039f843e",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/كتاب إلكتروني للتعلم/IMG_20260917_004727.jpg.jpeg",
+      "to": "input/TGS-ARABIC-SOUND-LEARNING/angle3.jpeg",
+      "md5": "1b1dfc0443927bac8b3f886b87704a3b",
+      "why": "re-shoot"
+    },
+    {
+      "from": "Revised images from Batch 1 & batch 2/كتاب إلكتروني للتعلم/IMG_20260917_004740.jpg.jpeg",
+      "to": "input/TGS-ARABIC-SOUND-LEARNING/angle4.jpeg",
+      "md5": "c2535c9c6274b671b2babcae2c3ca629",
+      "why": "re-shoot"
+    },
+    {
+      "from": "input/TGS-SQUISHY-DUMPLINGS-BALL/front.jpg",
+      "to": "input/TGS-SQUISHY-BUN-STEAMER/angle4.jpg",
+      "md5": "7f0b91142461950d9d91ce00dd4464eb",
+      "why": "colour from duplicate TGS-SQUISHY-DUMPLINGS-BALL"
+    },
+    {
+      "from": "input/TGS-SQUISHY-DUMPLINGS-BALL",
+      "to": "_archive/superseded_photos/_duplicates/TGS-SQUISHY-DUMPLINGS-BALL",
+      "md5": null,
+      "why": "duplicate of TGS-SQUISHY-BUN-STEAMER"
+    },
+    {
+      "from": "input/TGS-INTERACTI-LEARNING-BOOK",
+      "to": "_archive/superseded_photos/_duplicates/TGS-INTERACTI-LEARNING-BOOK",
+      "md5": null,
+      "why": "duplicate of TGS-ARABIC-SOUND-LEARNING"
+    }
+  ],
+  "renamed": {
+    "TGS-PORTABLE-COOL-NECK": "TGS-FAN-VISOR-HAT"
+  },
+  "duplicates": {
+    "TGS-SQUISHY-DUMPLINGS-BALL": "TGS-SQUISHY-BUN-STEAMER",
+    "TGS-INTERACTI-LEARNING-BOOK": "TGS-ARABIC-SOUND-LEARNING"
+  },
+  "new": [
+    "TGS-TABLET-DRAWING-CALC",
+    "TGS-BABY-GAMES-CONSOLE"
+  ]
+}

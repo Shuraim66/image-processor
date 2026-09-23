@@ -45,10 +45,18 @@ W = SIZE * SS
 
 
 def _font(name, px):
+    """'File.ttf' or 'File.ttf@Weight' for a variable font's named instance (Archivo@Bold)."""
+    name, _, weight = name.partition("@")
     for d in _FONT_DIRS:
         p = os.path.join(d, name)
         if os.path.exists(p):
-            return ImageFont.truetype(p, px * SS)
+            f = ImageFont.truetype(p, px * SS)
+            if weight:
+                try:
+                    f.set_variation_by_name(weight)
+                except Exception:      # not a variable font on this Pillow/FreeType build
+                    pass
+            return f
     return ImageFont.truetype(name, px * SS)  # let PIL raise a clear error
 
 

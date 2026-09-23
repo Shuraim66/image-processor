@@ -1,0 +1,37 @@
+tag,group,meaning,products,examples
+sub:Novelty Toys,sub,subcategory; drives the proposed collections,25,Train Stacking Toy; Lightsaber; Blast Of Flames
+sub:Die-Cast Cars,sub,subcategory; drives the proposed collections,18,Nissan GT-R Motul Diecast Model Car; Rolls Royce Phantom Vintage Diecast ; BMW 7 Series Diecast Model Car
+sub:RC Vehicles,sub,subcategory; drives the proposed collections,15,RC Drift Racing Car; Voice Broadcast RC Police Car; RC Maserati MC20
+sub:Learning Toys,sub,subcategory; drives the proposed collections,12,Touch and Teach Words Book; Two in One Educational Laptop; Arabic Sound Learning Book
+sub:Squishies,sub,subcategory; drives the proposed collections,12,Squishy Dumplings Ball; Cube Squeeze Fidget; Crisp Choco Squishy
+sub:Art Sets,sub,subcategory; drives the proposed collections,9,Early Education Drawing Tablet Machi; Early Education Drawing Tablet Machi; Huanger Smart Remote Baby Toy
+sub:Animal Figures,sub,subcategory; drives the proposed collections,9,Animal Shaped Toy Phone; Cute Duck Water Wheel Bath Toy; Jellyfish Bump and Go Dancing Toy
+sub:Mini Appliances,sub,subcategory; drives the proposed collections,8,Toy Mini Hand Mixer; Toy Dishwasher Play Set; Mini Appliances Toy Refrigerator
+sub:Family Board Games,sub,subcategory; drives the proposed collections,7,Children Card Machine Puzzle Game; Four in One Insect Catching Game; Basketball Board Game
+sub:Makeup Sets,sub,subcategory; drives the proposed collections,7,Beauty Girl Makeup Case; Colorful Princess Bag Makeup Set; Makeup Set Treasure Chest
+sub:Action Figures,sub,subcategory; drives the proposed collections,7,FIFA Ronaldo Action Figure; FIFA Ronaldo Action Figure; Naruto Uzumaki Action Figure
+sub:Baby Activity Toys,sub,subcategory; drives the proposed collections,7,Stacked Circle Ring Stacker; Rainbow Tower Unicorn Stacker; Montessori Handle Light Game
+sub:Musical Instruments,sub,subcategory; drives the proposed collections,7,Cartoon Animal Xylophone Piano; Hedgehog Piano Baby Toy; Animal Piano Keyboard
+sub:Electronic Toys,sub,subcategory; drives the proposed collections,7,Vending Machine Toy; Kids Video Walkie Talkie; Cute Intelligent Robot
+sub:Baby Toys,sub,subcategory; drives the proposed collections,6,BabyLioni Baby Game Controller; Multifunction Learn Shelf; Four Players Dice Board Game
+sub:Arcade Games,sub,subcategory; drives the proposed collections,6,SUP Handheld Game Console; Retro Arcade Duel Mini Game; Power Punch Arcade Game
+sub:Bubble Toys,sub,subcategory; drives the proposed collections,5,Dream Unicorn Bubble Camera; Magic Bubble Bat Game; Labubu Bubble Gun
+sub:Sports Sets,sub,subcategory; drives the proposed collections,5,Rotating Orbit Ball Track; Despicable Me Minion Slide Toy; Toy Trucks
+sub:Water Play,sub,subcategory; drives the proposed collections,4,Desert Eagle Model Gun; Ocean Liner Water Gun; Inflatable Kiddie Pool
+sub:Ride-Ons,sub,subcategory; drives the proposed collections,4,Tricycle Toy; Children'S Car; Scooter Led Beige
+sub:Role Play Sets,sub,subcategory; drives the proposed collections,3,Kids Tool Drill Set; Toy Circular Saw; Reassembly Screw Car Wooden Toy
+sub:STEM Kits,sub,subcategory; drives the proposed collections,3,STEM Chemistry Experiment Set; Case Round Blue; Stem Plantgrow Dome
+sub:Dinosaur Toys,sub,subcategory; drives the proposed collections,3,Gear Dinosaur Toy; Dino Running Dinosaur World; Electric Cartoon Dinosaur Toy
+sub:Night Lights,sub,subcategory; drives the proposed collections,3,Unicorn Toy; Curemi Night Light; Crescent Moon Night Light
+sub:Tumblers,sub,subcategory; drives the proposed collections,2,Insulated Tumbler with Handle; Insulated Coffee Tumbler with Strap
+sub:Drones,sub,subcategory; drives the proposed collections,2,Aerobat Four Axis Mini Drone; E99 Pro Max Drone
+sub:Gadgets,sub,subcategory; drives the proposed collections,1,Portable Cool Neck Fan
+sub:Cleaning Play Sets,sub,subcategory; drives the proposed collections,1,Little Helper Cleaning Kit
+sub:Magic & Dress-Up,sub,subcategory; drives the proposed collections,1,Magic Wand Crown Tiara
+sub:Plush Toys,sub,subcategory; drives the proposed collections,1,Plush Spiderman Lg
+age:…,age,"age bucket, only when printed on the box (never for Drinkware)",,
+occasion:…,occasion,gifting moment; birthday + eid default for toys,,
+feature:…,feature,new / gift-ready / pick,,
+gender:…,gender,only when clearly gendered,,
+play:…,play,"build, games, outdoor, pretend, vehicles",,
+type:…,type,"secondary category, ready if a rule is switched to tags",,

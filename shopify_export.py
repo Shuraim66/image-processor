@@ -2,18 +2,21 @@
 """
 Shopify product CSV exporter.
 
-Reads each product's `input/<SKU>/product.json` (from analyzer.py) + its gallery
-images (`gallery_out/<SKU>/*.jpg`) and writes a Shopify-import CSV: one product
-row with the full data, then one extra row per additional image.
+Reads the verified catalog (`catalog_products.csv` + `catalog_variants.csv` --
+box-checked, priced and stocked) and each product's final curated image set
+(`output/<SKU>/*.png`, built by build_output_folders.py from the working
+`input/<FOLDER>/output/` pipeline dirs), and writes a Shopify-import CSV: one
+row per product (or per variant, for multi-variant products), then one extra
+row per additional image.
 
     python shopify_export.py
-    python shopify_export.py --image-base-url https://cdn.example.com/toys/ \
-        --status active --price 29.99
+    python shopify_export.py --status active \
+        --image-base-url https://cdn.example.com/toys/
 
 Note: Shopify's importer fetches Image Src over HTTP, so it needs PUBLIC URLs.
 Pass --image-base-url to prefix your hosted image location; without it the CSV
-lists relative paths (fine for review, but upload the images or set a base URL
-before importing to Shopify).
+lists local paths (fine for review / for devs to swap in a real host, not for
+importing to Shopify directly).
 """
 
 import argparse
@@ -21,129 +24,219 @@ import csv
 import html
 import json
 import os
-import re
 import sys
-
-import analyzer
+from collections import defaultdict
 
 PRODUCTS_DIR = "input"
-GALLERY_DIR = "gallery_out"
+OUTPUT_DIR = "output"      # final per-SKU image folders (output/<SKU>/), built by build_output_folders.py
+CATALOG_PRODUCTS = "catalog_products.csv"
+CATALOG_VARIANTS = "catalog_variants.csv"
 IMG_EXTS = (".jpg", ".jpeg", ".png", ".webp")
 
 COLUMNS = [
     "Handle", "Title", "Body (HTML)", "Vendor", "Product Category", "Type",
     "Tags", "Published", "Option1 Name", "Option1 Value", "Variant SKU",
-    "Variant Inventory Tracker", "Variant Inventory Qty", "Variant Inventory Policy",
-    "Variant Fulfillment Service", "Variant Price", "Variant Requires Shipping",
-    "Variant Taxable", "Image Src", "Image Position", "Image Alt Text",
-    "Gift Card", "SEO Title", "SEO Description", "Status",
+    "Variant Barcode", "Variant Inventory Tracker", "Variant Inventory Qty",
+    "Variant Inventory Policy", "Variant Fulfillment Service", "Variant Price",
+    "Variant Compare At Price", "Variant Requires Shipping", "Variant Taxable",
+    "Image Src", "Image Position", "Image Alt Text", "Gift Card",
+    "SEO Title", "SEO Description", "Status",
 ]
 
-
-def slug(sku):
-    return re.sub(r"[^a-z0-9]+", "-", sku.lower()).strip("-")
-
-
-def body_html(p: "analyzer.ProductProfile"):
-    parts = [f"<p>{html.escape(p.description)}</p>"]
-    if p.bullet_points:
-        parts.append("<ul>" + "".join(
-            f"<li>{html.escape(b)}</li>" for b in p.bullet_points) + "</ul>")
-    if p.whats_included:
-        parts.append("<p><strong>What's included:</strong></p><ul>" + "".join(
-            f"<li>{html.escape(w)}</li>" for w in p.whats_included) + "</ul>")
-    return "".join(parts)
+# Gallery order for a per-product output/ folder: the plain CatalogClean main image first
+# (the one Shopify/Google Shopping feeds need unwatermarked), then the branded "_wm" copy of
+# each marketing slot -- falling back to the plain copy only if that slot was never branded --
+# then the two locally-rendered extras. Anything else in the folder (a hand-added variant
+# photo, a future slot) is appended afterwards, alphabetically, so nothing gets silently lost.
+GALLERY_SLOTS = ["CatalogHero", "Angle", "Open", "Box", "Detail", "FeatureProduct", "Lifestyle"]
+GALLERY_EXTRAS = ["Hero_titled", "FeatureCard"]
 
 
-def images_for(sku, base_url, per_product=False):
-    d = os.path.join(PRODUCTS_DIR, sku, "output") if per_product else os.path.join(GALLERY_DIR, sku)
+def curated_filenames(d):
+    """The gallery order for one product's image dir: plain CatalogClean main image
+    first (Shopify/Google Shopping feeds need it unwatermarked), then the branded
+    "_wm" copy of each marketing slot -- falling back to the plain copy only if that
+    slot was never branded -- then the two locally-rendered extras. Anything else in
+    the folder is appended afterwards, alphabetically, so nothing gets silently lost.
+    Used both to build output/<SKU>/ from a pipeline dir and to list it back out."""
     if not os.path.isdir(d):
         return []
-    files = sorted(f for f in os.listdir(d) if f.lower().endswith(IMG_EXTS))
+    existing = set(os.listdir(d))
+
+    def pick(name):
+        return next((name + ext for ext in IMG_EXTS if name + ext in existing), None)
+
+    files, handled = [], set()
+    main = pick("CatalogClean")
+    if main:
+        files.append(main)
+    handled.add("CatalogClean")
+    for slot in GALLERY_SLOTS:
+        f = pick(slot + "_wm") or pick(slot)
+        if f:
+            files.append(f)
+        handled.add(slot)          # decided either way -- the plain copy never falls through too
+    for extra in GALLERY_EXTRAS:
+        f = pick(extra)
+        if f:
+            files.append(f)
+        handled.add(extra)
+
+    def base_name(fname):
+        stem = os.path.splitext(fname)[0]
+        return stem[:-3] if stem.endswith("_wm") else stem
+
+    files += sorted(f for f in os.listdir(d)
+                     if f.lower().endswith(IMG_EXTS) and base_name(f) not in handled)
+    return files
+
+
+def images_for(sku, base_url):
+    d = os.path.join(OUTPUT_DIR, sku)
+    files = curated_filenames(d)
     return [f"{base_url}{sku}/{f}" if base_url else os.path.join(d, f) for f in files]
 
 
-def rows_for(sku, folder, args):
-    prof_path = os.path.join(folder, "product.json")
-    if not os.path.exists(prof_path):
-        print(f"  ! {sku}: no product.json (run analyzer.py first)", file=sys.stderr)
-        return []
-    p = analyzer.ProductProfile.model_validate_json(open(prof_path, encoding="utf-8").read())
-    imgs = images_for(sku, args.image_base_url, per_product=args.per_product)
-    if not imgs:
-        print(f"  ! {sku}: no gallery images in {GALLERY_DIR}/{sku}", file=sys.stderr)
+def body_html(description, bullet_points, whats_included):
+    parts = [f"<p>{html.escape(description)}</p>"]
+    if bullet_points:
+        parts.append("<ul>" + "".join(
+            f"<li>{html.escape(b)}</li>" for b in bullet_points) + "</ul>")
+    if whats_included:
+        parts.append("<p><strong>What's included:</strong></p><ul>" + "".join(
+            f"<li>{html.escape(w)}</li>" for w in whats_included) + "</ul>")
+    return "".join(parts)
 
-    handle = slug(sku)
-    base = {c: "" for c in COLUMNS}
+
+def row_template():
+    return {c: "" for c in COLUMNS}
+
+
+def load_variants_by_handle():
+    by_handle = defaultdict(list)
+    with open(CATALOG_VARIANTS, encoding="utf-8", newline="") as f:
+        for r in csv.DictReader(f):
+            by_handle[r["product_handle"]].append(r)
+    return by_handle
+
+
+def rows_for(prod, variants, args):
+    handle = prod["handle"]
+    folder = handle.upper()
+    pj_path = os.path.join(PRODUCTS_DIR, folder, "product.json")
+    alt_text, bullets, included = "", [], []
+    if os.path.exists(pj_path):
+        pj = json.load(open(pj_path, encoding="utf-8"))
+        alt_text = pj.get("alt_text") or ""
+        bullets = pj.get("bullet_points") or []
+        included = pj.get("whats_included") or []
+    alt_text = alt_text or prod["title"]
+
+    imgs = images_for(prod["sku"], args.image_base_url)
+    if not imgs:
+        print(f"  ! {prod['sku']}: no images in output/{prod['sku']}/", file=sys.stderr)
+
+    status = (prod["status"] or "draft").lower()
+    base = row_template()
     base.update({
         "Handle": handle,
-        "Title": p.title,
-        "Body (HTML)": body_html(p),
-        "Vendor": args.vendor,
-        "Type": "Toy",
-        "Tags": ", ".join(p.tags),
-        "Published": "TRUE" if args.status == "active" else "FALSE",
-        "Option1 Name": "Title",
-        "Option1 Value": "Default Title",
-        "Variant SKU": sku,
+        "Title": prod["title"],
+        "Body (HTML)": body_html(prod["description"], bullets, included),
+        "Vendor": prod["vendor"],
+        "Type": prod["product_type"],
+        "Tags": prod["all_tags"],
+        "Published": "TRUE" if status == "active" else "FALSE",
         "Variant Inventory Tracker": "shopify",
-        "Variant Inventory Qty": str(args.qty),
         "Variant Inventory Policy": "deny",
         "Variant Fulfillment Service": "manual",
-        "Variant Price": str(args.price) if args.price else "",
         "Variant Requires Shipping": "TRUE",
         "Variant Taxable": "TRUE",
         "Gift Card": "FALSE",
-        "SEO Title": p.seo_title,
-        "SEO Description": p.meta_description,
-        "Status": args.status,
-        "Image Src": imgs[0] if imgs else "",
-        "Image Position": "1" if imgs else "",
-        "Image Alt Text": p.alt_text,
+        "SEO Title": prod["seo_title"],
+        "SEO Description": prod["seo_description"],
+        "Status": status,
     })
-    rows = [base]
-    for i, src in enumerate(imgs[1:], start=2):        # extra images: image-only rows
-        r = {c: "" for c in COLUMNS}
+
+    # catalog_variants.csv carries one row per product even for single-SKU products
+    # (variant == "Default Title") -- real multi-style products (football figures,
+    # squishy flavors, appliance colors) just have more than one row there.
+    if not variants:
+        variants = [{"variant": "Default Title", "sku": prod["sku"], "barcode": "",
+                     "price": prod["price"], "compare_at_price": prod.get("compare_at_price", ""),
+                     "stock": prod["stock"]}]
+    option_name = "Style" if len(variants) > 1 else "Title"
+
+    rows = []
+    first = True
+    for v in variants:
+        r = base if first else row_template()
+        r.update({
+            "Handle": handle,
+            "Option1 Name": option_name,
+            "Option1 Value": v["variant"],
+            "Variant SKU": v["sku"],
+            "Variant Barcode": v.get("barcode", ""),
+            "Variant Price": v["price"],
+            "Variant Compare At Price": v.get("compare_at_price", ""),
+            "Variant Inventory Qty": v["stock"],
+            "Variant Inventory Tracker": "shopify",
+            "Variant Inventory Policy": "deny",
+            "Variant Fulfillment Service": "manual",
+            "Variant Requires Shipping": "TRUE",
+            "Variant Taxable": "TRUE",
+        })
+        if first and imgs:
+            r["Image Src"], r["Image Position"], r["Image Alt Text"] = imgs[0], "1", alt_text
+        rows.append(r)
+        first = False
+
+    for i, src in enumerate(imgs[1:], start=2):
+        r = row_template()
         r.update({"Handle": handle, "Image Src": src, "Image Position": str(i),
-                  "Image Alt Text": p.alt_text})
+                  "Image Alt Text": alt_text})
         rows.append(r)
     return rows
 
 
 def main():
-    ap = argparse.ArgumentParser(description="Export product.json + gallery images to a Shopify CSV.")
-    ap.add_argument("--sku", help="only this SKU (default: all under input/)")
+    ap = argparse.ArgumentParser(
+        description="Export catalog_products.csv + catalog_variants.csv + generated "
+                     "images to a Shopify-import CSV.")
+    ap.add_argument("--sku", help="only this SKU (default: all in catalog_products.csv)")
     ap.add_argument("--out", default="shopify_import.csv")
-    ap.add_argument("--vendor", default="The Toy Gift Shop")
-    ap.add_argument("--status", choices=["draft", "active"], default="draft")
-    ap.add_argument("--price", default="", help="variant price (blank = set later in Shopify)")
-    ap.add_argument("--qty", type=int, default=0, help="inventory quantity")
-    ap.add_argument("--per-product", action="store_true",
-                    help="read images from input/<SKU>/output/ (matches --per-product build)")
     ap.add_argument("--image-base-url", default="",
-                    help="public URL prefix for images (Shopify fetches Image Src over HTTP)")
+                     help="public URL prefix for images (Shopify fetches Image Src over HTTP); "
+                          "omit for local paths (fine for review, not for import)")
     args = ap.parse_args()
     if args.image_base_url and not args.image_base_url.endswith("/"):
         args.image_base_url += "/"
 
-    skus = ([args.sku] if args.sku else
-            sorted(d for d in os.listdir(PRODUCTS_DIR)
-                   if os.path.isdir(os.path.join(PRODUCTS_DIR, d))))
+    with open(CATALOG_PRODUCTS, encoding="utf-8", newline="") as f:
+        products = list(csv.DictReader(f))
+    incomplete = [p["sku"] for p in products if not p["price"].strip() or not p["stock"].strip()]
+    if incomplete:
+        print(f"Skipping {len(incomplete)} incomplete catalog row(s) (no price/stock -- "
+              f"never finished intake): {incomplete}", file=sys.stderr)
+    products = [p for p in products if p["price"].strip() and p["stock"].strip()]
+    if args.sku:
+        products = [p for p in products if p["sku"] == args.sku]
+        if not products:
+            sys.exit(f"No such SKU in {CATALOG_PRODUCTS}: {args.sku}")
+    variants_by_handle = load_variants_by_handle()
 
     all_rows = []
-    for sku in skus:
-        rows = rows_for(sku, os.path.join(PRODUCTS_DIR, sku), args)
-        if rows:
-            print(f"[{sku}] {len(rows)} row(s)")
-            all_rows.extend(rows)
+    for prod in products:
+        rows = rows_for(prod, variants_by_handle.get(prod["handle"], []), args)
+        print(f"[{prod['sku']}] {len(rows)} row(s)")
+        all_rows.extend(rows)
 
     with open(args.out, "w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=COLUMNS)
         w.writeheader()
         w.writerows(all_rows)
-    print(f"\nWrote {len(all_rows)} rows for {len(skus)} product(s) to '{args.out}'.")
+    print(f"\nWrote {len(all_rows)} rows for {len(products)} product(s) to '{args.out}'.")
     if not args.image_base_url:
-        print("Note: Image Src is relative — set --image-base-url to public URLs "
+        print("Note: Image Src is a local path -- set --image-base-url to public URLs "
               "before importing to Shopify.", file=sys.stderr)
     return 0
 
