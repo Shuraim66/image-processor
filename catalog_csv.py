@@ -33,11 +33,6 @@ FIELDS = ["handle", "title", "vendor", "product_type", "status", "price", "compa
 VARIANT_FIELDS = ["product_handle", "product_title", "variant", "sku", "barcode", "price", "compare_at_price", "stock"]
 
 
-def handle_for(title, sku):
-    slug = re.sub(r"[^a-z0-9]+", "-", (title or sku).lower()).strip("-")
-    return slug[:100].rstrip("-")
-
-
 def profile(sku):
     path = os.path.join(pp.INPUT_DIR, sku, "product.json")
     return json.load(open(path, encoding="utf-8")) if os.path.exists(path) else {}
@@ -70,7 +65,9 @@ def row_for(folder, prof, collections):
     age = next((t.split(":", 1)[1] for t in tags if t.startswith("age:")), "")
     play = next((t.split(":", 1)[1] for t in tags if t.startswith("play:")), "")
     row = {
-        "handle": prof.get("handle") or handle_for(title, sku),
+        # store convention: handle = folder name lowercased. Every downstream script finds a
+        # product's folder via handle.upper(), so a title-derived handle silently breaks them.
+        "handle": prof.get("handle") or folder.lower(),
         "title": title,
         "vendor": prof.get("vendor") or "The Toy Gift Shop",
         "product_type": category,
@@ -103,6 +100,27 @@ def images_for(sku):
     return [have[n] for n in order if n in have]
 
 
+def variant_rows(row, prof):
+    """catalog_variants.csv rows for one product: one per Star / Colour / Character, else a
+    single Default Title row."""
+    opts = prof.get("variants") or {}
+    values = [v for v in (opts.get("values") or []) if v and v != "assorted"]
+    if not values:
+        return [{"product_handle": row["handle"], "product_title": row["title"], "variant": "Default Title",
+                 "sku": row["sku"], "barcode": "", "price": row["price"], "compare_at_price": "",
+                 "stock": row["stock"]}]
+    skus = opts.get("skus") or {}
+    out = []
+    for v in values:
+        code = re.sub(r"[^A-Z0-9]+", "-", v.upper()).strip("-")[:20]
+        vp = (opts.get("prices") or {}).get(v) or prof.get("price_pkr")
+        vs = (opts.get("stock") or {}).get(v, "")    # blank = count not given yet
+        out.append({"product_handle": row["handle"], "product_title": row["title"], "variant": v,
+                    "sku": skus.get(v) or f"{row['sku']}-{code}", "barcode": "",
+                    "price": f"{vp:.2f}" if vp else "", "compare_at_price": "", "stock": vs})
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--all", action="store_true", help="every product folder, not only the finished ones")
@@ -118,21 +136,7 @@ def main():
             continue
         row, price_pending, age_source = row_for(sku, prof, collections)
         rows.append(row)
-        opts = prof.get("variants") or {}
-        values = [v for v in (opts.get("values") or []) if v and v != "assorted"]
-        if values:                                   # one Shopify variant per Star / Colour / Character
-            skus = opts.get("skus") or {}
-            for v in values:
-                code = re.sub(r"[^A-Z0-9]+", "-", v.upper()).strip("-")[:20]
-                vp = (opts.get("prices") or {}).get(v) or prof.get("price_pkr")
-                vs = (opts.get("stock") or {}).get(v, "")    # blank = count not given yet
-                variants.append({"product_handle": row["handle"], "product_title": row["title"], "variant": v,
-                                 "sku": skus.get(v) or f"{row['sku']}-{code}", "barcode": "",
-                                 "price": f"{vp:.2f}" if vp else "", "compare_at_price": "", "stock": vs})
-        else:
-            variants.append({"product_handle": row["handle"], "product_title": row["title"], "variant": "Default Title",
-                             "sku": row["sku"], "barcode": "", "price": row["price"], "compare_at_price": "",
-                             "stock": row["stock"]})
+        variants.extend(variant_rows(row, prof))
         missing = [k for k in ("description", "seo_title", "seo_description") if not row[k]]
         if not images_for(sku):
             missing.append("catalog images")

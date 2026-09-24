@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """
-Pre-launch QA pass over the "ready" bundle (98 active products with a generated
-image set) -- everything scheduled to go live today. Checks pricing, stock,
-category/subcategory/age completeness, copy/SEO quality, image file integrity,
-and structural correctness of shopify_import_ready.csv itself.
+Pre-launch QA over both handoff bundles. Processed (shopify_import_ready.csv, products
+with a generated image set): pricing, stock, category/subcategory/age, copy/SEO,
+image integrity, CSV structure. Unprocessed (shopify_import_draft.csv): the same
+product checks, plus that each draft matches the catalog exactly (handle, variant
+SKUs) so the later import updates it instead of duplicating it, and that every
+output_pending/<SKU>/shopify_import.csv matches the combined file.
 
     python qa_ready.py
 """
@@ -16,9 +18,14 @@ import sys
 
 from PIL import Image
 
+import catalog_csv as cc
 import shopify_export as se
+import store_taxonomy as st
 
 CSV_PATH = "shopify_import_ready.csv"
+DRAFT_CSV = "shopify_import_draft.csv"
+PENDING_DIR = "output_pending"
+FAILED_DIR = "backlog-products-image-failed"
 
 
 def load_ready_skus():
@@ -146,21 +153,106 @@ def main():
             if not r["Variant Price"].strip():
                 issues.append((handle, "csv-structure", f"variant {r['Variant SKU']} has no price"))
 
-    print(f"Checked {len(products)} ready products, {len(rows)} CSV rows.\n")
+    print(f"=== PROCESSED: {len(products)} products, {len(rows)} rows in {CSV_PATH} ===")
+    ok = report(issues)
+
+    draft_issues, n_draft, n_rows = check_draft_bundle({p["sku"] for p in products})
+    print(f"\n=== UNPROCESSED: {n_draft} products, {n_rows} rows in {DRAFT_CSV} ===")
+    ok = report(draft_issues) and ok
+    return 0 if ok else 1
+
+
+def report(issues):
     if not issues:
         print("No issues found.")
-        return 0
-
+        return True
     by_field = {}
     for sku, field, msg in issues:
         by_field.setdefault(field, []).append((sku, msg))
     for field, items in sorted(by_field.items()):
-        print(f"=== {field} ({len(items)}) ===")
+        print(f"--- {field} ({len(items)}) ---")
         for sku, msg in items:
             print(f"  {sku}: {msg}")
-        print()
-    print(f"TOTAL: {len(issues)} issue(s) across {len(set(i[0] for i in issues))} product(s)/group(s).")
-    return 1
+    print(f"TOTAL: {len(issues)} issue(s) across {len(set(i[0] for i in issues))} product(s).")
+    return False
+
+
+def check_draft_bundle(processed_skus):
+    """The unprocessed bundle must say exactly what the processed CSV will say once the
+    product gets images (same handle, same variant SKUs) -- otherwise Shopify creates a
+    duplicate product on the later import instead of updating the draft."""
+    issues = []
+    with open(se.CATALOG_PRODUCTS, encoding="utf-8", newline="") as f:
+        catalog = {p["sku"]: p for p in csv.DictReader(f) if p["price"].strip() and p["stock"].strip()}
+    variants_by_handle = se.load_variants_by_handle()
+    collections = st.load_collections()
+
+    expected = {}  # sku -> (catalog-style row, variant rows, product.json)
+    for sku, p in catalog.items():
+        if sku not in processed_skus:
+            pj_path = os.path.join(se.PRODUCTS_DIR, p["handle"].upper(), "product.json")
+            pj = json.load(open(pj_path, encoding="utf-8")) if os.path.isfile(pj_path) else None
+            if pj is None:
+                issues.append((sku, "handle", f"no input/{p['handle'].upper()}/ folder -- handle doesn't match folder"))
+            expected[sku] = (p, variants_by_handle.get(p["handle"], []), pj or {})
+    if os.path.isdir(FAILED_DIR):
+        for folder in sorted(os.listdir(FAILED_DIR)):
+            pj_path = os.path.join(FAILED_DIR, folder, "product.json")
+            if os.path.isfile(pj_path):
+                pj = json.load(open(pj_path, encoding="utf-8"))
+                row, _, _ = cc.row_for(folder, pj, collections)
+                expected[row["sku"]] = (row, cc.variant_rows(row, pj), pj)
+
+    with open(DRAFT_CSV, encoding="utf-8", newline="") as f:
+        rows = list(csv.DictReader(f))
+    by_handle = {}
+    for r in rows:
+        by_handle.setdefault(r["Handle"], []).append(r)
+
+    for sku, (p, variants, pj) in expected.items():
+        check_product_row(p, issues)
+        hrows = by_handle.pop(p["handle"], None)
+        if not hrows:
+            issues.append((sku, "missing", f"no rows with the catalog handle {p['handle']!r}"))
+            continue
+        got_skus = [r["Variant SKU"] for r in hrows if r["Variant SKU"].strip()]
+        want_skus = [v["sku"] for v in variants]
+        if got_skus != want_skus:
+            issues.append((sku, "variants", f"variant SKUs {got_skus} != catalog {want_skus}"))
+        for r in hrows:
+            if r["Variant SKU"].strip():
+                if not r["Variant Price"].strip():
+                    issues.append((sku, "variants", f"{r['Variant SKU']} has no price"))
+                if not r["Variant Inventory Qty"].strip():
+                    issues.append((sku, "stock", f"{r['Variant SKU']} has no stock count (imports as 0)"))
+        first = hrows[0]
+        if first["Published"] != "FALSE" or first["Status"] != "draft":
+            issues.append((sku, "status", f"Published={first['Published']} Status={first['Status']}, expected draft"))
+        if "age:" not in first["Tags"]:
+            issues.append((sku, "tags", f"not store-format tags: {first['Tags'][:60]!r}"))
+        if pj.get("bullet_points") and "<ul>" not in first["Body (HTML)"]:
+            issues.append((sku, "body", "product.json has bullet points but the body has none"))
+        srcs = [r["Image Src"] for r in hrows if r["Image Src"].strip()]
+        if not srcs:
+            issues.append((sku, "image", "no reference photo"))
+        for s in srcs:
+            if not os.path.isfile(s):
+                issues.append((sku, "image", f"missing file {s}"))
+        positions = [r["Image Position"] for r in hrows if r["Image Position"].strip()]
+        if positions != [str(i) for i in range(1, len(positions) + 1)]:
+            issues.append((sku, "csv-structure", f"Image Position sequence not 1..N: {positions}"))
+        per_product = os.path.join(PENDING_DIR, sku, "shopify_import.csv")
+        if not os.path.isfile(per_product):
+            issues.append((sku, "per-product-csv", f"missing {per_product}"))
+        elif list(csv.DictReader(open(per_product, encoding="utf-8", newline=""))) != hrows:
+            issues.append((sku, "per-product-csv", f"{per_product} differs from {DRAFT_CSV}"))
+
+    for handle in by_handle:
+        issues.append((handle, "unexpected", "handle in the draft CSV that isn't an unprocessed product"))
+    overlap = processed_skus & set(expected)
+    if overlap:
+        issues.append((", ".join(sorted(overlap)), "overlap", "product in both bundles"))
+    return issues, len(expected), len(rows)
 
 
 if __name__ == "__main__":

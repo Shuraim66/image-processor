@@ -91,8 +91,8 @@ def curated_filenames(d):
     return files
 
 
-def images_for(sku, base_url):
-    d = os.path.join(OUTPUT_DIR, sku)
+def images_for(sku, base_url, image_dir=OUTPUT_DIR):
+    d = os.path.join(image_dir, sku)
     files = curated_filenames(d)
     return [f"{base_url}{sku}/{f}" if base_url else os.path.join(d, f) for f in files]
 
@@ -120,10 +120,10 @@ def load_variants_by_handle():
     return by_handle
 
 
-def rows_for(prod, variants, args):
+def rows_for(prod, variants, args, image_dir=OUTPUT_DIR, product_dir=None):
     handle = prod["handle"]
-    folder = handle.upper()
-    pj_path = os.path.join(PRODUCTS_DIR, folder, "product.json")
+    product_dir = product_dir or os.path.join(PRODUCTS_DIR, handle.upper())
+    pj_path = os.path.join(product_dir, "product.json")
     alt_text, bullets, included = "", [], []
     if os.path.exists(pj_path):
         pj = json.load(open(pj_path, encoding="utf-8"))
@@ -132,9 +132,9 @@ def rows_for(prod, variants, args):
         included = pj.get("whats_included") or []
     alt_text = alt_text or prod["title"]
 
-    imgs = images_for(prod["sku"], args.image_base_url)
+    imgs = images_for(prod["sku"], args.image_base_url, image_dir)
     if not imgs:
-        print(f"  ! {prod['sku']}: no images in output/{prod['sku']}/", file=sys.stderr)
+        print(f"  ! {prod['sku']}: no images in {image_dir}/{prod['sku']}/", file=sys.stderr)
 
     status = (prod["status"] or "draft").lower()
     base = row_template()
