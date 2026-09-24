@@ -185,6 +185,12 @@ def main():
                           "the handoff zip a manageable size)")
     ap.add_argument("--image-base-url", default="")
     ap.add_argument("--out", default="shopify_import_pending.csv")
+    ap.add_argument("--shopify-only", action="store_true",
+                     help="write a clean, standard 27-column Shopify-import CSV instead: only the "
+                          "real priced/stocked products waiting on an image (active_unimaged + "
+                          "content_policy) -- excludes backlog_low_stock (not real listings yet, "
+                          "many have no price) and drops the Row Type/Units On Hand/Notes tracking "
+                          "columns. All rows still Published=FALSE / Status=draft.")
     args = ap.parse_args()
     if args.image_base_url and not args.image_base_url.endswith("/"):
         args.image_base_url += "/"
@@ -200,6 +206,23 @@ def main():
         BACKLOG_DIR, "backlog_low_stock",
         "Below the stock-listing threshold (or explicitly discontinued) -- not priced for sale yet.",
         args)
+
+    if args.shopify_only:
+        all_rows = unimaged_rows + failed_rows
+        for r in all_rows:
+            for c in EXTRA_COLUMNS:
+                r.pop(c, None)
+        out_path = args.out if args.out != "shopify_import_pending.csv" else "shopify_import_draft.csv"
+        with open(out_path, "w", newline="", encoding="utf-8") as f:
+            w = csv.DictWriter(f, fieldnames=se.COLUMNS)
+            w.writeheader()
+            w.writerows(all_rows)
+        print(f"active_unimaged: {unimaged_n} products")
+        print(f"content_policy:  {failed_n} products")
+        print(f"(backlog_low_stock excluded: {backlog_n} products -- not real listings yet)")
+        print(f"\nWrote {len(all_rows)} rows for {unimaged_n + failed_n} product(s) to '{out_path}' "
+              f"(standard Shopify columns only, Published=FALSE).")
+        return 0
 
     all_rows = unimaged_rows + failed_rows + backlog_rows_
     with open(args.out, "w", newline="", encoding="utf-8") as f:
