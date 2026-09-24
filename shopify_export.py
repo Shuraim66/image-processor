@@ -203,6 +203,10 @@ def main():
         description="Export catalog_products.csv + catalog_variants.csv + generated "
                      "images to a Shopify-import CSV.")
     ap.add_argument("--sku", help="only this SKU (default: all in catalog_products.csv)")
+    ap.add_argument("--only-imaged", action="store_true",
+                     help="skip products with no images in output/<SKU>/ (for splitting a "
+                          "'ready to import' bundle from products still waiting on a generated "
+                          "image set)")
     ap.add_argument("--out", default="shopify_import.csv")
     ap.add_argument("--image-base-url", default="",
                      help="public URL prefix for images (Shopify fetches Image Src over HTTP); "
@@ -222,6 +226,12 @@ def main():
         products = [p for p in products if p["sku"] == args.sku]
         if not products:
             sys.exit(f"No such SKU in {CATALOG_PRODUCTS}: {args.sku}")
+    if args.only_imaged:
+        unimaged = [p["sku"] for p in products if not curated_filenames(os.path.join(OUTPUT_DIR, p["sku"]))]
+        if unimaged:
+            print(f"--only-imaged: excluding {len(unimaged)} product(s) with no output/<SKU>/ images: "
+                  f"{unimaged}", file=sys.stderr)
+        products = [p for p in products if p["sku"] not in unimaged]
     variants_by_handle = load_variants_by_handle()
 
     all_rows = []

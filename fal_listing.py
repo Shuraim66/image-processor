@@ -382,7 +382,7 @@ LIFESTYLE_SCENES = [
      "on a display shelf in a softly lit bedroom"),
     (r"scooter|bike|bicycle|tricycle|ride ?on", "standing on a sunny park footpath beside green grass"),
     (r"plane|jet|glider|catapult", "on the green lawn of a sunny backyard"),
-    (r"bath|duck|water ?wheel", "floating in a bathtub filled with water in a bright bathroom"),
+    (r"bath|rubber ?duck|bath ?duck|water ?wheel", "floating in a bathtub filled with water in a bright bathroom"),
     (r"pool|water gun|blaster|beach|sand", "beside a paddling pool on a sunny patio"),
     (r"bubble", "on a garden table in a sunny backyard"),
     (r"makeup|cosmetic|vanity|beauty|nail|princess ?bag|lipstick",
@@ -532,6 +532,8 @@ def _content(profile):
     """Map an analyzer product.json profile -> FeatureCard V2 content."""
     feats = []
     for f in profile.get("features", [])[:4]:
+        if not isinstance(f, dict):
+            continue  # legacy product.json: "features" is the store's plain tag list (e.g. ["new"]), not icon/label dicts
         lines = [l.strip() for l in f.get("label", "").split("\n") if l.strip()]
         title, desc = (lines + ["", ""])[:2]
         # "DANCES &" / "WIGGLES" reads as two half-phrases on the card: join them up.

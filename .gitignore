@@ -30,6 +30,9 @@ backlog-products/**/product.json
 backlog-products-image-failed/**/*.jpg
 backlog-products-image-failed/**/*.jpeg
 backlog-products-image-failed/**/product.json
+backlog-products-discontinued/**/*.jpg
+backlog-products-discontinued/**/*.jpeg
+backlog-products-discontinued/**/product.json
 .DS_Store
 photo_labels.json
 photo_labels.json.tmp
