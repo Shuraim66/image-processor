@@ -27,6 +27,7 @@ import argparse
 import csv
 import json
 import os
+import re
 import shutil
 import sys
 
@@ -56,18 +57,26 @@ def raw_photos(folder, limit):
         return []
     files = [f for f in os.listdir(folder)
              if f.lower().endswith(se.IMG_EXTS) and os.path.isfile(os.path.join(folder, f))]
-    # front shot first: it becomes the draft listing's main image
-    return sorted(files, key=lambda f: (not f.lower().startswith("front"), f))[:limit]
+    # front shot first: it becomes the draft listing's main image. Natural order after that
+    # (angle2 before angle10): a plain sort picked angle10/angle11 as the 2nd/3rd photos on
+    # 10+-photo products -- on TGS-MAKEUP-SET-CASE those are a different design
+    return sorted(files, key=lambda f: (not f.lower().startswith("front"),
+                                        [int(t) if t.isdigit() else t.lower() for t in re.split(r"(\d+)", f)]))[:limit]
 
 
 def copy_images(sku, src_dir, limit):
     dest = os.path.join(PENDING_DIR, sku)
     os.makedirs(dest, exist_ok=True)
-    for fn in raw_photos(src_dir, limit):
+    for old in os.listdir(dest):   # a changed photo choice must not leave the old file in the listing
+        if old.lower().endswith(se.IMG_EXTS):
+            os.remove(os.path.join(dest, old))
+    # "1-front.jpg", "2-angle2.jpg"...: the listing's image order is alphabetical
+    # (shopify_export.curated_filenames), so the prefix keeps the front shot as the main image
+    for i, fn in enumerate(raw_photos(src_dir, limit), 1):
         try:
             im = Image.open(os.path.join(src_dir, fn)).convert("RGB")
             im.thumbnail((MAX_DIM, MAX_DIM), Image.LANCZOS)
-            im.save(os.path.join(dest, os.path.splitext(fn)[0] + ".jpg"), "JPEG", quality=82, optimize=True)
+            im.save(os.path.join(dest, f"{i}-{os.path.splitext(fn)[0]}.jpg"), "JPEG", quality=82, optimize=True)
         except Exception as e:
             print(f"  ! {sku}/{fn}: {e}", file=sys.stderr)
 

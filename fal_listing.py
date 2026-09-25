@@ -323,6 +323,101 @@ When determining what the actual product looks like, use this priority:
 
 Never use packaging artwork to override a clear photograph of the real product."""
 
+# Built from the "PRODUCT IDENTITY LOCK" prompt shared 2026-09-26 -- kept its product-fidelity,
+# reference-priority, accessory-rule and realism sections (a stricter restatement of FIDELITY/
+# REF_ROLE below) but dropped every section that asked the model to draw feature callouts,
+# typography or "verified" text onto the image. That's the same shape as the ChatGPT-prompt hero
+# test (hero_test/A.jpg) already tried and reverted for CatalogHero this session -- headline/
+# feature text stays with the free local FeatureCard/Hero_titled templates, which pull from
+# product.json and can't misspell or invent a claim. See catalog-image-approach.md.
+PRODUCT_FEATURE_HERO = """PRODUCT FEATURE HERO — STYLED FEATURE PHOTOGRAPH
+
+Create ONE premium, dramatic feature photograph of this exact product using ALL attached reference photos.
+
+The reference photos are the SOURCE OF TRUTH for the real physical product and everything physically included with it.
+
+--------------------------------------------------
+1. PRODUCT IDENTITY LOCK
+--------------------------------------------------
+
+Never redesign, reinterpret, improve, beautify, simplify, stylize or modify the product itself.
+
+Preserve exactly: shape, silhouette, proportions, geometry, colors, color distribution, materials,
+surface texture, stitching, seams, folds, edges, accessories, attached components, buttons,
+switches, handles, straps, labels, markings, printed graphics, logos, text appearing on the
+product, packaging, packaging artwork, orientation of printed elements, and the number and
+arrangement of visible parts.
+
+Do not add anything to the product. Do not remove anything. Do not replace any component. Do not
+invent missing details or infer how the product "should" look from similar products. Do not
+substitute a generic version or merge characteristics from different products.
+
+If a feature is not visible in the reference images, treat it as UNKNOWN — do not invent it. If
+references disagree because of angle, lighting or occlusion, use the most physically consistent
+reading of ALL of them together. The reference images outrank general product knowledge.
+
+--------------------------------------------------
+2. REFERENCE PRIORITY
+--------------------------------------------------
+
+1. Clear photographs of the actual physical product
+2. Multiple photographs showing the same physical product
+3. Actual accessories/components visibly shown in photographs
+4. Packaging photographs
+5. Product artwork/illustrations printed on packaging
+
+Never use packaging artwork to override a clear photograph of the real product, and never treat an
+item shown only in package artwork as physically included unless a reference photo or verified
+product information confirms it.
+
+--------------------------------------------------
+3. ACCESSORY RULE
+--------------------------------------------------
+
+An accessory is real only if it appears in a reference photo or is explicitly given in the product
+data. If something is not shown and not confirmed, do not add it.
+
+--------------------------------------------------
+4. CREATIVE FREEDOM — PRESENTATION ONLY
+--------------------------------------------------
+
+Creative generation is allowed ONLY for the surroundings: background, environment, tabletop or
+room setting, lighting, shadows, reflections, camera angle and perspective, depth of field, and
+overall composition. Make it striking and dramatic — more creative and atmospheric than a plain
+catalog shot — while the product itself stays exactly as photographed.
+
+Background elements must never be confused with product components, and must never imply the
+product includes accessories that were not shown.
+
+--------------------------------------------------
+5. THIS IS A PHOTOGRAPH, NOT A GRAPHIC DESIGN
+--------------------------------------------------
+
+Do not add a headline, product-name text, feature callouts, slogans, icons, badges, or any other
+typography or graphic text element. Do not compose a mini-infographic, feature card or marketing
+layout. The only text allowed anywhere in the image is text physically printed on the real product
+or its real packaging, reproduced exactly as photographed — never redrawn, resized, recolored or
+moved. Headline and feature-callout text are added separately by the store's own template, from
+verified product data — this image must not pre-empt or duplicate that.
+
+--------------------------------------------------
+6. REALISM
+--------------------------------------------------
+
+Correct perspective, realistic contact shadows and reflections, realistic material response,
+correct real-world scale, realistic occlusion and depth of field. Never make the product appear
+larger, smaller, wider, thinner or a different shape than the references.
+
+--------------------------------------------------
+7. FINAL CHECK
+--------------------------------------------------
+
+Before finishing, verify: same product, same shape, same proportions, same colors, no component
+missing, no component added, no accessory invented, no packaging redesigned, no text or typography
+added anywhere. If any check fails, correct it before producing the final image.
+
+Generate exactly one image, square 1:1."""
+
 # One image per mode (the store's /CatalogHero, /CatalogClean, /FeatureProduct, /Lifestyle).
 # The extra catalog views re-photograph a specific real view (opened, packaging, another angle).
 SLOT_PROMPTS = {
@@ -342,10 +437,7 @@ SLOT_PROMPTS = {
     "Detail": "Close-up catalog photograph framed as in the first reference image, showing the real "
               "texture and printed details of this exact product, shallow depth of "
               "field." + STUDIO + REF_ROLE + FIDELITY,
-    "FeatureProduct": "Premium feature photograph of this exact product as the clear main subject, "
-                      "with a more creative background, dramatic but natural lighting and a sense of "
-                      "depth. The presentation may be striking; the product itself may not change."
-                      + PHYSICS + FIDELITY,
+    "FeatureProduct": PRODUCT_FEATURE_HERO + PHYSICS + FIDELITY,
     "Lifestyle": "Realistic commercial lifestyle photograph: this exact product {scene}. Natural "
                  "daylight, softly blurred background, realistic real-world scale, the product "
                  "placed naturally and never operating, glowing or transforming." + PHYSICS + FIDELITY,
@@ -729,16 +821,29 @@ def build(sku, raws, profile, out_dir, ext="png"):
             json.dump(sources, f, indent=2)
 
     # FeatureCard V2 (brand catalog layout + verified copy + real thumbnails)
-    hero = O + "CatalogHero.png" if os.path.exists(O + "CatalogHero.png") else O + "CatalogClean.png"
+    # the cards cut the product out of this image with background removal. CatalogHero first: its
+    # background separates cleanly. Re-cutting the white-background CatalogClean tears white boxes
+    # and white toys (tried and reverted 2026-09-25). profile "card_photo" names another slot for a
+    # hero whose styling leaks into the cutout (the Unicorn Makeup Case's pink podium).
+    pick = [profile.get("card_photo"), "CatalogHero", "CatalogClean"]
+    hero = next(O + n + ".png" for n in pick if n and os.path.exists(O + n + ".png"))
     thumbs = [{"photo": O + slot + ".png", "crop": (0, 0, 1, 1), "caption": cap}
               for slot, cap in THUMB_CAPTIONS.items() if slot in plan and slot != "CatalogHero"][:4]
-    fc.render_v2(hero, thumbs, _content(profile), O + "FeatureCard.png")
+    content = _content(profile)
+    content["in_box"] = profile.get("whats_included") or []
+    # bottom row = the box-checked "What's included" list (user's pick 2026-09-25: the old captioned
+    # thumbnails only repeated gallery images); products with no list fall back to plain thumbnails
+    fc.render_v2(hero, thumbs, content, O + "FeatureCard.png",
+                 strip="in_box" if content["in_box"] else "thumbs_plain")
     print("  -> FeatureCard")
 
     # Titled hero (store-style: eyebrow + big title + subhead + badge)
     fc.render_hero_title(hero,
                          {"eyebrow": profile.get("tagline_top", ""),
-                          "title": profile.get("name") or sku,
+                          # older product.json files have product_name/title but no name --
+                          # falling straight to the SKU put "Tgs-Kuromi-Moon-Lamp" on a listing
+                          "title": (profile.get("name") or profile.get("product_name")
+                                    or profile.get("title") or sku),
                           "subhead2": profile.get("tagline_sub", ""),
                           "badge": "TOY GIFT"},
                          O + "Hero_titled.png")

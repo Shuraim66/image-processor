@@ -15,8 +15,12 @@ import os
 import re
 import sys
 
-COLLECTIONS_CSV = os.environ.get("STORE_COLLECTIONS_CSV",
-                                 os.path.expanduser("~/Downloads/collections.csv"))
+# store_collections.csv is built by build_collections.py from the developer's original export
+# (collections_dev.csv) -- the ~/Downloads copy was their 24-product sample
+_HERE = os.path.dirname(os.path.abspath(__file__))
+COLLECTIONS_CSV = os.environ.get("STORE_COLLECTIONS_CSV") or next(
+    p for p in (os.path.join(_HERE, "store_collections.csv"), os.path.join(_HERE, "collections_dev.csv"))
+    if os.path.exists(p))
 RULE = re.compile(r'(\w+)\s+(equals|not_equals|less_than|greater_than)\s+"([^"]*)"')
 
 # category -> (play tag, default subcategory). Play tags are the store's own five.
@@ -62,7 +66,11 @@ SUB_OVERRIDES = [
     (r"refrigerator|fridge|washing machine|vacuum|kettle|\biron\b|dishwasher|hand mixer|appliance",
      ("Mini Appliances", "Pretend Play & Role Play")),
     (r"cleaning kit|mop|broom|little helper", ("Cleaning Play Sets", "Pretend Play & Role Play")),
-    (r"makeup|cosmetic|nail polish|vanity|hair styling|beauty", ("Makeup Sets", "Pretend Play & Role Play")),
+    # hair TOOLS (dryer/curler/comb) before the makeup rule -- a set with no cosmetics isn't a
+    # "Makeup Set" just because it's beauty-adjacent pretend play (found 2026-09-25: the Deluxe
+    # Hair Styling Set has a dryer, brush and comb, no makeup at all, and was in Makeup Sets)
+    (r"hair (styl|dry|curl)", ("Hair Styling Sets", "Pretend Play & Role Play")),
+    (r"makeup|cosmetic|nail polish|vanity|beauty", ("Makeup Sets", "Pretend Play & Role Play")),
     (r"arcade|pinball|claw game|power punch|hammer game|shooting machine|handheld game|game console",
      ("Arcade Games", "Robots & Electronic Toys")),
     (r"bubble", ("Bubble Toys", "Outdoor Toys")),
@@ -148,11 +156,70 @@ def age_tag(printed):
     return "age:8+"
 
 
+# "What They Love" on the storefront: one chip per play tag, and a product carries every tag it
+# fits (a smart collection per chip, rule `tag equals play:<x>`). The first five are the store's
+# own; learning and squishy were added 2026-09-25 for the Learning / Squishy & fidget chips.
+PLAY_CHIPS = {"learning": "Learning", "build": "Building", "pretend": "Pretending",
+              "vehicles": "Cars & racing", "games": "Games & arcade",
+              "outdoor": "Outdoors & bubbles", "squishy": "Squishy & fidget",
+              # added 2026-09-25: neither belongs under "Learning" -- creative/tactile making and
+              # musical/sound play are both real, but distinct, play modes (user: "they don't relate")
+              "arts_crafts": "Arts & Crafts", "music": "Musical Toys"}
+
+PLAY_BY_TYPE = {
+    "Action Figures & Characters": ["pretend"], "Animal & Dinosaur Toys": ["pretend"],
+    "Arts, Crafts & Creative Toys": ["arts_crafts"], "Baby & Toddler Toys": ["learning"],
+    "Baby Care & Pretend Accessories": ["pretend"], "Battle & Action Play": ["games", "outdoor"],
+    "Board Games": ["games"], "Building & Construction Toys": ["build"],
+    "Card & Tabletop Games": ["games"], "Cars & Vehicles": ["vehicles"],
+    "Collectibles & Miniatures": ["vehicles"], "Doll Houses & Pretend Homes": ["pretend"],
+    "Dolls & Doll Play": ["pretend"], "Dress-Up & Costumes": ["pretend"],
+    "Educational Toys": ["learning"], "Fantasy & Magic Toys": ["pretend"],
+    "Musical Toys": ["music"], "Novelty & Fun Toys": [], "Outdoor Toys": ["outdoor"],
+    "Party Toys & Favors": ["games"], "Plush & Stuffed Toys": ["pretend"],
+    "Pretend Play & Role Play": ["pretend"], "Puzzles": ["games", "learning"],
+    "RC & Remote Control Toys": ["vehicles"], "Ride-On Toys": ["outdoor", "vehicles"],
+    "Robots & Electronic Toys": ["games"], "STEM & Science Toys": ["learning", "build"],
+    "Scooters, Bikes & Tricycles": ["outdoor", "vehicles"], "Sensory & Fidget Toys": ["squishy"],
+    "Sports Toys": ["outdoor", "games"], "Water & Beach Toys": ["outdoor"], "Drinkware": [],
+}
+PLAY_BY_SUB = {"Drones": ["outdoor"], "Arcade Games": ["games"], "Squishies": ["squishy"],
+               "Fidget Toys": ["squishy"], "Bubble Toys": ["outdoor"], "Stationery Gifts": ["learning"],
+               "Die-Cast Cars": ["vehicles"], "Electronic Toys": ["learning"]}
+# matched against title + product name + subcategory; each adds its tag
+PLAY_WORDS = [
+    ("squishy", r"squish|fidget|needoh|stress ?ball|pop ?it|slime|mochi|crackle"),
+    ("vehicles", r"\bcars?\b|truck|racing|racer|drift|\btrains?\b|tractor|excavator|forklift|"
+                 r"bike|motorcycle|\bjet\b|aeroplane|airplane|helicopter|bumper car|steering wheel|vehicle|railcar"),
+    ("outdoor", r"bubble|water gun|water bomb|\bpool\b|swim|beach|kite|\bsand\b|garden|outdoor"),
+    ("learning", r"learn|educat|alphabet|\babc\b|number|counting|quran|arabic|phonetic|spelling|"
+                 r"montessori|busy (book|board)|shape sorter|clock|flash ?card|\bstem\b|science|experiment|puzzle|"
+                 r"study|chess|coding|intellig"),
+    ("build", r"block|brick|construct|building (blocks?|sets?|toys?)|assembl|\bdiy\b|3d (printing )?pen|track set"),
+    ("games", r"\bgame|arcade|claw|pinball|dart|\buno\b|domino|jenga|ludo|monopoly|tambola|"
+              r"pictionary|taboo|sequence|catan|shooting machine|hammer"),
+    ("pretend", r"kitchen|make-?up|beauty|hair styling|doctor|\btool|drill|cleaning|\biron\b|appliance|"
+                r"dishwasher|fridge|refrigerator|vending|kettle|role play|pretend|costume|wand|crown|tiara|"
+                r"sword|\bdoll|telephone|super ?hero|spider"),
+]
+
+
+def play_tags(category, sub="", text=""):
+    """Every "What They Love" chip a product fits (see PLAY_CHIPS)."""
+    got = list(PLAY_BY_TYPE.get(category, PLAY_SUB.get(category, ("games", ""))[:1]))
+    got += PLAY_BY_SUB.get(sub, [])
+    blob = f"{text} {sub}".lower()
+    got += [tag for tag, pat in PLAY_WORDS if re.search(pat, blob)]
+    return sorted(set(got))
+
+
 def tags_for(category, *, printed_age="", gender="", occasions=("birthday", "eid"),
-             features=("new", "gift-ready"), extra_categories=(), sub=None):
-    play, default_sub = PLAY_SUB.get(category, ("games", ""))
+             features=("new", "gift-ready"), extra_categories=(), sub=None, play=None):
+    default_sub = PLAY_SUB.get(category, ("games", ""))[1]
     sub = sub or default_sub
-    tags = [f"play:{play}"]
+    if play is None:
+        play = PLAY_SUB.get(category, ("games", ""))[:1]
+    tags = [f"play:{p}" for p in play]
     if sub:
         tags.append(f"sub:{sub}")
     a = age_tag(printed_age or default_age(category, sub)) if category not in NON_TOY_TYPES else None
@@ -167,38 +234,75 @@ def tags_for(category, *, printed_age="", gender="", occasions=("birthday", "eid
     return sorted(set(tags))
 
 
+def gender_for(category, sub="", text=""):
+    """The store's gender:boys / gender:girls tag, only where it's obvious (user, 2026-09-25: "tag by
+    clear rules" -- makeup/unicorn/princess -> girls; blasters, RC cars, action figures -> boys;
+    everything else untagged). Baby toys and add-ons are never gendered."""
+    t = f"{text} {sub}".lower()
+    if category in ("Baby & Toddler Toys",) or category in NON_TOY_TYPES:
+        return ""
+    if sub == "Makeup Sets" or re.search(r"make-?up|unicorn|(?<!prince )princess", t):
+        return "girls"
+    if category == "Battle & Action Play":
+        return "boys"
+    if sub == "RC Vehicles" and re.search(r"\bcars?\b|truck|racing|drift|forklift", t) \
+            and not re.search(r"stitch|follow me", t):
+        return "boys"
+    if sub == "Action Figures" and not re.search(
+            r"kuromi|cocomelon|pooh|toy story|pony|minecraft|roblox|my world|sonic", t):
+        return "boys"
+    return ""
+
+
+# Ramadan family games: real Islamic-content items (Quran/dua/Arabic learning) qualify same as
+# board/card/puzzle games; user (2026-09-25): no music, especially, on anything shown for Ramadan
+ISLAMIC_PAT = re.compile(r"quran|qur'an|islamic|\bdua\b|duas|arabic|azan|\bnamaz\b|\bsalah\b", re.I)
+MUSIC_PAT = re.compile(r"\bmusic\b|\bsong\b|\bsongs\b|melod|\btune\b|\bsings?\b|\bsinging\b", re.I)
+
+
+def occasions_for(category, age, price, text="", base=("birthday", "eid")):
+    """The store's occasion collections, from what a product is (adds to `base`, never removes):
+    Ramadan family games, New baby gifts, Return gifts & party favours. `text` (title + description
+    + bullet points) drives the Islamic-content and no-music checks for Ramadan."""
+    out = list(base)
+    if (category in ("Board Games", "Card & Tabletop Games", "Puzzles") or ISLAMIC_PAT.search(text)) \
+            and not MUSIC_PAT.search(text):
+        out.append("ramadan")
+    if age == "0-1" or category == "Baby & Toddler Toys":
+        out.append("new-baby")
+    if (price and float(price) <= 1000) or category == "Party Toys & Favors":
+        out.append("return-gift")
+    return list(dict.fromkeys(out))
+
+
 def load_collections(path=COLLECTIONS_CSV):
+    """(handle, title, conditions, disjunctive) per smart collection. Shopify rules are all-AND
+    or all-OR ("A OR B"), never mixed."""
     rows = []
-    with open(path, encoding="utf-8") as f:
+    with open(path, encoding="utf-8-sig") as f:
         for r in csv.DictReader(f):
             if r["type"] == "smart" and r["rule"]:
-                rows.append((r["handle"], r["title"], RULE.findall(r["rule"])))
+                rows.append((r["handle"], r["title"], RULE.findall(r["rule"]), " OR " in r["rule"]))
     return rows
 
 
-def collections_for(category, tags, price=None, collections=None):
+def collections_for(category, tags, price=None, collections=None, vendor=""):
     """Handles this product lands in. Price rules are skipped while price is unknown."""
     out, skipped = [], []
-    for handle, _title, rules in (collections if collections is not None else load_collections()):
-        ok, needs_price = True, False
+    for handle, _title, rules, disjunctive in (collections if collections is not None else load_collections()):
+        results, needs_price = [], False
         for field, op, value in rules:
-            if field == "type":
-                got = category
-            elif field == "tag":
-                got = value if value in tags else ""
-            elif field == "variant_price":
+            if field == "variant_price":
                 needs_price = True
                 if price is None:
                     continue
                 got = float(price)
-                ok = ok and ((op == "less_than" and got < float(value)) or
-                             (op == "greater_than" and got > float(value)))
+                results.append((op == "less_than" and got < float(value)) or
+                               (op == "greater_than" and got > float(value)))
                 continue
-            elif field == "vendor":
-                got = ""
-            else:
-                got = ""
-            ok = ok and ((op == "equals" and got == value) or (op == "not_equals" and got != value))
+            got = {"type": category, "tag": value if value in tags else "", "vendor": vendor}.get(field, "")
+            results.append((op == "equals" and got == value) or (op == "not_equals" and got != value))
+        ok = any(results) if disjunctive else all(results)
         if ok and needs_price and price is None:
             skipped.append(handle)
         elif ok:

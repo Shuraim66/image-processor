@@ -41,11 +41,19 @@ def profile(sku):
 def seo_title_for(prof, title):
     """The store's form: '<Name> in Pakistan | Toy Gift Shop' (see the developer's products.csv)."""
     t = (prof.get("seo_title") or "").strip()
-    if t.endswith("| Toy Gift Shop"):
+    if t.endswith("| Toy Gift Shop") and len(t) <= 70:
         return t
     name = (prof.get("product_name") or title).strip()
-    out = f"{name} in Pakistan | Toy Gift Shop"
-    return out if len(out) <= 70 else f"{name} | Toy Gift Shop"
+    # past 70 chars search results cut the title off; a long full title ("... with 27MHz
+    # Transmitter") keeps its core name, the part before " with " / a dash
+    core = name
+    for sep in (" – ", " - ", " with "):
+        core = core.split(sep)[0].strip()
+    for out in (f"{name} in Pakistan | Toy Gift Shop", f"{name} | Toy Gift Shop",
+                f"{core} in Pakistan | Toy Gift Shop", f"{core} | Toy Gift Shop"):
+        if len(out) <= 70:
+            return out
+    return core[:70 - len(" | Toy Gift Shop")].rsplit(" ", 1)[0] + " | Toy Gift Shop"
 
 
 def row_for(folder, prof, collections):
@@ -57,19 +65,33 @@ def row_for(folder, prof, collections):
     # "features" is also the FeatureCard's icon list (dicts) on analysed products — the store's
     # feature tags (gift-ready, new, pick) are only the plain strings
     features = [f for f in (prof.get("store_features") or prof.get("features") or []) if isinstance(f, str)] or ["new"]
-    tags = st.tags_for(category, printed_age=prof.get("printed_age", ""), gender=prof.get("gender", ""),
-                       occasions=occasions, features=features, sub=sub)
+    if category in st.NON_TOY_TYPES and not prof.get("occasions"):
+        # batteries & other add-ons: no gift-occasion or "new in" tags, or they'd show up in
+        # Birthday gifts / New in next to the toys
+        occasions, features = [], []
+    # every "What They Love" chip it fits; product.json "play" (a list) overrides the rules
+    play = prof.get("play") if isinstance(prof.get("play"), list) else st.play_tags(
+        category, sub, " ".join(str(prof.get(k) or "") for k in ("title", "product_name", "name")))
     price = prof.get("price_pkr")                     # the shop's selling price, PKR
-    got, price_pending = st.collections_for(category, tags, price, collections)
+    vendor = prof.get("vendor") or "The Toy Gift Shop"
+    name_text = " ".join(str(prof.get(k) or "") for k in ("title", "product_name", "name"))
+    gender = prof.get("gender") or st.gender_for(category, sub, name_text)
+    tag_args = dict(printed_age=prof.get("printed_age", ""), gender=gender,
+                    features=features, sub=sub, play=play)
+    age = next((t.split(":", 1)[1] for t in st.tags_for(category, occasions=occasions, **tag_args)
+                if t.startswith("age:")), "")
+    if category not in st.NON_TOY_TYPES:
+        occ_text = name_text + " " + (prof.get("description") or "") + " " + " ".join(prof.get("bullet_points") or [])
+        occasions = st.occasions_for(category, age, price, occ_text, occasions)
+    tags = st.tags_for(category, occasions=occasions, **tag_args)
+    got, price_pending = st.collections_for(category, tags, price, collections, vendor=vendor)
     age_source = "box" if prof.get("printed_age") else ("n/a" if category in st.NON_TOY_TYPES else "type default")
-    age = next((t.split(":", 1)[1] for t in tags if t.startswith("age:")), "")
-    play = next((t.split(":", 1)[1] for t in tags if t.startswith("play:")), "")
     row = {
         # store convention: handle = folder name lowercased. Every downstream script finds a
         # product's folder via handle.upper(), so a title-derived handle silently breaks them.
         "handle": prof.get("handle") or folder.lower(),
         "title": title,
-        "vendor": prof.get("vendor") or "The Toy Gift Shop",
+        "vendor": vendor,
         "product_type": category,
         "status": prof.get("status") or "DRAFT",       # priced by hand before it goes ACTIVE
         "price": f"{price:.2f}" if price else "", "compare_at_price": "",
@@ -77,7 +99,7 @@ def row_for(folder, prof, collections):
         "sku": sku,
         "age": age,
         "occasions": ", ".join(occasions),
-        "play": play,
+        "play": ", ".join(play),
         "subcategories": sub,
         "features": ", ".join(features),
         "collections": ", ".join(got if "all" in got else got + ["all"]),
@@ -105,7 +127,9 @@ def variant_rows(row, prof):
     single Default Title row."""
     opts = prof.get("variants") or {}
     values = [v for v in (opts.get("values") or []) if v and v != "assorted"]
-    if not values:
+    # one value isn't a choice: exported as a real option it shows the buyer a one-item
+    # selector ("Title: Kuromi") and gives the product a suffixed SKU
+    if len(values) <= 1:
         return [{"product_handle": row["handle"], "product_title": row["title"], "variant": "Default Title",
                  "sku": row["sku"], "barcode": "", "price": row["price"], "compare_at_price": "",
                  "stock": row["stock"]}]

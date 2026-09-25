@@ -12,6 +12,7 @@ icon picked from its wording.
     render_hero_title(product_photo, content, out_path)
 """
 
+import functools
 import math
 import os
 import re
@@ -177,12 +178,18 @@ def _soft_disc(bg, box, blur):
     bg.paste(Image.new("RGBA", (W, W), TINT + (255,)), (0, 0), mask.filter(ImageFilter.GaussianBlur(blur)))
 
 
+@functools.lru_cache(maxsize=8)
+def _cutout(photo, mtime):
+    """Background-removed, trimmed product (cached: FeatureCard and Hero_titled cut the same hero)."""
+    return pp.trim_to_content(pp.remove_background(Image.open(photo).convert("RGBA")))
+
+
 def _place_cutout(bg, photo, box, shadow=True, disc=None):
     """Real product cutout fitted into box=(left, top, width, height).
 
     `disc` = (cx, cy, radius): also keep the cutout inside that circle, so a wide or tall
     product is framed by the brand disc instead of spilling out of it."""
-    cut = pp.trim_to_content(pp.remove_background(Image.open(photo).convert("RGBA")))
+    cut = _cutout(photo, os.path.getmtime(photo)).copy()
     left, top, bw, bh = box
     s = min(bw / cut.width, bh / cut.height)
     if disc:
@@ -211,8 +218,11 @@ def _logo(bg, x, y, width):
 
 
 # ---------- main -------------------------------------------------------------
-def render_v2(hero_photo, thumbs, content, out_path, theme=None, scene=None):
-    """theme/scene are accepted for backward compatibility; the brand look is fixed."""
+def render_v2(hero_photo, thumbs, content, out_path, theme=None, scene=None, strip="thumbs"):
+    """theme/scene are accepted for backward compatibility; the brand look is fixed.
+    strip: the row under the features -- "thumbs" (other listing images, captioned),
+    "thumbs_plain" (no captions), "in_box" (content["in_box"]: the box-checked whats_included
+    list as chips) or "none"."""
     bg = _brand_background()
     d = ImageDraw.Draw(bg)
 
@@ -273,7 +283,52 @@ def render_v2(hero_photo, thumbs, content, out_path, theme=None, scene=None):
         else:
             d.text((tx, cyf), title, font=f_ft, fill=NAVY, anchor="lm")
 
-    # thumbnail row (the product's own images)
+    if strip == "in_box":
+        _in_box_row(bg, d, content.get("in_box") or [], x0, int(W * 0.72))
+    elif strip == "thumbs":
+        _thumb_row(bg, d, thumbs, x0, captions=True)
+    elif strip == "thumbs_plain":
+        _thumb_row(bg, d, thumbs, x0, captions=False)
+    bg.convert("RGB").resize((SIZE, SIZE), Image.LANCZOS).save(out_path, quality=94)
+    return out_path
+
+
+def _in_box_row(bg, d, items, x0, y):
+    """'In the box': the box-checked whats_included list as chips, wrapped to 3 rows at most."""
+    if not items:
+        return
+    f_l = mh._font(F_B, 21)
+    d.rounded_rectangle([x0, y + 11 * SS, x0 + 34 * SS, y + 14 * SS], radius=2 * SS, fill=GOLD_RULE)
+    _tracked(d, (x0 + 48 * SS, y), "IN THE BOX", f_l, GOLD, 3.2 * SS)
+    f = mh._font(F_SB, 30)
+    h, px, gap = int(74 * SS), int(28 * SS), int(16 * SS)
+    right, y = W - x0, y + int(56 * SS)
+    x, row = x0, 0
+    items = [i[:1].upper() + i[1:] for i in items]
+    for k, item in enumerate(items):
+        text = item
+        while d.textlength(text, font=f) + 2 * px > right - x0 and len(text) > 4:
+            text = text[:-2].rstrip() + "…"          # drops one character per pass once it ends in …
+        w = int(d.textlength(text, font=f)) + 2 * px
+        if x + w > right:
+            row += 1; x = x0; y += h + gap
+        left = len(items) - k
+        if row == 2 and left > 1:     # last row: stop early and say how many more
+            more = f"+{left} more"
+            mw = int(d.textlength(more, font=f)) + 2 * px
+            if x + w + gap + mw > right:
+                d.rounded_rectangle([x, y, x + mw, y + h], radius=h // 2, fill=LINE)
+                d.text((x + mw / 2, y + h / 2), more, font=f, fill=SLATE, anchor="mm")
+                return
+        if row > 2:
+            return
+        d.rounded_rectangle([x, y, x + w, y + h], radius=h // 2, fill=TINT)
+        d.text((x + w / 2, y + h / 2), text, font=f, fill=NAVY, anchor="mm")
+        x += w + gap
+
+
+def _thumb_row(bg, d, thumbs, x0, captions=True):
+    """The product's own other listing images as a thumbnail row."""
     n = len(thumbs); pad = int(W * 0.02)
     tw = int((W - 2 * x0 - 3 * pad) / 4)          # always the 4-up size; fewer never means bigger
     row_w = n * tw + (n - 1) * pad
@@ -288,11 +343,9 @@ def render_v2(hero_photo, thumbs, content, out_path, theme=None, scene=None):
         tx = x_row + i * (tw + pad)
         bg.alpha_composite(_rounded_thumb(crop, tw, int(20 * SS)), (tx, ty))
         d.rounded_rectangle([tx, ty, tx + tw, ty + tw], radius=int(20 * SS), outline=LINE, width=int(3 * SS))
-        cap = t["caption"].upper(); cw = _tracked_width(d, cap, f_c, 2.5 * SS)
-        _tracked(d, (tx + (tw - cw) / 2, ty + tw + int(14 * SS)), cap, f_c, SLATE, 2.5 * SS)
-
-    bg.convert("RGB").resize((SIZE, SIZE), Image.LANCZOS).save(out_path, quality=94)
-    return out_path
+        if captions:
+            cap = t["caption"].upper(); cw = _tracked_width(d, cap, f_c, 2.5 * SS)
+            _tracked(d, (tx + (tw - cw) / 2, ty + tw + int(14 * SS)), cap, f_c, SLATE, 2.5 * SS)
 
 
 def render_hero_title(product_photo, content, out_path, theme=None, scene=None):

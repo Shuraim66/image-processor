@@ -41,3 +41,12 @@ _archive/
 # supplier price list (business data, not code)
 happy_toys_prices.csv
 recovered-photos/
+
+# dev-handoff bundles: rebuilt from output/ + output_pending/ and delivered via Drive, never committed
+Processed-Images/
+Unprocessed-Images/
+Products-CSV/
+Processed-Images.zip
+Unprocessed-Images.zip
+Products-CSV.zip
+output_pending/

@@ -23,7 +23,7 @@ def main():
         products = [r for r in csv.DictReader(f) if r["sku"].strip()]
 
     os.makedirs(OUT_ROOT, exist_ok=True)
-    missing, copied_total = [], 0
+    missing, copied_total, built = [], 0, set()
 
     for prod in products:
         sku, handle = prod["sku"], prod["handle"]
@@ -36,8 +36,21 @@ def main():
         os.makedirs(dest_dir, exist_ok=True)
         for fname in files:
             shutil.copy2(os.path.join(src_dir, fname), os.path.join(dest_dir, fname))
+        # a file archived out of the working dir must leave the handoff too, or it stays in the
+        # gallery (curated_filenames() appends unrecognised files); shopify_import.csv is
+        # written here by split_import_csv.py
+        for stale in set(os.listdir(dest_dir)) - set(files) - {"shopify_import.csv"}:
+            os.remove(os.path.join(dest_dir, stale))
+            print(f"  removed stale {dest_dir}/{stale}")
+        built.add(sku)
         copied_total += len(files)
         print(f"[{sku}] {len(files)} image(s) -> {dest_dir}/")
+
+    # a leftover output/<SKU>/ would mark a product "processed" for every downstream script
+    for stale in sorted(set(os.listdir(OUT_ROOT)) - built):
+        if os.path.isdir(os.path.join(OUT_ROOT, stale)):
+            shutil.rmtree(os.path.join(OUT_ROOT, stale))
+            print(f"removed stale {OUT_ROOT}/{stale}/")
 
     print(f"\n{len(products)} products, {copied_total} files copied, "
           f"{len(missing)} with no images: {missing}")

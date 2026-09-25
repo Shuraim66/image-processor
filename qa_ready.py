@@ -57,7 +57,7 @@ def check_product_row(p, issues):
         issues.append((sku, "category", "blank product_type"))
     if not p["subcategories"].strip():
         issues.append((sku, "subcategory", "blank subcategories"))
-    if not p["age"].strip():
+    if not p["age"].strip() and p["product_type"] not in st.NON_TOY_TYPES:   # batteries etc. have no age
         issues.append((sku, "age", "blank age tag"))
     # copy
     desc = p["description"].strip()
@@ -228,13 +228,16 @@ def check_draft_bundle(processed_skus):
         first = hrows[0]
         if first["Published"] != "FALSE" or first["Status"] != "draft":
             issues.append((sku, "status", f"Published={first['Published']} Status={first['Status']}, expected draft"))
-        if "age:" not in first["Tags"]:
+        if "age:" not in first["Tags"] and first["Type"] not in st.NON_TOY_TYPES:
             issues.append((sku, "tags", f"not store-format tags: {first['Tags'][:60]!r}"))
         if pj.get("bullet_points") and "<ul>" not in first["Body (HTML)"]:
             issues.append((sku, "body", "product.json has bullet points but the body has none"))
         srcs = [r["Image Src"] for r in hrows if r["Image Src"].strip()]
         if not srcs:
             issues.append((sku, "image", "no reference photo"))
+        has_front = pj.get("photos") and any(k.lower().startswith("front") for k in pj["photos"])
+        if srcs and has_front and "-front" not in os.path.basename(srcs[0]):
+            issues.append((sku, "image", f"main image is {os.path.basename(srcs[0])}, not the front shot"))
         for s in srcs:
             if not os.path.isfile(s):
                 issues.append((sku, "image", f"missing file {s}"))
