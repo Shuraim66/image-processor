@@ -50,3 +50,8 @@ Processed-Images.zip
 Unprocessed-Images.zip
 Products-CSV.zip
 output_pending/
+
+# image deliverables built for the store/dev (regenerable, delivered via Drive)
+Transparent-Images/
+Transparent-Images.zip
+Collection-Images/

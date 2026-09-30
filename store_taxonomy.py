@@ -143,7 +143,9 @@ def age_tag(printed):
         return None
     text = printed.lower().replace("years", "").replace("yrs", "")
     months = re.search(r"(\d+)\s*m", text)
-    if months and "month" in text or (months and int(months.group(1)) >= 12 and "m+" in text):
+    # "6M+" is 6 months, not 6 years -- the old ">= 12" guard read it as years and put a
+    # 6-month baby stacker under ages 5-8 (TGS-STACKED-CIRCLE-RING, fixed 2026-10-01)
+    if months and ("month" in text or "m+" in text):
         years = int(months.group(1)) / 12
     else:
         nums = [int(n) for n in re.findall(r"\d+", text)]
