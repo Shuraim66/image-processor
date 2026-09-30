@@ -323,100 +323,134 @@ When determining what the actual product looks like, use this priority:
 
 Never use packaging artwork to override a clear photograph of the real product."""
 
-# Built from the "PRODUCT IDENTITY LOCK" prompt shared 2026-09-26 -- kept its product-fidelity,
-# reference-priority, accessory-rule and realism sections (a stricter restatement of FIDELITY/
-# REF_ROLE below) but dropped every section that asked the model to draw feature callouts,
-# typography or "verified" text onto the image. That's the same shape as the ChatGPT-prompt hero
-# test (hero_test/A.jpg) already tried and reverted for CatalogHero this session -- headline/
-# feature text stays with the free local FeatureCard/Hero_titled templates, which pull from
-# product.json and can't misspell or invent a claim. See catalog-image-approach.md.
-PRODUCT_FEATURE_HERO = """PRODUCT FEATURE HERO — STYLED FEATURE PHOTOGRAPH
+# v3, replacing the v2 explicit-callout version 2026-09-26: the user's third prompt draft drops
+# the "always add 2-3 callouts" instruction in favor of letting the model pick the presentation
+# (studio / usage-demo / feature-focus / contents / lifestyle) per product, and only allows text
+# when "necessary and supported by verified information" rather than always. Kept the {facts}
+# block from v2 as the concrete backing for that phrase -- still the same product.json source the
+# free FeatureCard/Hero_titled templates use, so any text drawn here still traces to a checked
+# fact rather than the model's guess. Whether v2's callout text actually rendered correctly is
+# still an open question (awaiting the user's read of that test) -- if it garbled real words, that
+# finding applies here too, since this version can still draw text when it decides to.
+PRODUCT_FEATURE_HERO = """PRODUCT FEATURE HERO — AUTO-PRESENTATION
 
-Create ONE premium, dramatic feature photograph of this exact product using ALL attached reference photos.
-
-The reference photos are the SOURCE OF TRUTH for the real physical product and everything physically included with it.
+Create ONE polished, commercially useful e-commerce image of this exact product using ALL attached reference photos.
 
 --------------------------------------------------
-1. PRODUCT IDENTITY LOCK
+1. PRODUCT IDENTITY — HIGHEST PRIORITY
 --------------------------------------------------
 
-Never redesign, reinterpret, improve, beautify, simplify, stylize or modify the product itself.
+Treat all reference photos as authoritative for the SAME physical product. Analyze all of them before generating.
 
 Preserve exactly: shape, silhouette, proportions, geometry, colors, color distribution, materials,
-surface texture, stitching, seams, folds, edges, accessories, attached components, buttons,
-switches, handles, straps, labels, markings, printed graphics, logos, text appearing on the
-product, packaging, packaging artwork, orientation of printed elements, and the number and
-arrangement of visible parts.
+texture, finish, buttons, controls, components, accessories, labels, logos, graphics, markings and
+packaging.
 
-Do not add anything to the product. Do not remove anything. Do not replace any component. Do not
-invent missing details or infer how the product "should" look from similar products. Do not
-substitute a generic version or merge characteristics from different products.
-
-If a feature is not visible in the reference images, treat it as UNKNOWN — do not invent it. If
-references disagree because of angle, lighting or occlusion, use the most physically consistent
-reading of ALL of them together. The reference images outrank general product knowledge.
+Do not redesign, improve, simplify, stylize, modernize or reinterpret the product. Do not add,
+remove, replace or merge product components. Do not create a similar-looking substitute. If a
+physical detail is not visible or verified, do not invent it.
 
 --------------------------------------------------
-2. REFERENCE PRIORITY
+2. REFERENCE PHOTOS ARE PRODUCT REFERENCES ONLY
 --------------------------------------------------
 
-1. Clear photographs of the actual physical product
-2. Multiple photographs showing the same physical product
-3. Actual accessories/components visibly shown in photographs
-4. Packaging photographs
-5. Product artwork/illustrations printed on packaging
+The reference photos define WHAT THE PRODUCT IS. They do NOT define the background, room, table,
+lighting, camera angle, composition, props or environment. Do not simply place the original
+photograph into a prettier background — create a NEW commercial e-commerce composition.
 
-Never use packaging artwork to override a clear photograph of the real product, and never treat an
-item shown only in package artwork as physically included unless a reference photo or verified
-product information confirms it.
-
---------------------------------------------------
-3. ACCESSORY RULE
---------------------------------------------------
-
-An accessory is real only if it appears in a reference photo or is explicitly given in the product
-data. If something is not shown and not confirmed, do not add it.
+A common mistake is pasting the exact same product cutout — same pose, same crop, same camera
+distance and angle as the reference photo — onto a new backdrop and calling that "new." That is
+NOT acceptable here: it is a background swap, not a new photograph. Re-imagine how a professional
+product photographer would frame THIS product fresh, in the new scene: pick a different camera
+angle (for example three-quarter instead of straight-on), a different crop or distance, and a
+composition built for the new setting — while the product itself stays physically identical to
+the references.
 
 --------------------------------------------------
-4. CREATIVE FREEDOM — PRESENTATION ONLY
+3. AUTOMATIC PRESENTATION CHOICE
 --------------------------------------------------
 
-Creative generation is allowed ONLY for the surroundings: background, environment, tabletop or
-room setting, lighting, shadows, reflections, camera angle and perspective, depth of field, and
-overall composition. Make it striking and dramatic — more creative and atmospheric than a plain
-catalog shot — while the product itself stays exactly as photographed.
+Determine the most useful presentation automatically from the product itself — whichever best
+communicates it to an online customer:
 
-Background elements must never be confused with product components, and must never imply the
-product includes accessories that were not shown.
+1. Clean studio catalog presentation
+2. Product-in-use demonstration
+3. Feature-focused product presentation
+4. Contents/components presentation
+5. Attractive lifestyle-commercial presentation
 
---------------------------------------------------
-5. THIS IS A PHOTOGRAPH, NOT A GRAPHIC DESIGN
---------------------------------------------------
-
-Do not add a headline, product-name text, feature callouts, slogans, icons, badges, or any other
-typography or graphic text element. Do not compose a mini-infographic, feature card or marketing
-layout. The only text allowed anywhere in the image is text physically printed on the real product
-or its real packaging, reproduced exactly as photographed — never redrawn, resized, recolored or
-moved. Headline and feature-callout text are added separately by the store's own template, from
-verified product data — this image must not pre-empt or duplicate that.
+Use the product's actual nature and its visible/verified function to decide. Do not choose a
+lifestyle scene merely because it looks attractive — prefer a functional or explanatory
+presentation when that communicates the product better.
 
 --------------------------------------------------
-6. REALISM
+4. E-COMMERCE COMPOSITION
 --------------------------------------------------
 
-Correct perspective, realistic contact shadows and reflections, realistic material response,
-correct real-world scale, realistic occlusion and depth of field. Never make the product appear
-larger, smaller, wider, thinner or a different shape than the references.
+Prioritize product recognition, product visibility, realistic scale, clear purpose, strong visual
+hierarchy, professional lighting, believable shadows, realistic materials and clean composition.
+The product must remain the dominant subject. Use supporting props only when they help communicate
+the product — do not fill the image with decorative objects.
 
 --------------------------------------------------
-7. FINAL CHECK
+5. PRODUCT USAGE (WHEN CHOSEN)
 --------------------------------------------------
 
-Before finishing, verify: same product, same shape, same proportions, same colors, no component
-missing, no component added, no accessory invented, no packaging redesigned, no text or typography
-added anywhere. If any check fails, correct it before producing the final image.
+If a usage demonstration is the chosen presentation, it must show a REALISTIC and VERIFIED use of
+the exact product. Do not invent mechanisms or capabilities. Do not add accessories unless visible
+in the references or explicitly confirmed in the product data. The product itself must stay
+clearly visible and recognizable throughout.
+
+--------------------------------------------------
+6. TEXT AND BRANDING — VERIFIED ONLY
+--------------------------------------------------
+
+Preserve existing product/packaging branding and visible markings exactly as photographed. Do not
+invent specifications, certifications, labels, claims, features, dimensions or packaging text.
+
+Default: no watermark, no store logo, no promotional text — unless it is necessary and the exact
+wording is supported by the verified information below, reproduced as-is or shortened without
+changing its meaning:
+
+{facts}
+
+Never draw any word, claim or number that is not listed above.
+
+--------------------------------------------------
+7. REALISM
+--------------------------------------------------
+
+Realistic perspective, realistic scale, believable physical interaction, realistic shadows,
+realistic reflections, realistic depth of field, natural object placement. Avoid surreal
+backgrounds, impossible geometry, floating objects, exaggerated proportions, excessive cinematic
+effects and excessive decoration.
+
+--------------------------------------------------
+8. FINAL DECISION RULE
+--------------------------------------------------
+
+Ask internally: "What image would be most useful to a customer viewing this product online?" Then
+create that image. The product must remain faithful to the reference images; the presentation may
+be creative; when information is unknown, omit it — never invent it.
 
 Generate exactly one image, square 1:1."""
+
+
+def _verified_facts(profile):
+    """Short, verified-only fact list for the one prompt allowed to draw text (FeatureProduct) --
+    pulled straight from product.json, same source as the free FeatureCard/Hero_titled templates,
+    so any text the model draws traces back to a checked fact instead of its own guess."""
+    lines = []
+    name = profile.get("name") or profile.get("product_name") or profile.get("title")
+    if name:
+        lines.append(f"Product name: {name}")
+    if profile.get("printed_age"):
+        lines.append(f"Age: {profile['printed_age']}")
+    for b in (profile.get("bullet_points") or [])[:3]:
+        lines.append(f"Feature: {b}")
+    if profile.get("whats_included"):
+        lines.append("Includes: " + ", ".join(profile["whats_included"]))
+    return "\n".join(lines) or "No verified facts on file — do not draw any feature text."
 
 # One image per mode (the store's /CatalogHero, /CatalogClean, /FeatureProduct, /Lifestyle).
 # The extra catalog views re-photograph a specific real view (opened, packaging, another angle).
@@ -437,7 +471,10 @@ SLOT_PROMPTS = {
     "Detail": "Close-up catalog photograph framed as in the first reference image, showing the real "
               "texture and printed details of this exact product, shallow depth of "
               "field." + STUDIO + REF_ROLE + FIDELITY,
-    "FeatureProduct": PRODUCT_FEATURE_HERO + PHYSICS + FIDELITY,
+    # no + FIDELITY here: its trailing "no added text, captions or logos" would fight section 5
+    # above. PRODUCT_FEATURE_HERO's own section 1 already restates FIDELITY's shape/color/
+    # accessory rules without that clause.
+    "FeatureProduct": PRODUCT_FEATURE_HERO + PHYSICS,
     "Lifestyle": "Realistic commercial lifestyle photograph: this exact product {scene}. Natural "
                  "daylight, softly blurred background, realistic real-world scale, the product "
                  "placed naturally and never operating, glowing or transforming." + PHYSICS + FIDELITY,
@@ -528,6 +565,14 @@ FAL_MODELS = {
         "endpoint": "meta/muse-image/edit", "usd": 0.01,
         "args": lambda url, prompt: {"image_urls": [url], "prompt": prompt, "aspect_ratio": "1:1",
                                      "output_format": "png"}},
+    # added 2026-09-26: gpt-image-2.5's edit behavior kept doing a background swap on the
+    # original crop/pose instead of a real re-composition (confirmed on the tent test). fal's own
+    # docs call this model out specifically for "composition-aware transforms that respect depth,
+    # perspective and lighting automatically" -- worth a real test before assuming it's better.
+    "nano-banana-pro": {
+        "endpoint": "fal-ai/nano-banana-pro/edit", "usd": 0.15,
+        "args": lambda url, prompt: {"image_urls": [url], "prompt": prompt, "aspect_ratio": "1:1",
+                                     "output_format": "png", "resolution": "1K"}},
     # token-billed: longer prompts cost more, so this is fal's list price, not a guarantee.
     # quality must be explicit — the endpoint defaults to "high" (~4x the price)
     "gpt-image-2.5-sunburst-medium": {
@@ -664,7 +709,12 @@ PRODUCT_ONLY_VIEWS = ["product_front", "product_angle", "product_back"]
 SOURCES_FILE = "slot_sources.json"   # {slot: photo file} for every generated image
 
 
-ALWAYS_KEEP = ("CatalogHero", "CatalogClean", "Lifestyle")
+# FeatureProduct defaults to the same source photo as CatalogHero on purpose -- it's a different
+# creative restyling of that same reference, not a second documentary view of it -- so it must
+# not be dropped as a "repeat" of CatalogHero's photo the way Angle/Open/Box/Detail should be.
+# Found 2026-09-26: it was being silently deduped away on every product where it wasn't pinned
+# to a different photo via slot_photos, which in practice was every product tested so far.
+ALWAYS_KEEP = ("CatalogHero", "CatalogClean", "Lifestyle", "FeatureProduct")
 
 
 def drop_duplicate_views(plan):
@@ -804,7 +854,8 @@ def build(sku, raws, profile, out_dir, ext="png"):
             os.makedirs(O + "_replaced", exist_ok=True)
             os.replace(png, f"{O}_replaced/{slot}-{stamp}.png")
         if slot in PAID_SLOTS:
-            _fal_scene(photo, SLOT_PROMPTS[slot].format(scene=scene), png, refs=others)
+            _fal_scene(photo, SLOT_PROMPTS[slot].format(scene=scene, facts=_verified_facts(profile)),
+                      png, refs=others)
         elif not os.path.exists(png):
             src = O + "CatalogHero.png" if slot == "CatalogClean" and os.path.exists(O + "CatalogHero.png") else photo
             pp.process_image(src, None).save(png)

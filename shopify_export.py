@@ -48,8 +48,15 @@ COLUMNS = [
 # each marketing slot -- falling back to the plain copy only if that slot was never branded --
 # then the two locally-rendered extras. Anything else in the folder (a hand-added variant
 # photo, a future slot) is appended afterwards, alphabetically, so nothing gets silently lost.
-GALLERY_SLOTS = ["CatalogHero", "Angle", "Open", "Box", "Detail", "FeatureProduct", "Lifestyle"]
+# Box comes right after the main image (2026-09-26, per competitor examples the user shared):
+# most theme "show second image on hover" settings just use gallery position 2, and a packaging
+# shot there gives the shopper a second useful reference for free -- no new fal generation needed.
+GALLERY_SLOTS = ["Box", "CatalogHero", "Angle", "Open", "Detail", "FeatureProduct", "Lifestyle"]
 GALLERY_EXTRAS = ["Hero_titled", "FeatureCard"]
+# Title hero + lifestyle the user makes by hand in ChatGPT (2026-09-30). They already carry the
+# store logo and watermark, so they keep their own names (never "<slot>.png", which build() would
+# brand a second time) and sit right after the main image, ahead of everything the pipeline made.
+GPT_SLOTS = ["GPT_TitleHero", "GPT_Lifestyle"]
 
 
 def curated_filenames(d):
@@ -71,6 +78,11 @@ def curated_filenames(d):
     if main:
         files.append(main)
     handled.add("CatalogClean")
+    for slot in GPT_SLOTS:
+        f = pick(slot)
+        if f:
+            files.append(f)
+        handled.add(slot)
     for slot in GALLERY_SLOTS:
         f = pick(slot + "_wm") or pick(slot)
         if f:
