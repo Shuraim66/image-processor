@@ -1,20 +1,20 @@
 handle,change,note
 frontpage,unchanged,
 action-figures-characters,updated,product_count 0 -> 18; description filled; seo_description filled; seo_title filled
-age-0-1,updated,product_count 1 -> 2; description filled; seo_description filled; seo_title filled
-age-1-3,updated,product_count 2 -> 13; description filled; seo_description filled; seo_title filled
-age-3-5,updated,product_count 11 -> 146; description filled; seo_description filled; seo_title filled
-age-5-8,updated,product_count 6 -> 42; description filled; seo_description filled; seo_title filled
-age-8-plus,updated,product_count 4 -> 14; description filled; seo_description filled; seo_title filled
-all,updated,product_count 24 -> 217; seo_title filled
+age-0-1,updated,product_count 1 -> 3; description filled; seo_description filled; seo_title filled
+age-1-3,updated,product_count 2 -> 16; description filled; seo_description filled; seo_title filled
+age-3-5,updated,product_count 11 -> 162; description filled; seo_description filled; seo_title filled
+age-5-8,updated,product_count 6 -> 56; description filled; seo_description filled; seo_title filled
+age-8-plus,updated,product_count 4 -> 19; description filled; seo_description filled; seo_title filled
+all,updated,product_count 24 -> 256; seo_title filled
 animal-dinosaur-toys,updated,product_count 0 -> 9; description filled; seo_description filled; seo_title filled
-arts-crafts-creative-toys,updated,product_count 0 -> 7; description filled; seo_description filled; seo_title filled
-baby-care-pretend-accessories,updated,description filled; seo_description filled; seo_title filled; EMPTY -- no product matches its rule yet
-baby-toddler-toys,updated,product_count 0 -> 12; description filled; seo_description filled; seo_title filled
+arts-crafts-creative-toys,updated,product_count 0 -> 26; description filled; seo_description filled; seo_title filled
+baby-care-pretend-accessories,updated,product_count 0 -> 1; description filled; seo_description filled; seo_title filled
+baby-toddler-toys,updated,product_count 0 -> 15; description filled; seo_description filled; seo_title filled
 battle-action-play,updated,product_count 0 -> 7; description filled; seo_description filled; seo_title filled
-best-sellers,updated,product_count 24 -> 217; description filled; seo_description filled; seo_title filled
+best-sellers,updated,product_count 24 -> 256; description filled; seo_description filled; seo_title filled
 bestway,removed,sample brand collection -- none of our products has this vendor
-big-gifts,updated,product_count 10 -> 45; description filled; seo_description filled; seo_title filled
+big-gifts,updated,product_count 10 -> 50; description filled; seo_description filled; seo_title filled
 board-games,updated,product_count 4 -> 26; description filled; seo_description filled; seo_title filled
 building-construction-toys,updated,description filled; seo_description filled; seo_title filled
 card-tabletop-games,updated,description filled; seo_description filled; seo_title filled; EMPTY -- no product matches its rule yet
@@ -26,9 +26,9 @@ dress-up-costumes,updated,product_count 0 -> 1; description filled; seo_descript
 educational-toys,updated,product_count 0 -> 14; description filled; seo_description filled; seo_title filled
 fantasy-magic-toys,updated,product_count 0 -> 2; description filled; seo_description filled; seo_title filled
 gift-ready-under-1000,updated,product_count 5 -> 0; description filled; seo_description filled; seo_title filled; EMPTY -- no product matches its rule yet
-gifts-under-1000,updated,product_count 5 -> 9; description filled; seo_description filled; seo_title filled
-gifts-under-2500,updated,product_count 11 -> 97; description filled; seo_description filled; seo_title filled
-gifts-under-5000,updated,product_count 14 -> 172; description filled; seo_description filled; seo_title filled
+gifts-under-1000,updated,product_count 5 -> 12; description filled; seo_description filled; seo_title filled
+gifts-under-2500,updated,product_count 11 -> 116; description filled; seo_description filled; seo_title filled
+gifts-under-5000,updated,product_count 14 -> 206; description filled; seo_description filled; seo_title filled
 hasbro,removed,sample brand collection -- none of our products has this vendor
 hot-wheels,updated,"product_count 4 -> 0; kept empty -- brand not stocked yet, on the roadmap per the user (2026-09-25); description filled; seo_description filled; seo_title filled; EMPTY -- no product matches its rule yet"
 lego,updated,"product_count 2 -> 0; kept empty -- brand not stocked yet, on the roadmap per the user (2026-09-25); description filled; seo_description filled; seo_title filled; EMPTY -- no product matches its rule yet"
@@ -36,22 +36,22 @@ mega-bloks,removed,sample brand collection -- none of our products has this vend
 melissa-doug,removed,sample brand collection -- none of our products has this vendor
 musical-toys,updated,product_count 0 -> 6; description filled; seo_description filled; seo_title filled
 nerf,removed,sample brand collection -- none of our products has this vendor
-new-in,updated,product_count 6 -> 217; description filled; seo_description filled; seo_title filled
-novelty-fun-toys,updated,product_count 0 -> 23; description filled; seo_description filled; seo_title filled
+new-in,updated,product_count 6 -> 256; description filled; seo_description filled; seo_title filled
+novelty-fun-toys,updated,product_count 0 -> 24; description filled; seo_description filled; seo_title filled
 occasion-azadi,updated,description filled; seo_description filled; seo_title filled; EMPTY -- no product matches its rule yet
-occasion-birthday,updated,product_count 24 -> 217; description filled; seo_description filled; seo_title filled
-occasion-eid,updated,product_count 17 -> 216; description filled; seo_description filled; seo_title filled
-occasion-new-baby,updated,product_count 3 -> 12; description filled; seo_description filled; seo_title filled
+occasion-birthday,updated,product_count 24 -> 256; description filled; seo_description filled; seo_title filled
+occasion-eid,updated,product_count 17 -> 255; description filled; seo_description filled; seo_title filled
+occasion-new-baby,updated,product_count 3 -> 16; description filled; seo_description filled; seo_title filled
 occasion-ramadan,updated,product_count 9 -> 29; description filled; seo_description filled; seo_title filled
-occasion-return-gift,updated,product_count 9 -> 10; description filled; seo_description filled; seo_title filled
+occasion-return-gift,updated,product_count 9 -> 13; description filled; seo_description filled; seo_title filled
 outdoor-toys,updated,product_count 3 -> 10; description filled; seo_description filled; seo_title filled
 party-toys-favors,updated,description filled; seo_description filled; seo_title filled; EMPTY -- no product matches its rule yet
 plush-stuffed-toys,updated,description filled; seo_description filled; seo_title filled; EMPTY -- no product matches its rule yet
-pretend-play-role-play,updated,product_count 0 -> 22; description filled; seo_description filled; seo_title filled
+pretend-play-role-play,updated,product_count 0 -> 32; description filled; seo_description filled; seo_title filled
 puzzles,updated,description filled; seo_description filled; seo_title filled; EMPTY -- no product matches its rule yet
-rc-remote-control-toys,updated,product_count 0 -> 15; description filled; seo_description filled; seo_title filled
+rc-remote-control-toys,updated,product_count 0 -> 17; description filled; seo_description filled; seo_title filled
 ride-on-toys,updated,description filled; seo_description filled; seo_title filled; EMPTY -- no product matches its rule yet
-robots-electronic-toys,updated,product_count 0 -> 11; description filled; seo_description filled; seo_title filled
+robots-electronic-toys,updated,product_count 0 -> 12; description filled; seo_description filled; seo_title filled
 scooters-bikes-tricycles,updated,description filled; seo_description filled; seo_title filled; EMPTY -- no product matches its rule yet
 sensory-fidget-toys,updated,product_count 0 -> 8; description filled; seo_description filled; seo_title filled
 sports-toys,updated,product_count 0 -> 1; description filled; seo_description filled; seo_title filled
@@ -59,8 +59,8 @@ stem-science-toys,updated,product_count 0 -> 1; description filled; seo_descript
 the-edit,updated,product_count 6 -> 0; description filled; seo_description filled; seo_title filled; EMPTY -- no product matches its rule yet
 tiny-land,removed,sample brand collection -- none of our products has this vendor
 toys-for-boys,updated,product_count 8 -> 22; description filled; seo_description filled; seo_title filled
-toys-for-girls,updated,product_count 4 -> 12; description filled; seo_description filled; seo_title filled
-water-beach-toys,updated,product_count 4 -> 6; description filled; seo_description filled; seo_title filled
+toys-for-girls,updated,product_count 4 -> 18; description filled; seo_description filled; seo_title filled
+water-beach-toys,updated,product_count 4 -> 8; description filled; seo_description filled; seo_title filled
 learning,added,"""What They Love"" chip ""Learning"" -- point the chip at this collection"
 building,added,"""What They Love"" chip ""Building"" -- point the chip at this collection"
 pretending,added,"""What They Love"" chip ""Pretending"" -- point the chip at this collection"

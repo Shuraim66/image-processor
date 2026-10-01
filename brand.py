@@ -7,7 +7,7 @@ shots (scene hero, cards, angles) get branded.
 """
 import os
 
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFilter
 
 import feature_card as fc
 import make_hero as mh
@@ -59,7 +59,7 @@ def chip(im):
     im.alpha_composite(pill, (m, im.height - h - m))
 
 
-def corner_logo(im, opacity=0.9, width=0.12):
+def corner_logo(im, opacity=0.9, width=0.12, corner="tr"):
     logo = _logo()
     if not logo:
         return
@@ -67,7 +67,26 @@ def corner_logo(im, opacity=0.9, width=0.12):
     lw = int(w * width)
     l = logo.resize((lw, int(logo.height * lw / logo.width)), Image.LANCZOS)
     l.putalpha(l.getchannel("A").point(lambda v: int(v * opacity)))
-    im.alpha_composite(l, (w - lw - int(w * MARGIN), int(w * MARGIN)))
+    x = int(w * MARGIN) if corner == "tl" else w - lw - int(w * MARGIN)
+    im.alpha_composite(l, (x, int(w * MARGIN)))
+
+
+def quiet_corner(im, width=0.12):
+    """'tl' or 'tr': the top corner with less detail under where the logo would sit, so the
+    badge doesn't land on a drawn headline (ChatGPT title heroes centre big lettering up top)."""
+    w = im.width
+    s = int(w * (width + MARGIN * 2))
+    edges = im.convert("L").filter(ImageFilter.FIND_EDGES)
+    busy = {c: sum(edges.crop(box).getdata()) for c, box in
+            (("tl", (0, 0, s, s)), ("tr", (w - s, 0, w, s)))}
+    return min(busy, key=busy.get)
+
+
+def gpt_mark(im):
+    """Brand an image made by hand in ChatGPT the way the user's own GPT images are branded:
+    faint tiled wordmark + round logo badge in a top corner, no address chip."""
+    tile_wordmark(im)
+    corner_logo(im, corner=quiet_corner(im))
 
 
 def apply(src, out=None, corner=True):

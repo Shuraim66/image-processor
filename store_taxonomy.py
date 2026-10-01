@@ -115,6 +115,7 @@ DEFAULT_AGE_BY_SUB = {
     "Collectibles": "8+", "Arcade Games": "5+", "Battle Play": "5+",
     "Family Board Games": "5+", "Card Games": "5+", "Puzzles": "3+",
     "Swim Gear": "3+", "Pools": "3+",
+    "Baby Carriers": "0M+",     # a carrier is for babies; the imama box prints no age
 }
 DEFAULT_AGE_BY_TYPE = {
     "Baby & Toddler Toys": "18M+", "Plush & Stuffed Toys": "18M+",

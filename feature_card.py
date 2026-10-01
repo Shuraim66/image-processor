@@ -276,7 +276,9 @@ def render_v2(hero_photo, thumbs, content, out_path, theme=None, scene=None, str
         d.text((x0 + r, cyf), chr(ICONS[icon]), font=f_ic, fill=NAVY, anchor="mm")
         tx = x0 + 2 * r + int(22 * SS)
         title, desc = smart_title(ft.get("title", "")), ft.get("desc", "")
-        desc = desc[:1].upper() + desc[1:].lower() if desc.isupper() else desc
+        if desc.isupper():      # "DIY CRAFT" -> "DIY craft", not "Diy craft"
+            desc = " ".join(w.upper() if w.upper() in ACRONYMS else w
+                            for w in (desc[:1].upper() + desc[1:].lower()).split())
         if desc:
             d.text((tx, cyf - int(4 * SS)), title, font=f_ft, fill=NAVY, anchor="ls")
             d.text((tx, cyf + int(8 * SS)), desc, font=f_fd, fill=SLATE, anchor="lt")
